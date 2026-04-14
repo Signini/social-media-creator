@@ -1,0 +1,290 @@
+/* ============================================
+   Instagram 模拟样式
+   ============================================ */
+
+/* Post Card */
+.ig-post {
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    max-width: 470px;
+    margin: 0 auto;
+}
+
+/* Header */
+.ig-post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+}
+
+.ig-post-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ig-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #efefef;
+}
+
+.ig-avatar-placeholder {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-align: center;
+    line-height: 34px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.ig-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ig-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #262626;
+}
+
+.ig-location {
+    font-size: 11px;
+    color: #262626;
+    font-weight: 400;
+}
+
+.ig-header-more {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ig-header-more svg {
+    fill: #262626;
+}
+
+/* Image Area */
+.ig-image-container {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #efefef;
+    overflow: hidden;
+    position: relative;
+}
+
+.ig-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ig-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    color: #c7c7c7;
+}
+
+.ig-image-placeholder span {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.ig-image-placeholder small {
+    font-size: 13px;
+}
+
+/* Carousel Dots */
+.ig-carousel-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+}
+
+.ig-carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+}
+
+.ig-carousel-dot.active {
+    background: #0095f6;
+}
+
+/* Actions Bar */
+.ig-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px 0;
+}
+
+.ig-actions-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.ig-action-btn {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.ig-action-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #262626;
+}
+
+.ig-actions-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Likes */
+.ig-likes {
+    padding: 6px 14px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #262626;
+}
+
+/* Caption */
+.ig-caption {
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #262626;
+    line-height: 1.5;
+}
+
+.ig-caption .ig-caption-username {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.ig-caption .ig-caption-more {
+    color: #c7c7c7;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* View Comments */
+.ig-view-comments {
+    padding: 0 14px;
+    font-size: 13px;
+    color: #c7c7c7;
+    cursor: pointer;
+}
+
+/* Comments */
+.ig-comments {
+    padding: 4px 14px;
+}
+
+.ig-comment {
+    font-size: 13px;
+    color: #262626;
+    line-height: 1.5;
+    margin-bottom: 2px;
+}
+
+.ig-comment .ig-comment-username {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.ig-comment-like {
+    float: right;
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.ig-comment-like svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: #c7c7c7;
+    stroke-width: 2;
+}
+
+/* Timestamp */
+.ig-timestamp {
+    padding: 4px 14px 14px;
+    font-size: 10px;
+    color: #c7c7c7;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+}
+
+/* Add Comment */
+.ig-add-comment {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-top: 1px solid #efefef;
+    gap: 10px;
+}
+
+.ig-add-comment-placeholder {
+    flex: 1;
+    font-size: 13px;
+    color: #c7c7c7;
+}
+
+.ig-add-comment .ig-post-btn {
+    font-size: 13px;
+    color: #0095f6;
+    font-weight: 600;
+    opacity: 0.4;
+}
+
+/* Verified Badge */
+.ig-verified {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+}
+
+.ig-verified svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Emoji in caption */
+.ig-emoji {
+    font-style: normal;
+}
+
+/* Nested Replies */
+.ig-replies {
+    margin-left: 0;
+    padding-left: 0;
+}
+.ig-reply {
+    font-size: 13px;
+    margin-top: 2px;
+    line-height: 1.4;
+}
+.ig-reply .ig-comment-username {
+    margin-right: 4px;
+}

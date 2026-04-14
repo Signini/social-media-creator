@@ -1,0 +1,437 @@
+/* ============================================
+   WhatsApp 模拟样式
+   ============================================ */
+
+.wa-chat {
+    background: #efeae2;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    max-width: 414px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+/* Themes */
+.wa-theme-whatsapp { background: #efeae2; }
+.wa-theme-dark { background: #0b141a; }
+.wa-theme-ocean { background: #1a2732; }
+.wa-theme-lavender { background: #e8dff5; }
+.wa-theme-rose { background: #fce4ec; }
+.wa-theme-mint { background: #e0f2f1; }
+.wa-theme-sunset { background: #fff3e0; }
+.wa-theme-custom { }
+
+.wa-theme-dark .wa-header { background: #1f2c34; }
+.wa-theme-ocean .wa-header { background: #0d2137; }
+.wa-theme-lavender .wa-header { background: #5c4b8a; }
+.wa-theme-rose .wa-header { background: #b04060; }
+.wa-theme-mint .wa-header { background: #1b7a6e; }
+.wa-theme-sunset .wa-header { background: #c75b12; }
+
+.wa-theme-dark .wa-bubble-sent { background: #005c4b; }
+.wa-theme-dark .wa-bubble-received { background: #1f2c34; }
+.wa-theme-dark .wa-bubble-text { color: #e9edef; }
+.wa-theme-dark .wa-bubble-time { color: #8696a0; }
+.wa-theme-dark .wa-date-label { background: #1f2c34; color: #8696a0; }
+.wa-theme-dark .wa-input-bar { background: #1f2c34; }
+.wa-theme-dark .wa-input-field { background: #2a3942; }
+.wa-theme-dark .wa-input-placeholder { color: #8696a0; }
+.wa-theme-dark .wa-typing { background: #1f2c34; }
+
+.wa-theme-ocean .wa-bubble-sent { background: #0a3d5c; }
+.wa-theme-ocean .wa-bubble-received { background: #152d3f; }
+.wa-theme-ocean .wa-bubble-text { color: #e9edef; }
+.wa-theme-ocean .wa-bubble-time { color: #8696a0; }
+
+/* Group Chat */
+.wa-group-subject {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 0;
+    margin-bottom: 4px;
+}
+
+.wa-group-members {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: -2px;
+    margin-bottom: 8px;
+}
+
+.wa-group-members-text {
+    display: inline-block;
+    background: rgba(255,255,255,0.9);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #54656f;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+}
+
+.wa-sender-name {
+    font-size: 12.5px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.wa-sender-avatar-small {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    margin-right: 6px;
+    text-align: center;
+    line-height: 22px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 10px;
+}
+
+.wa-header-avatars {
+    display: flex;
+    margin-right: 10px;
+}
+
+.wa-header-avatar-item {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    margin-right: -6px;
+    border: 2px solid #075e54;
+    text-align: center;
+    line-height: 28px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+/* Header */
+.wa-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: #075e54;
+    color: #fff;
+}
+
+.wa-header-back {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.wa-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    margin-right: 10px;
+    background: #ccc;
+    text-align: center;
+    line-height: 36px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.wa-header-avatar img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+}
+
+.wa-header-info {
+    flex: 1;
+}
+
+.wa-header-name {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.wa-header-status {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+}
+
+.wa-header-actions {
+    display: flex;
+    margin-left: 8px;
+}
+
+.wa-header-action {
+    font-size: 18px;
+    margin-left: 16px;
+    opacity: 0.8;
+}
+
+/* Chat Background Pattern */
+.wa-messages {
+    flex: 1;
+    padding: 12px 16px;
+    background: #efeae2;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 600px;
+}
+
+/* Date Separator */
+.wa-date-separator {
+    text-align: center;
+    margin: 8px 0;
+}
+
+.wa-date-label {
+    display: inline-block;
+    background: rgba(255,255,255,0.9);
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #54656f;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+}
+
+/* Message Bubble */
+.wa-bubble {
+    max-width: 80%;
+    position: relative;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    padding: 6px 7px 8px 9px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+}
+
+.wa-bubble-sent {
+    align-self: flex-end;
+    background: #d9fdd3;
+}
+
+.wa-bubble-received {
+    align-self: flex-start;
+    background: #fff;
+}
+
+.wa-bubble-text {
+    font-size: 14.2px;
+    line-height: 1.35;
+    color: #303030;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.wa-bubble-image {
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.wa-bubble-image img {
+    width: 100%;
+    display: block;
+}
+
+.wa-image-placeholder {
+    width: 250px;
+    height: 180px;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1;
+}
+
+/* Message Meta (time + ticks) */
+.wa-bubble-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 2px;
+}
+
+.wa-bubble-time {
+    font-size: 11px;
+    color: #54656f;
+}
+
+.wa-bubble-ticks {
+    margin-left: 3px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.wa-ticks-sent {
+    color: #54656f;
+}
+
+.wa-ticks-delivered {
+    color: #54656f;
+}
+
+.wa-ticks-read {
+    color: #53bdeb;
+}
+
+/* Empty placeholder */
+.wa-bubble-empty {
+    color: #999;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* Reply Preview */
+.wa-reply-preview {
+    background: rgba(0,0,0,0.05);
+    border-left: 4px solid #25d366;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
+}
+
+.wa-reply-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #075e54;
+}
+
+.wa-reply-text {
+    font-size: 13px;
+    color: #54656f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 260px;
+}
+
+/* Typing Indicator */
+.wa-typing {
+    align-self: flex-start;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px 14px;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+}
+
+.wa-typing-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #90a4ae;
+    margin-right: 4px;
+}
+
+/* Input Bar */
+.wa-input-bar {
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: #f0f0f0;
+}
+
+.wa-input-field {
+    flex: 1;
+    min-width: 0;
+    background: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 9px 16px;
+    font-size: 15px;
+    color: #000;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.wa-input-placeholder {
+    color: #8696a0;
+}
+
+.wa-input-emoji {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.wa-input-attach {
+    font-size: 22px;
+    margin: 0 8px;
+    color: #54656f;
+}
+
+.wa-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #075e54;
+    text-align: center;
+    line-height: 40px;
+    color: #fff;
+    font-size: 18px;
+    margin-left: 6px;
+}
+
+/* Emoji Reaction */
+.wa-reaction {
+    display: inline-block;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2px 6px;
+    font-size: 13px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    margin-top: -4px;
+}
+
+.wa-bubble-sent .wa-reaction {
+    margin-right: 10px;
+}
+
+.wa-bubble-received .wa-reaction {
+    margin-left: 10px;
+}
+
+/* Voice Message */
+.wa-voice {
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+}
+
+.wa-voice-play {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #075e54;
+    text-align: center;
+    line-height: 32px;
+    color: #fff;
+    font-size: 14px;
+    margin-right: 8px;
+}
+
+.wa-voice-wave {
+    flex: 1;
+    height: 20px;
+    background: repeating-linear-gradient(90deg, #075e54 0px, #075e54 2px, transparent 2px, transparent 5px);
+    opacity: 0.4;
+    border-radius: 2px;
+}
+
+.wa-voice-duration {
+    font-size: 11px;
+    color: #54656f;
+    margin-left: 6px;
+}
+
+/* Read Receipt */
+.wa-read-receipt {
+    text-align: right;
+    font-size: 11px;
+    color: #8696a0;
+    padding: 2px 16px 0 0;
+    margin-top: 4px;
+}

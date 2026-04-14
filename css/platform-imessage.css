@@ -1,0 +1,350 @@
+/* ============================================
+   iMessage 模拟样式
+   ============================================ */
+
+.msg-conversation {
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    max-width: 414px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+/* Navigation Bar */
+.msg-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px 6px;
+    background: #f6f6f6;
+    border-bottom: 1px solid #d5d5d5;
+}
+
+.msg-navbar-left {
+    display: flex;
+    align-items: center;
+    color: #007aff;
+    font-size: 17px;
+    cursor: pointer;
+}
+.msg-navbar-left svg {
+    margin-right: 4px;
+}
+
+.msg-navbar-left svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #007aff;
+    stroke-width: 2;
+}
+
+.msg-navbar-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.msg-navbar-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #000;
+}
+
+.msg-navbar-subtitle {
+    font-size: 11px;
+    color: #8e8e93;
+}
+
+.msg-navbar-right {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.msg-navbar-right svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #007aff;
+    stroke-width: 1.8;
+}
+
+/* Messages Area */
+.msg-messages {
+    flex: 1;
+    padding: 12px 16px;
+    background: #fff;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-height: 832px;
+    -webkit-overflow-scrolling: touch;
+}
+
+.msg-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.msg-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.msg-messages::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 2px;
+}
+
+/* Time Separator */
+.msg-time-separator {
+    text-align: center;
+    padding: 8px 0;
+    font-size: 11px;
+    color: #8e8e93;
+    font-weight: 500;
+}
+
+/* Date Separator */
+.msg-date-separator {
+    text-align: center;
+    padding: 6px 0 10px;
+    font-size: 11px;
+    color: #8e8e93;
+}
+
+/* Message Bubble */
+.msg-bubble {
+    max-width: 70%;
+    position: relative;
+    margin-bottom: 1px;
+}
+
+.msg-bubble-sent {
+    align-self: flex-end;
+}
+
+.msg-bubble-received {
+    align-self: flex-start;
+}
+
+.msg-bubble-text {
+    padding: 8px 12px;
+    border-radius: 18px;
+    font-size: 16px;
+    line-height: 1.35;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+.msg-bubble-sent .msg-bubble-text {
+    background: #007aff;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.msg-bubble-received .msg-bubble-text {
+    background: #e9e9eb;
+    color: #000;
+    border-bottom-left-radius: 4px;
+}
+
+/* Tail (first message in group) */
+.msg-bubble-sent.msg-tail .msg-bubble-text {
+    border-bottom-right-radius: 4px;
+}
+
+.msg-bubble-received.msg-tail .msg-bubble-text {
+    border-bottom-left-radius: 4px;
+}
+
+/* Last in group - normal round */
+.msg-bubble-sent.msg-last .msg-bubble-text {
+    border-bottom-right-radius: 18px;
+}
+
+.msg-bubble-received.msg-last .msg-bubble-text {
+    border-bottom-left-radius: 18px;
+}
+
+/* Single message - fully round */
+.msg-bubble-sent.msg-single .msg-bubble-text {
+    border-bottom-right-radius: 18px;
+}
+
+.msg-bubble-received.msg-single .msg-bubble-text {
+    border-bottom-left-radius: 18px;
+}
+
+/* Image Message */
+.msg-bubble-image {
+    border-radius: 18px;
+    overflow: hidden;
+    max-width: 220px;
+}
+
+.msg-bubble-sent .msg-bubble-image {
+    border-bottom-right-radius: 4px;
+}
+
+.msg-bubble-received .msg-bubble-image {
+    border-bottom-left-radius: 4px;
+}
+
+.msg-bubble-image img {
+    width: 100%;
+    display: block;
+}
+
+.msg-image-placeholder {
+    width: 200px;
+    height: 150px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #c7c7cc;
+    font-size: 13px;
+}
+
+/* Read Receipt */
+.msg-read-receipt {
+    text-align: right;
+    font-size: 11px;
+    color: #8e8e93;
+    padding: 2px 16px 0 0;
+    margin-top: 4px;
+}
+
+/* Typing Indicator */
+.msg-typing {
+    align-self: flex-start;
+    padding: 10px 14px;
+    background: #e9e9eb;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+.msg-typing-dot {
+    margin-right: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #8e8e93;
+    animation: msg-typing-bounce 1.4s infinite ease-in-out;
+}
+
+.msg-typing-dot:nth-child(1) { animation-delay: 0s; }
+.msg-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.msg-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes msg-typing-bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
+/* Input Bar */
+.msg-input-bar {
+    padding: 8px 0;
+    background: #f6f6f6;
+    border-top: 1px solid #d5d5d5;
+}
+
+.msg-input-bar table {
+    border-collapse: collapse;
+}
+
+.msg-input-plus {
+    color: #007aff;
+    font-size: 22px;
+}
+
+.msg-input-field {
+    background: #fff;
+    border: 1px solid #c7c7cc;
+    border-radius: 20px;
+    padding: 8px 12px;
+    font-size: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.msg-input-placeholder {
+    color: #c7c7cc;
+}
+
+.msg-send-btn {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #007aff;
+    text-align: center;
+    line-height: 32px;
+    color: #fff;
+    font-size: 16px;
+}
+
+/* Emoji Reaction */
+.msg-reaction {
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #d5d5d5;
+    border-radius: 12px;
+    padding: 2px 6px;
+    font-size: 13px;
+    margin-top: -4px;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.msg-bubble-sent .msg-reaction {
+    align-self: flex-end;
+    margin-right: 8px;
+}
+
+.msg-bubble-received .msg-reaction {
+    align-self: flex-start;
+    margin-left: 8px;
+}
+
+/* Contact Avatar (for group chats or first in group) */
+.msg-contact-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-bottom: 2px;
+}
+
+.msg-contact-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #007aff;
+    margin-bottom: 2px;
+    margin-left: 2px;
+}
+
+/* Delivered / Read status */
+.msg-status {
+    font-size: 11px;
+    color: #8e8e93;
+    text-align: right;
+    padding-right: 4px;
+}
+
+/* Effect: Screen effect indicator */
+.msg-effect-badge {
+    display: inline-block;
+    font-size: 11px;
+    color: #8e8e93;
+    padding: 2px 8px;
+    border: 1px solid #d5d5d5;
+    border-radius: 10px;
+    text-align: center;
+    margin: 4px auto;
+}

@@ -1,0 +1,411 @@
+/**
+ * HTML 导出引擎
+ * 使用内嵌 CSS 字符串（完全兼容 file:// 协议）
+ */
+const ExporterUtil = {
+
+    ALLOWED_TAGS: new Set([
+        'a','abbr','acronym','address','b','big','blockquote','br','caption','center',
+        'cite','code','col','colgroup','dd','del','details','div','dl','dt','em',
+        'figcaption','figure','h1','h2','h3','h4','h5','h6','hr','i','img','ins',
+        'kbd','li','ol','p','pre','q','rp','rt','ruby','s','samp','small','span',
+        'strike','strong','sub','summary','sup','table','tbody','td','tfoot','th',
+        'thead','tr','tt','u','ul','var'
+    ]),
+
+    ALLOWED_ATTRS: new Set([
+        'align','alt','axis','class','height','href','name','src','title','width'
+    ]),
+
+    SVG_REPLACEMENTS: [
+        { path: 'M20.396', text: '✓' },
+        { path: 'M12 4L4 12h5v8h6v-8h5z', text: '▲' },
+        { path: 'M12 20l8-8h-5V4H9v8H4z', text: '▼' },
+        { path: 'M1.751 10c0-4.42', text: '💬' },
+        { path: 'M4.5 3.88l4.432', text: '🔄' },
+        { path: 'M20.884 13.19c-1.351', text: '❤️' },
+        { path: 'M12 2.59l5.7', text: '📤' },
+        { path: 'M8.75 21V3h2', text: '📊' },
+        { path: 'M18 16.08c-.76', text: '🔗' },
+        { path: 'M17 3H7c-1.1', text: '🔖' },
+        { path: 'M15 18l-6-6', text: '←' },
+        { path: 'M2.01 21L23 12', text: '➤' },
+        { path: 'M12 5V1L7', text: '↩' },
+        { path: 'M16.5 6H11', text: '↗' },
+    ],
+
+    BLOCKED_CSS_PROPS: [
+        'aspect-ratio', 'object-fit', 'backdrop-filter', '-webkit-overflow-scrolling',
+        '-webkit-font-smoothing', '-moz-osx-font-smoothing', '-webkit-appearance',
+        '-webkit-tap-highlight-color', '-webkit-touch-callout', '-webkit-text-size-adjust',
+        '-webkit-mask', '-webkit-clip-path', 'clip-path', 'image-rendering',
+        'scroll-behavior', 'overscroll-behavior', 'touch-action',
+        'cursor', 'fill', 'stroke-width', 'pointer-events', 'user-select',
+        'resize', 'content', 'flex-shrink',
+        'animation', 'animation-delay', 'animation-direction', 'animation-duration',
+        'animation-fill-mode', 'animation-iteration-count', 'animation-name',
+        'animation-play-state', 'animation-timing-function'
+    ],
+
+    SVG_RULE_SELECTORS: [
+        /\s*svg\s*\{[^}]*\}/gi,
+        /\s*[\w\-.#:\[\]="'>+\s~]+\s+svg\s*\{[^}]*\}/gi,
+        /\s*[\w\-.#:\[\]="'>+\s~]+:hover\s+svg\s*\{[^}]*\}/gi,
+    ],
+
+    getExportBaseCSS() {
+        return `
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+}
+img { max-width: 100%; }
+`;
+    },
+
+    getCompatibleBaseCSS() {
+        return `
+.social-media-export {
+    max-width: 620px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1d1d1f;
+}
+.social-media-export * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.social-media-export img {
+    max-width: 100%;
+}
+`;
+    },
+
+    _cleanCSS(css) {
+        css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+
+        css = css.replace(/@keyframes\s+[\w-]+\s*\{[^}]*\}/gi, '');
+        css = css.replace(/@keyframes\s+[\w-]+\s*\{[\s\S]*?\n\}/gi, '');
+        css = css.replace(/@keyframes\s+[\w-]+\s*\{[\s\S]*?\}\s*\}/gi, '');
+
+        css = css.replace(/^\s*stroke\s*:[^;]+;/gim, '\n');
+
+        for (const prop of this.BLOCKED_CSS_PROPS) {
+            const escaped = prop.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            css = css.replace(new RegExp('^\\s*' + escaped + '\\s*:[^;]*;', 'gim'), '\n');
+        }
+
+        css = css.replace(/^\s*gap\s*:[^;]+;/gim, '\n');
+
+        css = css.replace(/[^{}\n]*svg[^{\n]*\{[^}]*\}/gi, '');
+
+        css = css.replace(/[^{}\n]*::(?:before|after|placeholder|-webkit-scrollbar|-webkit-scrollbar-track|-webkit-scrollbar-thumb)\s*\{[^}]*\}/gi, '');
+
+        css = css.replace(/[^{}\n]*:hover[^{\n]*\{[^}]*\}/gi, '');
+
+        css = css.replace(/[^{}\n]*nth-child[^{\n]*\{[^}]*\}/gi, '');
+
+        css = css.replace(/[^{\n]+\{\s*\}/g, '');
+        css = css.replace(/\w[\w\-]*\s*\{\s*\n?\s*\}/g, '');
+
+        css = css.replace(/\n\s*\n\s*\n/g, '\n');
+
+        return css.trim();
+    },
+
+    _collectCSS(platform) {
+        let css = this.getExportBaseCSS() + '\n';
+
+        if (platform === 'universal') {
+            for (const p of Object.keys(PlatformCSS)) {
+                css += PlatformCSS[p] + '\n';
+            }
+            css += `
+.universal-export-container {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 24px 0;
+    background: #f5f5f7;
+}
+.universal-export-container > section {
+    margin-bottom: 32px;
+}
+.universal-export-container > section:last-child {
+    margin-bottom: 0;
+}
+`;
+        } else if (PlatformCSS[platform]) {
+            css += PlatformCSS[platform] + '\n';
+        }
+
+        return css;
+    },
+
+    COMPAT_FIXES: {
+        instagram: `
+.ig-image-container { height: 470px; }
+.ig-image-container img { max-height: 470px; }
+`,
+        twitter: `
+.tw-image-container img { max-height: 500px; }
+`,
+        youtube: `
+.yt-player { height: 338px; }
+.yt-player img { max-height: 338px; }
+.yt-player-placeholder { height: 338px; }
+`,
+        imessage: `
+.msg-messages { height: auto; }
+`,
+        whatsapp: `
+.wa-messages { height: auto; }
+.wa-bubble-image img { max-height: 400px; }
+`,
+        reddit: `
+.rd-post-image img { max-height: 600px; }
+`
+    },
+
+    _collectCompatibleCSS(platform) {
+        let css = this.getCompatibleBaseCSS() + '\n';
+
+        if (platform === 'universal') {
+            for (const p of Object.keys(PlatformCSS)) {
+                css += PlatformCSS[p] + '\n';
+            }
+        } else if (PlatformCSS[platform]) {
+            css += PlatformCSS[platform] + '\n';
+        }
+
+        css = this._cleanCSS(css);
+
+        if (platform === 'universal') {
+            for (const p of Object.keys(this.COMPAT_FIXES)) {
+                css += this.COMPAT_FIXES[p] + '\n';
+            }
+        } else if (this.COMPAT_FIXES[platform]) {
+            css += this.COMPAT_FIXES[platform] + '\n';
+        }
+
+        return css;
+    },
+
+    _extractInlineStyles(rootEl) {
+        const styleMap = {};
+        let idx = 0;
+        const elements = rootEl.querySelectorAll('[style]');
+        for (const el of elements) {
+            const style = el.getAttribute('style') || '';
+            const props = {};
+            const colorMatch = style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
+            const bgMatch = style.match(/(?:^|;)\s*background(?:-color)?\s*:\s*([^;]+)/i);
+            const borderColorMatch = style.match(/(?:^|;)\s*border-color\s*:\s*([^;]+)/i);
+            const borderLeftMatch = style.match(/(?:^|;)\s*border-left\s*:\s*([^;]+)/i);
+            if (colorMatch) props['color'] = colorMatch[1].trim();
+            if (bgMatch) props['background'] = bgMatch[1].trim();
+            if (borderColorMatch) props['border-color'] = borderColorMatch[1].trim();
+            if (borderLeftMatch) props['border-left'] = borderLeftMatch[1].trim();
+            if (Object.keys(props).length === 0) continue;
+            const key = JSON.stringify(props);
+            if (!styleMap[key]) {
+                styleMap[key] = '_es' + idx;
+                idx++;
+            }
+            const cls = styleMap[key];
+            el.removeAttribute('style');
+            const existing = el.getAttribute('class') || '';
+            el.setAttribute('class', (existing + ' ' + cls).trim());
+        }
+        let css = '';
+        for (const [key, cls] of Object.entries(styleMap)) {
+            const props = JSON.parse(key);
+            let rule = '.' + cls + ' { ';
+            for (const [prop, val] of Object.entries(props)) {
+                rule += prop + ': ' + val + '; ';
+            }
+            rule += '}\n';
+            css += rule;
+        }
+        return css;
+    },
+
+    _replaceSVG(svgEl) {
+        const pathEl = svgEl.querySelector('path');
+        if (pathEl) {
+            const d = pathEl.getAttribute('d') || '';
+            for (const rep of this.SVG_REPLACEMENTS) {
+                if (d.startsWith(rep.path)) {
+                    return document.createTextNode(rep.text);
+                }
+            }
+        }
+        const html = svgEl.innerHTML || '';
+        if (html.includes('circle')) return document.createTextNode('⋯');
+        return document.createTextNode('');
+    },
+
+    _sanitizeNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) return node.cloneNode(true);
+
+        if (node.nodeType !== Node.ELEMENT_NODE) return null;
+
+        const tag = node.tagName.toLowerCase();
+
+        if (tag === 'svg') {
+            return this._replaceSVG(node);
+        }
+
+        if (!this.ALLOWED_TAGS.has(tag)) {
+            const frag = document.createDocumentFragment();
+            for (const child of node.childNodes) {
+                const sanitized = this._sanitizeNode(child);
+                if (sanitized) frag.appendChild(sanitized);
+            }
+            return frag;
+        }
+
+        const clean = document.createElement(tag);
+
+        for (const attr of node.attributes) {
+            if (this.ALLOWED_ATTRS.has(attr.name)) {
+                clean.setAttribute(attr.name, attr.value);
+            }
+        }
+
+        for (const child of node.childNodes) {
+            const sanitized = this._sanitizeNode(child);
+            if (sanitized) clean.appendChild(sanitized);
+        }
+
+        return clean;
+    },
+
+    _sanitizeHTML(htmlString) {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = htmlString;
+        const clean = document.createElement('div');
+        for (const child of wrapper.childNodes) {
+            const sanitized = this._sanitizeNode(child);
+            if (sanitized) clean.appendChild(sanitized);
+        }
+        return clean.innerHTML;
+    },
+
+    exportHTML(previewElement, platform) {
+        if (!previewElement) {
+            throw new Error('没有可导出的内容');
+        }
+
+        const content = previewElement.cloneNode(true);
+        content.querySelectorAll('[data-v-]').forEach(el => {
+            el.removeAttribute('data-v-');
+        });
+
+        const css = this._collectCSS(platform);
+
+        return `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒体内容</title>
+    <style>
+${css}
+    </style>
+</head>
+<body style="margin:0; padding:20px; background:#f5f5f7; display:flex; justify-content:center; align-items:flex-start; min-height:100vh;">
+    <div style="max-width:620px; width:100%;">
+${content.innerHTML}
+    </div>
+</body>
+</html>`;
+    },
+
+    exportCompatibleHTML(previewElement, platform) {
+        if (!previewElement) {
+            throw new Error('没有可导出的内容');
+        }
+
+        const content = previewElement.cloneNode(true);
+        content.querySelectorAll('[data-v-]').forEach(el => {
+            el.removeAttribute('data-v-');
+        });
+
+        const extractedCSS = this._extractInlineStyles(content);
+
+        content.querySelectorAll('img').forEach(img => {
+            const src = img.getAttribute('src') || '';
+            if (src.startsWith('data:')) {
+                const span = document.createElement('span');
+                span.textContent = '[图片]';
+                span.setAttribute('class', '_img-placeholder');
+                img.parentNode.replaceChild(span, img);
+            }
+        });
+
+        const imgPlaceholderCSS = content.querySelector('._img-placeholder')
+            ? '\n._img-placeholder { display: inline-block; padding: 8px 16px; background: #f0f0f0; border-radius: 4px; color: #666; font-size: 13px; }\n'
+            : '';
+
+        const cleanHTML = this._sanitizeHTML(content.innerHTML);
+        const css = this._collectCompatibleCSS(platform);
+
+        return `<!-- 社交媒体内容 - 兼容模式 -->
+<!-- HTML 部分：粘贴到平台的 HTML 编辑器 -->
+<!-- CSS 部分：粘贴到平台的自定义 CSS 区域 -->
+
+<style>
+${css}
+${extractedCSS}${imgPlaceholderCSS}</style>
+
+<div class="social-media-export">
+${cleanHTML}
+</div>`;
+    },
+
+    copyHTMLFragment(previewElement, platform) {
+        if (!previewElement) return '';
+        const content = previewElement.cloneNode(true);
+        const css = this._collectCSS(platform);
+
+        return `<div style="max-width:620px; margin:0 auto;">
+<style>
+${css}
+</style>
+${content.innerHTML}
+</div>`;
+    },
+
+    downloadHTML(htmlContent, filename) {
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename || 'social-media-content.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    },
+
+    downloadText(textContent, filename) {
+        const blob = new Blob(['\uFEFF' + textContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+};

@@ -1,0 +1,364 @@
+/* ============================================
+   X (Twitter) 模拟样式
+   ============================================ */
+
+.tw-tweet {
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+    max-width: 598px;
+    margin: 0 auto;
+    border: 1px solid #eff3f4;
+    border-radius: 0;
+}
+
+.tw-tweet-inner {
+    padding: 12px 16px;
+}
+
+/* Tweet Header */
+.tw-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.tw-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #eff3f4;
+}
+
+.tw-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
+    text-align: center;
+    line-height: 40px;
+    color: white;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.tw-header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-header-names {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.tw-display-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.tw-verified-badge {
+    display: inline-flex;
+    align-items: center;
+}
+
+.tw-verified-badge svg {
+    width: 18px;
+    height: 18px;
+    fill: #1d9bf0;
+}
+
+.tw-handle {
+    font-size: 15px;
+    color: #536471;
+    font-weight: 400;
+}
+
+.tw-timestamp {
+    font-size: 15px;
+    color: #536471;
+}
+
+.tw-more-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #536471;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Tweet Content */
+.tw-content {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 20px;
+    color: #0f1419;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.tw-content .tw-hashtag {
+    color: #1d9bf0;
+}
+
+.tw-content .tw-mention {
+    color: #1d9bf0;
+}
+
+/* Tweet Image */
+.tw-image-container {
+    margin-top: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #eff3f4;
+}
+
+.tw-image-container img {
+    width: 100%;
+    display: block;
+}
+
+.tw-image-placeholder {
+    width: 100%;
+    aspect-ratio: 16/9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #f7f9f9;
+    color: #c4cdd3;
+}
+
+.tw-image-placeholder span {
+    font-size: 40px;
+    margin-bottom: 6px;
+}
+
+/* Quote Tweet */
+.tw-quote-tweet {
+    margin-top: 12px;
+    border: 1px solid #eff3f4;
+    border-radius: 16px;
+    padding: 12px;
+    cursor: pointer;
+}
+
+.tw-quote-author {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.tw-quote-author img {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+.tw-quote-author-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.tw-quote-author-handle {
+    font-size: 13px;
+    color: #536471;
+}
+
+.tw-quote-text {
+    font-size: 13px;
+    color: #0f1419;
+    line-height: 1.4;
+}
+
+/* Translation */
+.tw-translation {
+    margin-top: 8px;
+    padding: 8px 0;
+    border-top: 1px solid #eff3f4;
+}
+
+.tw-translation-label {
+    font-size: 13px;
+    color: #1d9bf0;
+    font-weight: 400;
+}
+
+.tw-translation-text {
+    font-size: 15px;
+    color: #0f1419;
+    margin-top: 4px;
+}
+
+/* Actions Bar */
+.tw-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    max-width: 425px;
+}
+
+.tw-action-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tw-action-group svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #536471;
+    stroke-width: 1.5;
+}
+
+.tw-action-count {
+    font-size: 13px;
+    color: #536471;
+}
+
+/* Views */
+.tw-views {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #536471;
+    border-bottom: 1px solid #eff3f4;
+    padding-bottom: 12px;
+}
+
+/* Action Row (bottom) */
+.tw-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 12px 0 4px;
+    border-top: 1px solid #eff3f4;
+    margin-top: 0;
+}
+
+.tw-action-row-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 36px;
+    cursor: pointer;
+}
+
+.tw-action-row-item svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #536471;
+    stroke-width: 1.8;
+}
+
+/* Bookmark / Share Bar */
+.tw-bottom-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px 12px;
+    border-top: 1px solid #eff3f4;
+}
+
+/* Thread connector */
+.tw-thread-connector {
+    display: flex;
+    justify-content: center;
+    padding: 0 0 0 30px;
+}
+
+.tw-thread-line {
+    width: 2px;
+    height: 40px;
+    background: #eff3f4;
+    border-radius: 1px;
+}
+
+/* X 评论样式 */
+.tw-comments {
+    margin-top: 8px;
+    border-top: 1px solid #eff3f4;
+    padding-top: 8px;
+}
+
+.tw-comment {
+    display: flex;
+    margin-bottom: 8px;
+}
+
+.tw-comment-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.tw-comment-avatar:not([src]) {
+    background: #e1e8ed;
+    text-align: center;
+    line-height: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #1da1f2;
+}
+
+.tw-comment-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.tw-comment-header {
+    margin-bottom: 2px;
+}
+
+.tw-comment-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0f1419;
+    margin-right: 4px;
+}
+
+.tw-comment-text {
+    font-size: 13px;
+    color: #0f1419;
+    line-height: 1.3;
+}
+
+.tw-comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 2px;
+}
+
+.tw-comment-action {
+    font-size: 12px;
+    color: #536471;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.tw-comment-action:hover {
+    color: #1da1f2;
+}
+
+.tw-comment-like-count {
+    color: #536471;
+    font-size: 12px;
+}

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社交媒体内容创作器 v2.1</title>
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/platform-instagram.css">
+    <link rel="stylesheet" href="css/platform-twitter.css">
+    <link rel="stylesheet" href="css/platform-reddit.css">
+    <link rel="stylesheet" href="css/platform-youtube.css">
+    <link rel="stylesheet" href="css/platform-imessage.css">
+    <link rel="stylesheet" href="css/platform-whatsapp.css">
+    <style>
+        .modal-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航 -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="app-title">🎨 社交媒体内容创作器</h1>
+                <span class="app-badge">v2.0</span>
+                <span v-if="universalData.items.length > 0" class="app-badge" style="background:#34c759;cursor:pointer;" @click="switchView('universal')" title="查看综合页面">
+                    📋 {{ universalData.items.length }}个模块
+                </span>
+            </div>
+            <div class="header-actions">
+                <!-- 视图切换 -->
+                <div class="view-toggle">
+                    <button :class="['view-toggle-btn', { active: currentView === 'single' }]" @click="switchView('single')">📱 编辑</button>
+                    <button :class="['view-toggle-btn', { active: currentView === 'universal' }]" @click="switchView('universal')">📋 综合</button>
+                </div>
+                <button class="btn btn-outline" @click="saveProject" title="保存到浏览器">💾 保存项目</button>
+                <button class="btn btn-outline" @click="showLoadModal = true" title="加载已保存的项目">📂 加载项目</button>
+                <button class="btn btn-outline" @click="exportJSON" title="导出配置文件">📤 导出配置</button>
+                <label class="btn btn-outline" title="导入配置文件">
+                    📥 导入配置
+                    <input type="file" accept=".json" @change="importJSON" hidden>
+                </label>
+                <button class="btn btn-danger" @click="clearAllData" title="清除所有保存的数据">🗑️ 清除数据</button>
+            </div>
+        </header>
+
+        <!-- ====== 单平台编辑视图 ====== -->
+        <main class="app-main" v-if="currentView === 'single'">
+            <!-- 左侧：平台选择 + 编辑器 -->
+            <aside class="editor-panel">
+                <!-- 平台选择 -->
+                <div class="platform-selector">
+                    <div class="section-title">选择平台</div>
+                    <div class="platform-tabs">
+                        <button 
+                            v-for="p in platforms" 
+                            :key="p.id"
+                            :class="['platform-tab', { active: currentPlatform === p.id }]"
+                            @click="switchPlatform(p.id)">
+                            <span class="platform-icon">{{ p.icon }}</span>
+                            <span class="platform-name">{{ p.name }}</span>
+                            <span v-if="p.status === 'coming'" class="platform-badge">即将上线</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 平台编辑器 -->
+                <div class="editor-content">
+                    <!-- Instagram 编辑器 -->
+                    <instagram-editor v-if="currentPlatform === 'instagram'" 
+                        :data="projectData.instagram" 
+                        @update="updatePlatformData('instagram', $event)">
+                    </instagram-editor>
+
+                    <!-- X 编辑器 -->
+                    <twitter-editor v-if="currentPlatform === 'twitter'"
+                        :data="projectData.twitter"
+                        @update="updatePlatformData('twitter', $event)">
+                    </twitter-editor>
+
+                    <!-- Reddit 编辑器 -->
+                    <reddit-editor v-if="currentPlatform === 'reddit'"
+                        :data="projectData.reddit"
+                        @update="updatePlatformData('reddit', $event)">
+                    </reddit-editor>
+
+                    <!-- YouTube 编辑器 -->
+                    <youtube-editor v-if="currentPlatform === 'youtube'"
+                        :data="projectData.youtube"
+                        @update="updatePlatformData('youtube', $event)">
+                    </youtube-editor>
+
+                    <!-- iMessage 编辑器 -->
+                    <imessage-editor v-if="currentPlatform === 'imessage'"
+                        :data="projectData.imessage"
+                        @update="updatePlatformData('imessage', $event)">
+                    </imessage-editor>
+
+                    <!-- WhatsApp 编辑器 -->
+                    <whatsapp-editor v-if="currentPlatform === 'whatsapp'"
+                        :data="projectData.whatsapp"
+                        @update="updatePlatformData('whatsapp', $event)">
+                    </whatsapp-editor>
+                </div>
+            </aside>
+
+            <!-- 右侧：实时预览 -->
+            <section class="preview-panel">
+                <div class="preview-toolbar">
+                    <div class="preview-device">
+                        <button :class="['device-btn', { active: deviceMode === 'phone' }]" @click="deviceMode = 'phone'">📱 手机</button>
+                        <button :class="['device-btn', { active: deviceMode === 'desktop' }]" @click="deviceMode = 'desktop'">🖥️ 桌面</button>
+                    </div>
+                    <div class="preview-actions">
+                        <button class="btn btn-primary" @click="addToUniversal">➕ 添加到综合页面</button>
+                        <button class="btn btn-outline" @click="resetCurrentPlatform">🔄 新建空白</button>
+                        <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
+                        <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
+                        <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
+                    </div>
+                </div>
+                <div class="preview-container" :class="'device-' + deviceMode">
+                    <div class="preview-scroll">
+                        <div class="preview-content" ref="previewContent">
+                            <!-- Instagram 预览 -->
+                            <instagram-preview v-if="currentPlatform === 'instagram'" 
+                                :data="projectData.instagram">
+                            </instagram-preview>
+
+                            <!-- X 预览 -->
+                            <twitter-preview v-if="currentPlatform === 'twitter'"
+                                :data="projectData.twitter">
+                            </twitter-preview>
+
+                            <!-- Reddit 预览 -->
+                            <reddit-preview v-if="currentPlatform === 'reddit'"
+                                :data="projectData.reddit">
+                            </reddit-preview>
+
+                            <!-- YouTube 预览 -->
+                            <youtube-preview v-if="currentPlatform === 'youtube'"
+                                :data="projectData.youtube">
+                            </youtube-preview>
+
+                            <!-- iMessage 预览 -->
+                            <imessage-preview v-if="currentPlatform === 'imessage'"
+                                :data="projectData.imessage">
+                            </imessage-preview>
+
+                            <!-- WhatsApp 预览 -->
+                            <whatsapp-preview v-if="currentPlatform === 'whatsapp'"
+                                :data="projectData.whatsapp">
+                            </whatsapp-preview>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ====== 综合页面视图 ====== -->
+        <main class="app-main universal-main" v-if="currentView === 'universal'">
+            <universal-editor
+                :universal-data="universalData"
+                @update="updateUniversalData"
+                @edit-item="editUniversalItem"
+                @export-complete="showToast($event)">
+            </universal-editor>
+        </main>
+
+        <!-- 加载项目弹窗 -->
+        <div class="modal-overlay" v-if="showLoadModal" @click.self="showLoadModal = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>📂 加载已保存的项目</h3>
+                    <button class="modal-close" @click="showLoadModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div v-if="savedProjects.length === 0" class="empty-state">
+                        <p>暂无已保存的项目</p>
+                    </div>
+                    <div v-for="(proj, idx) in savedProjects" :key="idx" class="saved-project-item">
+                        <div class="project-info">
+                            <span class="project-name">{{ proj.name || ('项目 ' + (idx + 1)) }}</span>
+                            <span class="project-platform">{{ platforms.find(p => p.id === proj.platform)?.name || '未知平台' }}</span>
+                            <span class="project-time">{{ proj.savedAt }}</span>
+                        </div>
+                        <div class="project-actions">
+                            <button class="btn btn-small btn-primary" @click="loadProject(proj)">加载</button>
+                            <button class="btn btn-small btn-danger" @click="deleteProject(idx)">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 保存项目弹窗 -->
+        <div class="modal-overlay" v-if="showSaveModal" @click.self="showSaveModal = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>💾 保存项目</h3>
+                    <button class="modal-close" @click="showSaveModal = false">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>项目名称</label>
+                        <input type="text" v-model="saveProjectName" placeholder="输入项目名称..." 
+                            @keyup.enter="confirmSaveProject">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-primary" @click="confirmSaveProject">确认保存</button>
+                        <button class="btn btn-outline" @click="showSaveModal = false">取消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast 提示 -->
+        <div class="toast" :class="{ show: toast.visible }">{{ toast.message }}</div>
+    </div>
+
+    <!-- Vue 3 (本地优先，CDN备用) -->
+    <script src="js/vendor/vue.global.prod.js"></script>
+    <script>
+        if (typeof Vue === 'undefined') {
+            var s = document.createElement('script');
+            s.src = 'https://unpkg.com/vue@3/dist/vue.global.prod.js';
+            document.head.appendChild(s);
+        }
+    </script>
+
+    <!-- 工具模块 -->
+    <script src="js/utils/storage.js?v=2.1"></script>
+    <script src="js/utils/image.js?v=2.1"></script>
+    <script src="js/utils/platform-css.js?v=2.2"></script>
+    <script src="js/utils/exporter.js?v=2.1"></script>
+
+    <!-- 平台模块 -->
+    <script src="js/platforms/instagram.js?v=2.1"></script>
+    <script src="js/platforms/twitter.js?v=2.1"></script>
+    <script src="js/platforms/reddit.js?v=2.1"></script>
+    <script src="js/platforms/youtube.js?v=2.1"></script>
+    <script src="js/platforms/imessage.js?v=2.1"></script>
+    <script src="js/platforms/whatsapp.js?v=2.1"></script>
+
+    <!-- 综合页面组件 -->
+    <script src="js/components/universal-editor.js?v=2.1"></script>
+
+    <!-- 主应用 -->
+    <script src="js/app.js?v=2.1"></script>
+</body>
+</html>

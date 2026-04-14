@@ -1,0 +1,17 @@
+.DS_Store
+.idea/
+clean-test.html
+debug.html
+debug.js
+index-fixed.html
+load-test.html
+quick-diagnose.js
+quick-test.js
+simple-test.html
+test-functionality.html
+test-loading.html
+test-modal.html
+test-single-components.html
+test.js
+TESTING.md
+UPDATE_LOG.md
