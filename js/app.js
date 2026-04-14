@@ -61,6 +61,7 @@ if (typeof Vue === 'undefined') {
                     likes: 1024,
                     views: 28600,
                     bookmarks: 56,
+                    quoteTweet: null,
                     isThread: false,
                     threadTweets: [],
                     comments: [
@@ -150,7 +151,9 @@ if (typeof Vue === 'undefined') {
                         { id: 1, type: 'received', text: '嗨！最近怎么样？', image: '', imageUrl: '', time: '下午 2:30', reaction: '', ticks: '', sender: 0 },
                         { id: 2, type: 'sent', text: '挺好的！你呢？', image: '', imageUrl: '', time: '下午 2:31', reaction: '', ticks: 'read', sender: -1 },
                         { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
-                        { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 }
+                        { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
+                        { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
+                        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
                     ]
                 }
             },
@@ -174,6 +177,9 @@ if (typeof Vue === 'undefined') {
         // 加载项目列表
         this.loadSavedProjectsList();
 
+        // 数据迁移：为旧数据补充 replies 字段
+        this._migrateData();
+
         // 再次确保所有弹窗关闭（防止加载项目列表时触发）
         this.$nextTick(() => {
             this.showLoadModal = false;
@@ -193,6 +199,19 @@ if (typeof Vue === 'undefined') {
     },
 
     methods: {
+        _migrateData() {
+            const platforms = ['instagram', 'twitter', 'youtube'];
+            for (const p of platforms) {
+                const comments = this.projectData[p] && this.projectData[p].comments;
+                if (Array.isArray(comments)) {
+                    for (let i = 0; i < comments.length; i++) {
+                        if (!comments[i].replies) {
+                            comments[i] = { ...comments[i], replies: [] };
+                        }
+                    }
+                }
+            }
+        },
         /**
          * 切换平台
          */
@@ -303,6 +322,7 @@ if (typeof Vue === 'undefined') {
                 this.currentPlatform = project.platform || 'instagram';
                 this.projectId = project.id;
                 this.universalData = project.universalData || { items: [] };
+                this._migrateData();
                 this.showLoadModal = false;
                 this.showToast('✅ 项目加载成功！');
             } catch (e) {
@@ -394,6 +414,7 @@ if (typeof Vue === 'undefined') {
                 likes: 1024,
                 views: 28600,
                 bookmarks: 56,
+                quoteTweet: null,
                 isThread: false,
                 threadTweets: [],
                 comments: [
@@ -507,7 +528,9 @@ if (typeof Vue === 'undefined') {
                     { id: 1, type: 'received', text: '嗨！最近怎么样？', image: '', imageUrl: '', time: '下午 2:30', reaction: '', ticks: '', sender: 0 },
                     { id: 2, type: 'sent', text: '挺好的！你呢？', image: '', imageUrl: '', time: '下午 2:31', reaction: '', ticks: 'read', sender: -1 },
                     { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
-                    { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 }
+                    { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
+                    { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
+                    { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
                 ]
             };
         },

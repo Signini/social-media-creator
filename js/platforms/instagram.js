@@ -395,17 +395,19 @@ const InstagramPreview = {
                 查看 {{ data.comments.length }} 条评论
             </div>
             <div class="ig-comments">
-                <div class="ig-comment" v-for="(comment, idx) in data.comments.slice(0, 5)" :key="idx">
-                    <span class="ig-comment-username">{{ comment.username }}</span>
-                    <span v-html="renderCaption(comment.text)"></span>
-                    <span class="ig-comment-like" v-if="comment.likes > 0">
-                        <svg viewBox="0 0 24 24"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.725-2.96 7.098-6.378 9.566a.998.998 0 0 1-1.244 0C10.46 16.22 7.5 12.847 7.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 .679-.938z"/></svg>
-                    </span>
-                </div>
-                <div v-if="comment.replies && comment.replies.length > 0" class="ig-replies">
-                    <div class="ig-reply" v-for="(reply, rIdx) in comment.replies" :key="rIdx">
-                        <span class="ig-comment-username">{{ reply.username }}</span>
-                        <span v-html="renderCaption(reply.text)"></span>
+                <div v-for="(comment, idx) in data.comments.slice(0, 5)" :key="idx">
+                    <div class="ig-comment">
+                        <span class="ig-comment-username">{{ comment.username }}</span>
+                        <span v-html="renderCaption(comment.text)"></span>
+                        <span class="ig-comment-like" v-if="comment.likes > 0">
+                            <svg viewBox="0 0 24 24"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.725-2.96 7.098-6.378 9.566a.998.998 0 0 1-1.244 0C10.46 16.22 7.5 12.847 7.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 .679-.938z"/></svg>
+                        </span>
+                    </div>
+                    <div v-if="(comment.replies || []).length > 0" class="ig-replies">
+                        <div class="ig-reply" v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx">
+                            <span class="ig-comment-username">{{ reply.username }}</span>
+                            <span v-html="renderCaption(reply.text)"></span>
+                        </div>
                     </div>
                 </div>
             </div>

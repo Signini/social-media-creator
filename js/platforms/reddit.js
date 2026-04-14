@@ -346,8 +346,8 @@ const RedditPreview = {
                             <span class="rd-comment-action">回复</span>
                         </div>
                         <!-- Nested Replies -->
-                        <template v-if="comment.replies && comment.replies.length > 0">
-                            <div v-for="(reply, rIdx) in comment.replies" :key="rIdx" class="rd-comment rd-comment-nested">
+                        <template v-if="(comment.replies || []).length > 0">
+                            <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" class="rd-comment rd-comment-nested">
                                 <div class="rd-comment-header">
                                     <div class="rd-comment-avatar" style="width:16px;height:16px;font-size:8px;">{{ (reply.author || 'U')[0].toUpperCase() }}</div>
                                     <span class="rd-comment-author">u/{{ reply.author }}</span>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社交媒体内容创作器 v2.1</title>
+    <title>社交媒体内容创作器 v3.1</title>
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/platform-instagram.css">
     <link rel="stylesheet" href="css/platform-twitter.css">
@@ -220,34 +220,27 @@
         <div class="toast" :class="{ show: toast.visible }">{{ toast.message }}</div>
     </div>
 
-    <!-- Vue 3 (本地优先，CDN备用) -->
+    <!-- Vue 3 (本地) -->
     <script src="js/vendor/vue.global.prod.js"></script>
-    <script>
-        if (typeof Vue === 'undefined') {
-            var s = document.createElement('script');
-            s.src = 'https://unpkg.com/vue@3/dist/vue.global.prod.js';
-            document.head.appendChild(s);
-        }
-    </script>
 
     <!-- 工具模块 -->
-    <script src="js/utils/storage.js?v=2.1"></script>
-    <script src="js/utils/image.js?v=2.1"></script>
-    <script src="js/utils/platform-css.js?v=2.2"></script>
-    <script src="js/utils/exporter.js?v=2.1"></script>
+    <script src="js/utils/storage.js?v=3.1"></script>
+    <script src="js/utils/image.js?v=3.1"></script>
+    <script src="js/utils/platform-css.js?v=3.1"></script>
+    <script src="js/utils/exporter.js?v=3.1"></script>
 
     <!-- 平台模块 -->
-    <script src="js/platforms/instagram.js?v=2.1"></script>
-    <script src="js/platforms/twitter.js?v=2.1"></script>
-    <script src="js/platforms/reddit.js?v=2.1"></script>
-    <script src="js/platforms/youtube.js?v=2.1"></script>
-    <script src="js/platforms/imessage.js?v=2.1"></script>
-    <script src="js/platforms/whatsapp.js?v=2.1"></script>
+    <script src="js/platforms/instagram.js?v=3.1"></script>
+    <script src="js/platforms/twitter.js?v=3.1"></script>
+    <script src="js/platforms/reddit.js?v=3.1"></script>
+    <script src="js/platforms/youtube.js?v=3.1"></script>
+    <script src="js/platforms/imessage.js?v=3.1"></script>
+    <script src="js/platforms/whatsapp.js?v=3.1"></script>
 
     <!-- 综合页面组件 -->
-    <script src="js/components/universal-editor.js?v=2.1"></script>
+    <script src="js/components/universal-editor.js?v=3.1"></script>
 
     <!-- 主应用 -->
-    <script src="js/app.js?v=2.1"></script>
+    <script src="js/app.js?v=3.1"></script>
 </body>
 </html>

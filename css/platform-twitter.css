@@ -347,6 +347,13 @@
     margin-top: 2px;
 }
 
+.tw-comment-action svg {
+    width: 16px;
+    height: 16px;
+    fill: #536471;
+    display: block;
+}
+
 .tw-comment-action {
     font-size: 12px;
     color: #536471;
@@ -361,4 +368,77 @@
 .tw-comment-like-count {
     color: #536471;
     font-size: 12px;
+}
+
+.tw-comment-replies {
+    margin-top: 8px;
+    padding-left: 12px;
+    border-left: 2px solid #e6ecf0;
+}
+
+.tw-comment-reply {
+    padding: 4px 0;
+    line-height: 1.4;
+}
+
+/* Quote Tweet Card */
+.tw-quote-card {
+    border: 1px solid #e6ecf0;
+    border-radius: 16px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+.tw-quote-card:hover {
+    background: #f7f9f9;
+}
+
+.tw-quote-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.tw-quote-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #e1e8ed;
+    text-align: center;
+    line-height: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #1da1f2;
+    flex-shrink: 0;
+}
+
+.tw-quote-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0f1419;
+}
+
+.tw-quote-handle {
+    font-size: 13px;
+    color: #536471;
+}
+
+.tw-quote-content {
+    font-size: 14px;
+    color: #0f1419;
+    line-height: 1.4;
+}
+
+.tw-quote-image {
+    margin-top: 8px;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.tw-quote-image img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
 }

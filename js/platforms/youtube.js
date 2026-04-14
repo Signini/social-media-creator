@@ -361,41 +361,38 @@ const YouTubePreview = {
                     排序方式
                 </span>
             </div>
-            <div v-for="(comment, idx) in data.comments" :key="idx" class="yt-comment" :class="{ 'yt-comment-pinned': comment.isPinned }">
-                <template v-if="comment.isPinned">
-                    <div class="yt-pinned-label">📌 由作者置顶</div>
-                </template>
-                <template v-if="data.channelAvatar || data.channelAvatarUrl">
-                    <img class="yt-comment-avatar" :src="data.channelAvatar || data.channelAvatarUrl" alt="">
-                </template>
-                <template v-else>
-                    <div class="yt-comment-avatar-placeholder">{{ (comment.author || 'U')[0].toUpperCase() }}</div>
-                </template>
-                <div class="yt-comment-content">
-                    <div class="yt-comment-header">
-                        <span class="yt-comment-author">@{{ comment.author }}</span>
-                        <span class="yt-comment-time">{{ comment.timeAgo || '刚刚' }}</span>
-                    </div>
-                    <div class="yt-comment-body">{{ comment.text }}</div>
-                    <div class="yt-comment-actions">
-                        <div class="yt-comment-action">
-                            <svg viewBox="0 0 24 24"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+            <div v-for="(comment, idx) in data.comments" :key="idx">
+                <div class="yt-comment" :class="{ 'yt-comment-pinned': comment.isPinned }">
+                    <template v-if="comment.isPinned">
+                        <div class="yt-pinned-label">📌 由作者置顶</div>
+                    </template>
+                    <template v-if="data.channelAvatar || data.channelAvatarUrl">
+                        <img class="yt-comment-avatar" :src="data.channelAvatar || data.channelAvatarUrl" alt="">
+                    </template>
+                    <template v-else>
+                        <div class="yt-comment-avatar-placeholder">{{ (comment.author || 'U')[0].toUpperCase() }}</div>
+                    </template>
+                    <div class="yt-comment-content">
+                        <div class="yt-comment-header">
+                            <span class="yt-comment-author">@{{ comment.author }}</span>
+                            <span class="yt-comment-time">{{ comment.timeAgo || '刚刚' }}</span>
                         </div>
-                        <div class="yt-comment-action">
-                            <svg viewBox="0 0 24 24" style="transform:rotate(180deg);"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                        <div class="yt-comment-body">{{ comment.text }}</div>
+                        <div class="yt-comment-actions">
+                            <div class="yt-comment-action">
+                                <svg viewBox="0 0 24 24"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                            </div>
+                            <div class="yt-comment-action">
+                                <svg viewBox="0 0 24 24" style="transform:rotate(180deg);"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                            </div>
+                            <span class="yt-comment-likes" v-if="comment.likes > 0">{{ comment.likes }}</span>
+                            <span class="yt-comment-action" style="margin-left:8px;">回复</span>
                         </div>
-                        <span class="yt-comment-likes" v-if="comment.likes > 0">{{ comment.likes }}</span>
-                        <span class="yt-comment-action" style="margin-left:8px;">回复</span>
                     </div>
                 </div>
-                <div v-if="comment.replies && comment.replies.length > 0" style="margin-left:40px;padding-left:16px;border-left:2px solid #e6e6e6;">
-                    <div v-for="(reply, rIdx) in comment.replies" :key="rIdx" class="yt-comment" style="padding-top:8px;">
-                        <template v-if="data.channelAvatar || data.channelAvatarUrl">
-                            <img class="yt-comment-avatar" :src="data.channelAvatar || data.channelAvatarUrl" alt="">
-                        </template>
-                        <template v-else>
-                            <div class="yt-comment-avatar-placeholder" style="width:24px;height:24px;font-size:10px;">{{ (reply.author || 'U')[0].toUpperCase() }}</div>
-                        </template>
+                <div v-if="(comment.replies || []).length > 0" style="margin-left:52px;padding-left:0;border-left:none;">
+                    <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" class="yt-comment" style="margin-bottom:8px;">
+                        <div class="yt-comment-avatar-placeholder" style="width:24px;height:24px;font-size:10px;">{{ (reply.author || 'U')[0].toUpperCase() }}</div>
                         <div class="yt-comment-content">
                             <div class="yt-comment-header">
                                 <span class="yt-comment-author">@{{ reply.author }}</span>

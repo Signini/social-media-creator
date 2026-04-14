@@ -19,6 +19,7 @@ const TwitterDefaults = {
     bookmarks: 56,
     isThread: false,
     threadTweets: [],
+    quoteTweet: null,
     comments: [
         { username: '李四', text: '太美了！在哪里拍的？', likes: 5, replies: [] },
         { username: '王五', text: '求拍照参数！📸', likes: 3, replies: [] },
@@ -99,6 +100,47 @@ const TwitterEditor = {
                 <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
             </div>
         </div>
+
+        <div class="section-divider"></div>
+
+        <div class="sub-title">🔄 引用转发</div>
+        <div class="form-group">
+            <div class="toggle-group">
+                <label class="toggle">
+                    <input type="checkbox" :checked="!!data.quoteTweet" @change="toggleQuote">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span style="font-size:13px;">引用转发</span>
+            </div>
+        </div>
+        <template v-if="data.quoteTweet">
+            <div class="form-group">
+                <label>原推作者</label>
+                <input class="form-input" :value="data.quoteTweet.displayName" @input="updateQuote('displayName', $event.target.value)" placeholder="显示名称">
+            </div>
+            <div class="form-group">
+                <label>@用户名</label>
+                <input class="form-input" :value="data.quoteTweet.username" @input="updateQuote('username', $event.target.value)" placeholder="username">
+            </div>
+            <div class="form-group">
+                <label>认证</label>
+                <div class="toggle-group" style="margin-top:4px;">
+                    <label class="toggle">
+                        <input type="checkbox" :checked="data.quoteTweet.verified" @change="updateQuote('verified', $event.target.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span style="font-size:13px;">蓝标</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>原推内容</label>
+                <textarea class="form-input" :value="data.quoteTweet.content" @input="updateQuote('content', $event.target.value)" rows="3" placeholder="原推文内容"></textarea>
+            </div>
+            <div class="form-group">
+                <label>原推图片链接</label>
+                <input class="form-input ext-url-input" :value="data.quoteTweet.imageUrlExt" @input="updateQuote('imageUrlExt', $event.target.value)" placeholder="外部图片链接">
+            </div>
+        </template>
 
         <div class="section-divider"></div>
 
@@ -233,6 +275,24 @@ const TwitterEditor = {
                 const compressed = await ImageUtil.compressImage(base64);
                 this.updateField(field, compressed);
             } catch (e) { console.error('图片上传失败:', e.message); }
+        },
+        toggleQuote() {
+            if (this.data.quoteTweet) {
+                this.updateField('quoteTweet', null);
+            } else {
+                this.updateField('quoteTweet', {
+                    displayName: '原推作者',
+                    username: 'original_user',
+                    verified: false,
+                    content: '',
+                    imageUrl: '',
+                    imageUrlExt: ''
+                });
+            }
+        },
+        updateQuote(field, value) {
+            const qt = { ...this.data.quoteTweet, [field]: value };
+            this.updateField('quoteTweet', qt);
         },
         addComment() {
             const comments = [...(this.data.comments || []), { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, avatar: '', avatarUrl: '', replies: [] }];
@@ -379,6 +439,22 @@ const TwitterPreview = {
                 <img :src="data.imageUrl || data.imageUrlExt" alt="tweet image">
             </div>
 
+            <!-- Quote Tweet Card -->
+            <div v-if="data.quoteTweet" class="tw-quote-card">
+                <div class="tw-quote-header">
+                    <div class="tw-quote-avatar">{{ (data.quoteTweet.displayName || 'U')[0] }}</div>
+                    <span class="tw-quote-name">{{ data.quoteTweet.displayName }}</span>
+                    <span v-if="data.quoteTweet.verified" class="tw-verified-badge" style="width:14px;height:14px;">
+                        <svg viewBox="0 0 22 22"><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.855-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.635-.08 1.293.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.604-.274 1.26-.144 1.896.13.636.433 1.221.878 1.69.47.446 1.055.752 1.69.883.635.13 1.294.083 1.902-.143.271.586.702 1.084 1.24 1.438.54.354 1.167.551 1.813.568.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.225 1.261.276 1.894.146.634-.13 1.22-.435 1.69-.88.445-.47.75-1.055.88-1.69.131-.634.084-1.292-.139-1.896.584-.273 1.084-.704 1.438-1.244.355-.54.553-1.17.57-1.817zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>
+                    </span>
+                    <span class="tw-quote-handle">@{{ data.quoteTweet.username }}</span>
+                </div>
+                <div class="tw-quote-content" v-html="renderContent(data.quoteTweet.content)"></div>
+                <div v-if="data.quoteTweet.imageUrlExt" class="tw-quote-image">
+                    <img :src="data.quoteTweet.imageUrlExt" alt="">
+                </div>
+            </div>
+
             <!-- Timestamp -->
             <div class="tw-views" v-if="data.timestamp">
                 {{ data.timestamp }}
@@ -420,22 +496,17 @@ const TwitterPreview = {
                                 </div>
                                 <div class="tw-comment-actions">
                                     <span class="tw-comment-action" title="喜欢">
-                                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#536471;"><path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.92-.32-6.64C4.05 8.49 5.96 7.5 7.91 7.5c1.57 0 3.09.69 4.08 1.83.99-1.14 2.51-1.83 4.08-1.83 1.96 0 3.87.99 5.12 3.05 1.13 1.72 1.04 4.14-.32 6.64z"/></svg>
+                                        <svg viewBox="0 0 24 24"><path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.92-.32-6.64C4.05 8.49 5.96 7.5 7.91 7.5c1.57 0 3.09.69 4.08 1.83.99-1.14 2.51-1.83 4.08-1.83 1.96 0 3.87.99 5.12 3.05 1.13 1.72 1.04 4.14-.32 6.64z"/></svg>
                                     </span>
                                     <span class="tw-comment-action" title="回复">
-                                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:#536471;"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.26-.88 4.27-2.37 5.77l-5.47 5.47c-.29.29-.77.29-1.06 0l-5.47-5.47c-1.5-1.5-2.37-3.52-2.37-5.77z"/></svg>
+                                        <svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.26-.88 4.27-2.37 5.77l-5.47 5.47c-.29.29-.77.29-1.06 0l-5.47-5.47c-1.5-1.5-2.37-3.52-2.37-5.77z"/></svg>
                                     </span>
                                     <span class="tw-comment-like-count">{{ comment.likes > 0 ? comment.likes : '' }}</span>
                                 </div>
-                            </div>
-                            <div v-if="comment.replies && comment.replies.length > 0" style="margin-left:40px;padding-left:12px;border-left:2px solid #e6ecf0;">
-                                <div class="tw-comment" v-for="(reply, rIdx) in comment.replies.slice(0, 3)" :key="rIdx" style="padding-top:8px;">
-                                    <div class="tw-comment-avatar" style="width:20px;height:20px;font-size:10px;">{{ (reply.username || 'U')[0].toUpperCase() }}</div>
-                                    <div class="tw-comment-content">
-                                        <div class="tw-comment-header">
-                                            <span class="tw-comment-username">{{ reply.username }}</span>
-                                            <span class="tw-comment-text">{{ reply.text }}</span>
-                                        </div>
+                                <div v-if="(comment.replies || []).length > 0" class="tw-comment-replies">
+                                    <div v-for="(reply, rIdx) in (comment.replies || []).slice(0, 3)" :key="rIdx" class="tw-comment-reply">
+                                        <span class="tw-comment-username" style="font-size:12px;">{{ reply.username }}</span>
+                                        <span class="tw-comment-text" style="font-size:12px;">{{ reply.text }}</span>
                                     </div>
                                 </div>
                             </div>

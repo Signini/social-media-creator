@@ -36,7 +36,9 @@ const WhatsAppDefaults = {
         { id: 1, type: 'received', text: '嗨！最近怎么样？', image: '', imageUrl: '', time: '下午 2:30', reaction: '', ticks: '', sender: 0 },
         { id: 2, type: 'sent', text: '挺好的！你呢？', image: '', imageUrl: '', time: '下午 2:31', reaction: '', ticks: 'read', sender: -1 },
         { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
-        { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 }
+        { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
+        { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
+        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
     ]
 };
 
@@ -237,6 +239,25 @@ const WhatsAppEditor = {
                         <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）" style="font-size:11px;">
                     </div>
                 </div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <div class="toggle-group" style="margin-bottom:0;">
+                                <label class="toggle">
+                                    <input type="checkbox" :checked="msg.isVoice" @change="updateMessage(idx, 'isVoice', $event.target.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span style="font-size:12px;">语音消息</span>
+                            </div>
+                        </div>
+                        <template v-if="msg.isVoice">
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label style="font-size:12px;">⏱ 时长</label>
+                                <input class="form-input" :value="msg.voiceDuration" @input="updateMessage(idx, 'voiceDuration', $event.target.value)" placeholder="0:05" style="font-size:12px;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label style="font-size:12px;">📝 转文字内容</label>
+                                <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" placeholder="语音转文字内容（可选）" style="font-size:12px;">
+                            </div>
+                        </template>
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
                         <label style="font-size:12px;">时间</label>
@@ -315,7 +336,7 @@ const WhatsAppEditor = {
             this.updateField('groupMembers', members);
         },
         addMessage() {
-            const messages = [...this.data.messages, { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1 }];
+            const messages = [...this.data.messages, { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '' }];
             this.updateField('messages', messages);
         },
         removeMessage(idx) {
@@ -408,11 +429,21 @@ const WhatsAppPreview = {
             <template v-for="(msg, idx) in data.messages" :key="idx">
                 <div :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
                     <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :style="{ color: getSender(msg).color || '#075e54' }">{{ getSender(msg).name }}</div>
-                    <div v-if="msg.image || msg.imageUrl" class="wa-bubble-image">
+                    <div v-if="msg.isVoice" class="wa-voice-msg">
+                        <div class="wa-voice-play">▶</div>
+                        <div class="wa-voice-waveform">
+                            <div class="wa-voice-bar" v-for="i in 20" :key="i" :style="{ height: (Math.sin(i * 0.8) * 8 + 10) + 'px' }"></div>
+                        </div>
+                        <div class="wa-voice-duration">{{ msg.voiceDuration || '0:01' }}</div>
+                    </div>
+                    <div v-if="msg.isVoice && msg.voiceTranscription" class="wa-voice-transcription">
+                        {{ msg.voiceTranscription }}
+                    </div>
+                    <div v-if="!msg.isVoice && (msg.image || msg.imageUrl)" class="wa-bubble-image">
                         <img :src="msg.image || msg.imageUrl" alt="">
                     </div>
-                    <div v-if="msg.text" class="wa-bubble-text">{{ msg.text }}</div>
-                    <div v-if="!msg.text && !msg.image && !msg.imageUrl" class="wa-bubble-empty">（空消息）</div>
+                    <div v-if="!msg.isVoice && msg.text" class="wa-bubble-text">{{ msg.text }}</div>
+                    <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wa-bubble-empty">（空消息）</div>
                     <div class="wa-bubble-meta">
                         <span class="wa-bubble-time">{{ msg.time }}</span>
                         <span v-if="msg.type === 'sent' && msg.ticks" :class="['wa-bubble-ticks', msg.ticks === 'read' ? 'wa-ticks-read' : 'wa-ticks-sent']">
