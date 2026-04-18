@@ -162,6 +162,9 @@ img { max-width: 100%; }
 .yt-player { height: 338px; }
 .yt-player img { max-height: 338px; }
 .yt-player-placeholder { height: 338px; }
+.yt-comment > .yt-comment-avatar-placeholder { margin-right: 12px; flex-shrink: 0; }
+.yt-comment > .yt-comment-avatar { margin-right: 12px; flex-shrink: 0; }
+.yt-comment > .yt-comment-content { flex: 1; min-width: 0; }
 `,
         imessage: `
 .msg-messages { height: auto; }
@@ -172,6 +175,10 @@ img { max-width: 100%; }
 `,
         reddit: `
 .rd-post-image img { max-height: 600px; }
+`,
+        xiaohongshu: `
+.xhs-image-area { height: 520px; }
+.xhs-image-area img { max-height: 520px; }
 `
     },
 
@@ -206,18 +213,21 @@ img { max-width: 100%; }
         for (const el of elements) {
             const style = el.getAttribute('style') || '';
             const props = {};
-            const colorMatch = style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i);
-            const bgMatch = style.match(/(?:^|;)\s*background(?:-color)?\s*:\s*([^;]+)/i);
-            const borderColorMatch = style.match(/(?:^|;)\s*border-color\s*:\s*([^;]+)/i);
-            const borderLeftMatch = style.match(/(?:^|;)\s*border-left\s*:\s*([^;]+)/i);
-            if (colorMatch) props['color'] = colorMatch[1].trim();
-            if (bgMatch) props['background'] = bgMatch[1].trim();
-            if (borderColorMatch) props['border-color'] = borderColorMatch[1].trim();
-            if (borderLeftMatch) props['border-left'] = borderLeftMatch[1].trim();
+            const regex = /(?:^|;)\s*([\w-]+)\s*:\s*([^;]+)/g;
+            let m;
+            while ((m = regex.exec(style)) !== null) {
+                const prop = m[1].trim().toLowerCase();
+                let val = m[2].trim();
+                if (!val) continue;
+                val = val.replace(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*[\d.]+)?\s*\)/gi, function(_, r, g, b) {
+                    return '#' + [r, g, b].map(function(c) { return parseInt(c).toString(16).padStart(2, '0'); }).join('');
+                });
+                props[prop] = val;
+            }
             if (Object.keys(props).length === 0) continue;
             const key = JSON.stringify(props);
             if (!styleMap[key]) {
-                styleMap[key] = '_es' + idx;
+                styleMap[key] = 'xc' + idx;
                 idx++;
             }
             const cls = styleMap[key];
@@ -342,6 +352,13 @@ ${content.innerHTML}
 
         const extractedCSS = this._extractInlineStyles(content);
 
+        let previewStyleCSS = '';
+        content.querySelectorAll('style').forEach(styleEl => {
+            const text = (styleEl.textContent || '').trim();
+            if (text) previewStyleCSS += text + '\n';
+            styleEl.remove();
+        });
+
         content.querySelectorAll('img').forEach(img => {
             const src = img.getAttribute('src') || '';
             if (src.startsWith('data:')) {
@@ -365,7 +382,7 @@ ${content.innerHTML}
 
 <style>
 ${css}
-${extractedCSS}${imgPlaceholderCSS}</style>
+${extractedCSS}${previewStyleCSS}${imgPlaceholderCSS}</style>
 
 <div class="social-media-export">
 ${cleanHTML}

@@ -1,0 +1,319 @@
+/* ============================================
+   小红书 模拟样式
+   ============================================ */
+
+.xhs-post {
+    background: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Helvetica Neue', sans-serif;
+    max-width: 390px;
+    margin: 0 auto;
+}
+
+.xhs-image-area {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: #f5f5f5;
+    overflow: hidden;
+    position: relative;
+}
+
+.xhs-image-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.xhs-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+    color: #ccc;
+}
+
+.xhs-image-placeholder span {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.xhs-image-placeholder small {
+    font-size: 13px;
+}
+
+.xhs-content-area {
+    padding: 12px 16px 16px;
+}
+
+.xhs-author-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.xhs-author-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.xhs-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f5f5f5;
+}
+
+.xhs-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff2442 0%, #ff6b81 100%);
+    text-align: center;
+    line-height: 32px;
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.xhs-author-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+
+.xhs-follow-btn {
+    padding: 5px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #ff2442;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.xhs-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+
+.xhs-desc {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.7;
+    word-break: break-word;
+    margin-bottom: 8px;
+}
+
+.xhs-desc .xhs-tag {
+    color: #13386c;
+    font-weight: 500;
+}
+
+.xhs-location-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 12px;
+}
+
+.xhs-location-row svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: #999;
+    stroke-width: 1.5;
+    flex-shrink: 0;
+}
+
+.xhs-interact-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 8px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.xhs-interact-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #999;
+}
+
+.xhs-interact-item svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #999;
+    stroke-width: 1.5;
+}
+
+.xhs-interact-item.liked svg {
+    fill: #ff2442;
+    stroke: #ff2442;
+}
+
+.xhs-comment-section {
+    padding: 0 16px 16px;
+}
+
+.xhs-comment-header {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.xhs-comment-item {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.xhs-comment-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f5f5f5;
+}
+
+.xhs-comment-avatar-placeholder {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.xhs-comment-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.xhs-comment-name {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 2px;
+}
+
+.xhs-comment-text {
+    font-size: 13px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.xhs-comment-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #bbb;
+}
+
+.xhs-comment-like {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    color: #bbb;
+    cursor: pointer;
+}
+
+.xhs-comment-like svg {
+    width: 12px;
+    height: 12px;
+    fill: none;
+    stroke: #bbb;
+    stroke-width: 1.5;
+}
+
+.xhs-comment-replies {
+    margin-left: 0;
+    margin-top: 8px;
+    padding-left: 12px;
+    position: relative;
+}
+
+.xhs-comment-replies::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 2px;
+    bottom: 6px;
+    width: 2px;
+    background: #eee;
+    border-radius: 1px;
+}
+
+.xhs-reply-item {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.xhs-reply-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f5f5f5;
+}
+
+.xhs-reply-avatar-placeholder {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.xhs-reply-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.xhs-reply-name {
+    font-size: 11px;
+    color: #999;
+}
+
+.xhs-reply-text {
+    font-size: 12px;
+    color: #333;
+    line-height: 1.4;
+}
+
+.xhs-date {
+    padding: 0 16px 16px;
+    font-size: 11px;
+    color: #bbb;
+}

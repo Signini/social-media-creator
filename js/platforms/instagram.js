@@ -395,7 +395,7 @@ const InstagramPreview = {
                 查看 {{ data.comments.length }} 条评论
             </div>
             <div class="ig-comments">
-                <div v-for="(comment, idx) in data.comments.slice(0, 5)" :key="idx">
+                <div v-for="(comment, idx) in data.comments" :key="idx" class="ig-comment-group">
                     <div class="ig-comment">
                         <span class="ig-comment-username">{{ comment.username }}</span>
                         <span v-html="renderCaption(comment.text)"></span>
@@ -404,6 +404,7 @@ const InstagramPreview = {
                         </span>
                     </div>
                     <div v-if="(comment.replies || []).length > 0" class="ig-replies">
+                        <div class="ig-reply-thread-line"></div>
                         <div class="ig-reply" v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx">
                             <span class="ig-comment-username">{{ reply.username }}</span>
                             <span v-html="renderCaption(reply.text)"></span>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>社交媒体内容创作器 v3.1</title>
+    <title>社交媒体内容创作器 v3.8</title>
     <link rel="stylesheet" href="css/app.css">
     <link rel="stylesheet" href="css/platform-instagram.css">
     <link rel="stylesheet" href="css/platform-twitter.css">
@@ -11,12 +11,7 @@
     <link rel="stylesheet" href="css/platform-youtube.css">
     <link rel="stylesheet" href="css/platform-imessage.css">
     <link rel="stylesheet" href="css/platform-whatsapp.css">
-    <style>
-        .modal-body {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="css/platform-xiaohongshu.css">
 </head>
 <body>
     <div id="app">
@@ -52,10 +47,13 @@
             <aside class="editor-panel">
                 <!-- 平台选择 -->
                 <div class="platform-selector">
-                    <div class="section-title">选择平台</div>
+                    <div class="platform-tab-switch">
+                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'domestic' }]" @click="platformRegion = 'domestic'">🇨🇳 国内平台</button>
+                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'international' }]" @click="platformRegion = 'international'">🌍 国际平台</button>
+                    </div>
                     <div class="platform-tabs">
                         <button 
-                            v-for="p in platforms" 
+                            v-for="p in filteredPlatforms" 
                             :key="p.id"
                             :class="['platform-tab', { active: currentPlatform === p.id }]"
                             @click="switchPlatform(p.id)">
@@ -103,6 +101,12 @@
                         :data="projectData.whatsapp"
                         @update="updatePlatformData('whatsapp', $event)">
                     </whatsapp-editor>
+
+                    <!-- 小红书 编辑器 -->
+                    <xiaohongshu-editor v-if="currentPlatform === 'xiaohongshu'"
+                        :data="projectData.xiaohongshu"
+                        @update="updatePlatformData('xiaohongshu', $event)">
+                    </xiaohongshu-editor>
                 </div>
             </aside>
 
@@ -115,6 +119,8 @@
                     </div>
                     <div class="preview-actions">
                         <button class="btn btn-primary" @click="addToUniversal">➕ 添加到综合页面</button>
+                        <button v-if="editingUniversalIndex >= 0" class="btn btn-primary" style="background:#34c759;" @click="updateUniversalItem">✅ 更新综合页面</button>
+                        <button v-if="editingUniversalIndex >= 0" class="btn btn-outline" @click="editingUniversalIndex = -1">❌ 取消编辑</button>
                         <button class="btn btn-outline" @click="resetCurrentPlatform">🔄 新建空白</button>
                         <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
                         <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
@@ -153,6 +159,11 @@
                             <whatsapp-preview v-if="currentPlatform === 'whatsapp'"
                                 :data="projectData.whatsapp">
                             </whatsapp-preview>
+
+                            <!-- 小红书 预览 -->
+                            <xiaohongshu-preview v-if="currentPlatform === 'xiaohongshu'"
+                                :data="projectData.xiaohongshu">
+                            </xiaohongshu-preview>
                         </div>
                     </div>
                 </div>
@@ -224,23 +235,24 @@
     <script src="js/vendor/vue.global.prod.js"></script>
 
     <!-- 工具模块 -->
-    <script src="js/utils/storage.js?v=3.1"></script>
-    <script src="js/utils/image.js?v=3.1"></script>
-    <script src="js/utils/platform-css.js?v=3.1"></script>
-    <script src="js/utils/exporter.js?v=3.1"></script>
+    <script src="js/utils/storage.js?v=3.6"></script>
+    <script src="js/utils/image.js?v=3.6"></script>
+    <script src="js/utils/platform-css.js?v=3.6"></script>
+    <script src="js/utils/exporter.js?v=3.6"></script>
 
     <!-- 平台模块 -->
-    <script src="js/platforms/instagram.js?v=3.1"></script>
-    <script src="js/platforms/twitter.js?v=3.1"></script>
-    <script src="js/platforms/reddit.js?v=3.1"></script>
-    <script src="js/platforms/youtube.js?v=3.1"></script>
-    <script src="js/platforms/imessage.js?v=3.1"></script>
-    <script src="js/platforms/whatsapp.js?v=3.1"></script>
+    <script src="js/platforms/instagram.js?v=3.6"></script>
+    <script src="js/platforms/twitter.js?v=3.6"></script>
+    <script src="js/platforms/reddit.js?v=3.6"></script>
+    <script src="js/platforms/youtube.js?v=3.6"></script>
+    <script src="js/platforms/imessage.js?v=3.6"></script>
+    <script src="js/platforms/whatsapp.js?v=3.6"></script>
+    <script src="js/platforms/xiaohongshu.js?v=3.6"></script>
 
     <!-- 综合页面组件 -->
-    <script src="js/components/universal-editor.js?v=3.1"></script>
+    <script src="js/components/universal-editor.js?v=3.6"></script>
 
     <!-- 主应用 -->
-    <script src="js/app.js?v=3.1"></script>
+    <script src="js/app.js?v=3.6"></script>
 </body>
 </html>

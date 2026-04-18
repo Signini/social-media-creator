@@ -165,6 +165,36 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+.platform-tab-switch {
+    display: flex;
+    gap: 0;
+    margin-bottom: 10px;
+    background: var(--bg-input);
+    border-radius: var(--radius-sm);
+    padding: 3px;
+}
+
+.platform-tab-switch-btn {
+    flex: 1;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    background: none;
+    color: var(--text-secondary);
+    transition: all var(--transition);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.platform-tab-switch-btn.active {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
 .section-title {
     font-size: 12px;
     font-weight: 600;
@@ -175,12 +205,12 @@ body {
 }
 
 .platform-tabs {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 6px;
 }
 
 .platform-tab {
-    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -995,6 +1025,12 @@ textarea.form-input {
     background: rgba(0, 122, 255, 0.04);
 }
 
+.universal-item.selected {
+    border-color: var(--accent-blue);
+    background: #e8f2ff;
+    box-shadow: 0 0 0 1px var(--accent-blue);
+}
+
 .universal-item.dragging {
     opacity: 0.4;
     transform: scale(0.97);
@@ -1094,6 +1130,12 @@ textarea.form-input {
 
 .universal-preview-section:last-child {
     margin-bottom: 0;
+}
+
+.universal-preview-section.preview-selected {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.12), var(--shadow-md);
 }
 
 .universal-section-label {

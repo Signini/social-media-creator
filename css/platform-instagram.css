@@ -208,6 +208,10 @@
     margin-bottom: 2px;
 }
 
+.ig-comment-group {
+    margin-bottom: 4px;
+}
+
 .ig-comment .ig-comment-username {
     font-weight: 600;
     margin-right: 4px;
@@ -225,6 +229,35 @@
     fill: none;
     stroke: #c7c7c7;
     stroke-width: 2;
+}
+
+.ig-replies {
+    margin-left: 20px;
+    padding-left: 12px;
+    position: relative;
+    margin-top: 2px;
+}
+
+.ig-reply-thread-line {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 6px;
+    width: 2px;
+    background: #dbdbdb;
+    border-radius: 1px;
+}
+
+.ig-reply {
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 1px;
+    color: #262626;
+}
+
+.ig-reply .ig-comment-username {
+    font-weight: 600;
+    margin-right: 4px;
 }
 
 /* Timestamp */
@@ -273,18 +306,4 @@
 /* Emoji in caption */
 .ig-emoji {
     font-style: normal;
-}
-
-/* Nested Replies */
-.ig-replies {
-    margin-left: 0;
-    padding-left: 0;
-}
-.ig-reply {
-    font-size: 13px;
-    margin-top: 2px;
-    line-height: 1.4;
-}
-.ig-reply .ig-comment-username {
-    margin-right: 4px;
 }

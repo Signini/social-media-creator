@@ -7,7 +7,6 @@ const UniversalEditor = {
     emits: ['update', 'export-complete'],
     template: `
     <div class="universal-layout">
-        <!-- 左侧：模块管理列表 -->
         <aside class="universal-sidebar">
             <div class="section-title">📋 已添加模块 ({{ universalData.items.length }})</div>
             
@@ -19,7 +18,8 @@ const UniversalEditor = {
                     @dragover.prevent="onDragOver(idx, $event)"
                     @dragleave="onDragLeave(idx, $event)"
                     @drop="onDrop(idx, $event)"
-                    :class="{ 'drag-over': dragOverIndex === idx }">
+                    @click="selectItem(idx)"
+                    :class="{ 'drag-over': dragOverIndex === idx, 'selected': selectedIndex === idx }">
                     <div class="universal-item-handle">⋮⋮</div>
                     <div class="universal-item-info">
                         <span class="universal-item-icon">{{ getPlatformIcon(item.platform) }}</span>
@@ -27,8 +27,8 @@ const UniversalEditor = {
                         <span class="universal-item-time">{{ item.addedAt }}</span>
                     </div>
                     <div class="universal-item-actions">
-                        <button class="btn btn-small btn-outline" @click="editItem(idx)" title="回到编辑器编辑此模块">✏️</button>
-                        <button class="btn btn-small btn-danger" @click="removeItem(idx)" title="删除此模块">✕</button>
+                        <button class="btn btn-small btn-outline" @click.stop="editItem(idx)" title="回到编辑器编辑此模块">✏️</button>
+                        <button class="btn btn-small btn-danger" @click.stop="removeItem(idx)" title="删除此模块">✕</button>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,6 @@ const UniversalEditor = {
             </div>
         </aside>
 
-        <!-- 右侧：综合预览 -->
         <section class="universal-preview-panel">
             <div class="universal-preview-toolbar">
                 <span class="section-title" style="margin:0;">综合页面预览</span>
@@ -57,7 +56,9 @@ const UniversalEditor = {
             <div class="universal-preview-scroll" ref="universalPreview">
                 <div class="universal-preview" v-if="universalData.items.length > 0">
                     <div class="universal-preview-section"
-                        v-for="(item, idx) in universalData.items" :key="item.id">
+                        v-for="(item, idx) in universalData.items" :key="item.id"
+                        :ref="el => { if (el) sectionRefs[idx] = el }"
+                        :class="{ 'preview-selected': selectedIndex === idx }">
                         <div class="universal-section-label">
                             <span>{{ getPlatformIcon(item.platform) }} {{ getPlatformName(item.platform) }}</span>
                             <span style="font-size:11px;color:#aeaeb2;">#{{ idx + 1 }}</span>
@@ -68,6 +69,7 @@ const UniversalEditor = {
                         <youtube-preview v-if="item.platform === 'youtube'" :data="item.data"></youtube-preview>
                         <imessage-preview v-if="item.platform === 'imessage'" :data="item.data"></imessage-preview>
                         <whatsapp-preview v-if="item.platform === 'whatsapp'" :data="item.data"></whatsapp-preview>
+                        <xiaohongshu-preview v-if="item.platform === 'xiaohongshu'" :data="item.data"></xiaohongshu-preview>
                     </div>
                 </div>
                 <div class="empty-state" v-else style="padding:80px 20px;">
@@ -81,20 +83,22 @@ const UniversalEditor = {
     data() {
         return {
             dragIndex: null,
-            dragOverIndex: null
+            dragOverIndex: null,
+            selectedIndex: -1,
+            sectionRefs: {}
         };
     },
     methods: {
         getPlatformIcon(platformId) {
             const map = {
-                instagram: '📸', twitter: '🐦', reddit: '🔴',
+                xiaohongshu: '📕', instagram: '📸', twitter: '🐦', reddit: '🔴',
                 youtube: '▶️', imessage: '💬', whatsapp: '📱'
             };
             return map[platformId] || '📱';
         },
         getPlatformName(platformId) {
             const map = {
-                instagram: 'Instagram',                 twitter: 'X', reddit: 'Reddit',
+                xiaohongshu: '小红书', instagram: 'Instagram',                 twitter: 'X', reddit: 'Reddit',
                 youtube: 'YouTube', imessage: 'iMessage',
                 whatsapp: 'WhatsApp'
             };
@@ -107,6 +111,17 @@ const UniversalEditor = {
         },
         editItem(idx) {
             this.$emit('edit-item', idx);
+        },
+        selectItem(idx) {
+            this.selectedIndex = this.selectedIndex === idx ? -1 : idx;
+            if (this.selectedIndex >= 0) {
+                this.$nextTick(() => {
+                    const el = this.sectionRefs[this.selectedIndex];
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
         },
         clearAll() {
             if (confirm('确定清空所有模块吗？')) {

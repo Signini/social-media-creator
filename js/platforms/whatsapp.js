@@ -38,7 +38,8 @@ const WhatsAppDefaults = {
         { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
         { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
         { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
-        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
+        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
+        { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
     ]
 };
 
@@ -205,6 +206,8 @@ const WhatsAppEditor = {
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
+                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
+                            @click="insertMessage(idx)">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
                             @click="toggleType(idx)">⇄</button>
                         <button class="remove-comment" @click="removeMessage(idx)">✕</button>
@@ -258,6 +261,36 @@ const WhatsAppEditor = {
                                 <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" placeholder="语音转文字内容（可选）" style="font-size:12px;">
                             </div>
                         </template>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <div class="toggle-group" style="margin-bottom:0;">
+                        <label class="toggle">
+                            <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size:12px;">通话记录</span>
+                    </div>
+                </div>
+                <template v-if="msg.isCall">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">通话类型</label>
+                        <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
+                            <option value="voice">📞 语音通话</option>
+                            <option value="video">📹 视频通话</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">通话状态</label>
+                        <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
+                            <option value="answered">✅ 已接听</option>
+                            <option value="missed">❌ 未接听</option>
+                            <option value="declined">🚫 已拒绝</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">⏱ 通话时长</label>
+                        <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
+                    </div>
+                </template>
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
                         <label style="font-size:12px;">时间</label>
@@ -336,7 +369,13 @@ const WhatsAppEditor = {
             this.updateField('groupMembers', members);
         },
         addMessage() {
-            const messages = [...this.data.messages, { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '' }];
+            const messages = [...this.data.messages, { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: false, callType: 'voice', callDuration: '', callStatus: 'answered' }];
+            this.updateField('messages', messages);
+        },
+        insertMessage(idx) {
+            const newMsg = { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: false, callType: 'voice', callDuration: '', callStatus: 'answered' };
+            const messages = [...this.data.messages];
+            messages.splice(idx + 1, 0, newMsg);
             this.updateField('messages', messages);
         },
         removeMessage(idx) {
@@ -427,8 +466,17 @@ const WhatsAppPreview = {
             </div>
 
             <template v-for="(msg, idx) in data.messages" :key="idx">
-                <div :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
-                    <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :style="{ color: getSender(msg).color || '#075e54' }">{{ getSender(msg).name }}</div>
+                <div v-if="msg.isCall" :class="['wa-call-record', 'wa-call-' + (msg.callStatus || 'answered')]">
+                    <span class="wa-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
+                    <span class="wa-call-text">
+                        <template v-if="msg.callStatus === 'missed'">未接听</template>
+                        <template v-else-if="msg.callStatus === 'declined'">已拒绝</template>
+                        <template v-else>已接听</template>
+                    </span>
+                    <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="wa-call-duration">{{ msg.callDuration }}</span>
+                </div>
+                <div v-if="!msg.isCall" :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
+                    <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :class="'wa-sc-' + (msg.sender || 0)">{{ getSender(msg).name }}</div>
                     <div v-if="msg.isVoice" class="wa-voice-msg">
                         <div class="wa-voice-play">▶</div>
                         <div class="wa-voice-waveform">
@@ -451,7 +499,7 @@ const WhatsAppPreview = {
                         </span>
                     </div>
                 </div>
-                <div v-if="msg.reaction" class="wa-reaction">
+                <div v-if="msg.reaction && !msg.isCall" class="wa-reaction">
                     {{ msg.reaction }}
                 </div>
             </template>
@@ -482,13 +530,40 @@ const WhatsAppPreview = {
         groupMembersText() {
             const members = this.data.groupMembers || [];
             return members.map(m => m.name).join('、');
+        },
+        memberColorCSS() {
+            const members = this.data.groupMembers || [];
+            if (!this.data.isGroup || members.length === 0) return '';
+            let css = '';
+            for (let i = 0; i < members.length; i++) {
+                css += '.wa-sc-' + i + ' { color: ' + (members[i].color || '#075e54') + ' !important; }\n';
+            }
+            return css;
         }
+    },
+    mounted() {
+        this._injectMemberColors();
+    },
+    updated() {
+        this._injectMemberColors();
     },
     methods: {
         getSender(msg) {
             if (!this.data.isGroup || msg.type === 'sent') return null;
             const members = this.data.groupMembers || [];
             return members[msg.sender] || null;
+        },
+        _injectMemberColors() {
+            if (!this.data.isGroup) return;
+            const el = this.$el;
+            if (!el) return;
+            let styleEl = el.querySelector(':scope > style.wa-member-colors');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.className = 'wa-member-colors';
+                el.insertBefore(styleEl, el.firstChild);
+            }
+            styleEl.textContent = this.memberColorCSS;
         }
     }
 };

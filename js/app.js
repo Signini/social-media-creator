@@ -11,20 +11,22 @@ if (typeof Vue === 'undefined') {
     const app = createApp({
     data() {
         return {
-            currentPlatform: 'instagram',
+            currentPlatform: 'xiaohongshu',
             deviceMode: 'phone',
+            platformRegion: 'domestic',
             showLoadModal: false,
             showSaveModal: false,
             saveProjectName: '',
             projectId: null,
             toast: { visible: false, message: '' },
             platforms: [
-                { id: 'instagram', name: 'Instagram', icon: '📸', status: 'ready' },
-                { id: 'twitter', name: 'X', icon: '🐦', status: 'ready' },
-                { id: 'reddit', name: 'Reddit', icon: '🔴', status: 'ready' },
-                { id: 'youtube', name: 'YouTube', icon: '▶️', status: 'ready' },
-                { id: 'imessage', name: 'iMessage', icon: '💬', status: 'ready' },
-                { id: 'whatsapp', name: 'WhatsApp', icon: '📱', status: 'ready' }
+                { id: 'xiaohongshu', name: '小红书', icon: '📕', status: 'ready', region: 'domestic' },
+                { id: 'instagram', name: 'Instagram', icon: '📸', status: 'ready', region: 'international' },
+                { id: 'twitter', name: 'X', icon: '🐦', status: 'ready', region: 'international' },
+                { id: 'reddit', name: 'Reddit', icon: '🔴', status: 'ready', region: 'international' },
+                { id: 'youtube', name: 'YouTube', icon: '▶️', status: 'ready', region: 'international' },
+                { id: 'imessage', name: 'iMessage', icon: '💬', status: 'ready', region: 'international' },
+                { id: 'whatsapp', name: 'WhatsApp', icon: '📱', status: 'ready', region: 'international' }
             ],
             projectData: {
                 instagram: {
@@ -125,7 +127,8 @@ if (typeof Vue === 'undefined') {
                         { id: 3, type: 'received', text: '周末要不要一起去三里屯拍照？听说那边新开了一家咖啡馆，装修特别好看', image: '', imageUrl: '', time: '下午 3:22', reaction: '' },
                         { id: 4, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:23', reaction: '' },
                         { id: 5, type: 'sent', text: '好啊！我正好想去！几点？', image: '', imageUrl: '', time: '下午 3:24', reaction: '❤️' },
-                        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' }
+                        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' },
+                        { id: 7, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:25', reaction: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                     ]
                 },
                 whatsapp: {
@@ -153,14 +156,42 @@ if (typeof Vue === 'undefined') {
                         { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
                         { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
                         { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
-                        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
+                        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
+                        { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                     ]
+                },
+                xiaohongshu: {
+                    username: '生活记录者小张',
+                    avatar: '',
+                    avatarUrl: '',
+                    imageUrl: '',
+                    imageUrlExt: '',
+                    title: '北京三里屯日落打卡 🌇 太美了！',
+                    content: '今天路过三里屯正好赶上日落，整个天空都变成金色了✨\n\n随手拿手机拍了几张，感觉每一张都可以当壁纸！\n\n#北京 #三里屯 #日落 #手机摄影 #日常分享',
+                    location: '北京·三里屯太古里',
+                    likes: 2048,
+                    favorites: 856,
+                    comments: [
+                        { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', replies: [
+                            { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '' }
+                        ]},
+                        { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', replies: [] }
+                    ],
+                    timestamp: '2小时前',
+                    showFollowBtn: true
                 }
             },
             currentView: 'single',
             universalData: { items: [] },
+            editingUniversalIndex: -1,
             savedProjects: []
         };
+    },
+
+    computed: {
+        filteredPlatforms() {
+            return this.platforms.filter(p => p.region === this.platformRegion);
+        }
     },
 
     mounted() {
@@ -200,7 +231,7 @@ if (typeof Vue === 'undefined') {
 
     methods: {
         _migrateData() {
-            const platforms = ['instagram', 'twitter', 'youtube'];
+            const platforms = ['instagram', 'twitter', 'youtube', 'xiaohongshu'];
             for (const p of platforms) {
                 const comments = this.projectData[p] && this.projectData[p].comments;
                 if (Array.isArray(comments)) {
@@ -217,9 +248,15 @@ if (typeof Vue === 'undefined') {
          */
         switchPlatform(platformId) {
             this.currentPlatform = platformId;
+            this.editingUniversalIndex = -1;
+            const p = this.platforms.find(p => p.id === platformId);
+            if (p && p.region !== this.platformRegion) {
+                this.platformRegion = p.region;
+            }
         },
 
         resetCurrentPlatform() {
+            this.editingUniversalIndex = -1;
             const platform = this.currentPlatform;
             const methodName = 'getDefault' + platform.charAt(0).toUpperCase() + platform.slice(1) + 'Data';
             if (this[methodName]) {
@@ -231,6 +268,9 @@ if (typeof Vue === 'undefined') {
 
         switchView(view) {
             this.currentView = view;
+            if (view !== 'single') {
+                this.editingUniversalIndex = -1;
+            }
         },
 
         addToUniversal() {
@@ -242,8 +282,25 @@ if (typeof Vue === 'undefined') {
                 data,
                 addedAt: new Date().toLocaleString('zh-CN')
             });
+            this.editingUniversalIndex = -1;
             const platformName = this.platforms.find(p => p.id === platform)?.name || platform;
             this.showToast('✅ ' + platformName + ' 已添加到综合页面（共 ' + this.universalData.items.length + ' 个模块）');
+        },
+
+        updateUniversalItem() {
+            const idx = this.editingUniversalIndex;
+            if (idx < 0 || idx >= this.universalData.items.length) return;
+            const item = this.universalData.items[idx];
+            const platform = item.platform;
+            this.universalData.items[idx] = {
+                ...item,
+                data: JSON.parse(JSON.stringify(this.projectData[platform])),
+                addedAt: new Date().toLocaleString('zh-CN')
+            };
+            this.universalData = { ...this.universalData };
+            this.editingUniversalIndex = -1;
+            const platformName = this.platforms.find(p => p.id === platform)?.name || platform;
+            this.showToast('✅ ' + platformName + ' 已更新到综合页面');
         },
 
         updateUniversalData(newData) {
@@ -255,8 +312,9 @@ if (typeof Vue === 'undefined') {
             if (!item) return;
             this.projectData[item.platform] = JSON.parse(JSON.stringify(item.data));
             this.currentPlatform = item.platform;
+            this.editingUniversalIndex = idx;
             this.currentView = 'single';
-            this.showToast('✏️ 已加载模块到编辑器，编辑后可重新添加');
+            this.showToast('✏️ 已加载模块到编辑器，编辑完点击「更新综合页面」');
         },
 
         /**
@@ -366,7 +424,8 @@ if (typeof Vue === 'undefined') {
                 reddit: this.getDefaultRedditData(),
                 youtube: this.getDefaultYoutubeData(),
                 imessage: this.getDefaultImessageData(),
-                whatsapp: this.getDefaultWhatsAppData()
+                whatsapp: this.getDefaultWhatsAppData(),
+                xiaohongshu: this.getDefaultXiaohongshuData()
             };
         },
 
@@ -496,7 +555,8 @@ if (typeof Vue === 'undefined') {
                     { id: 3, type: 'received', text: '周末要不要一起去三里屯拍照？听说那边新开了一家咖啡馆，装修特别好看', image: '', imageUrl: '', time: '下午 3:22', reaction: '' },
                     { id: 4, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:23', reaction: '' },
                     { id: 5, type: 'sent', text: '好啊！我正好想去！几点？', image: '', imageUrl: '', time: '下午 3:24', reaction: '❤️' },
-                    { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' }
+                    { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' },
+                    { id: 7, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:25', reaction: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                 ]
             };
         },
@@ -530,8 +590,32 @@ if (typeof Vue === 'undefined') {
                     { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
                     { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
                     { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
-                    { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' }
+                    { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
+                    { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                 ]
+            };
+        },
+
+        getDefaultXiaohongshuData() {
+            return {
+                username: '生活记录者小张',
+                avatar: '',
+                avatarUrl: '',
+                imageUrl: '',
+                imageUrlExt: '',
+                title: '北京三里屯日落打卡 🌇 太美了！',
+                content: '今天路过三里屯正好赶上日落，整个天空都变成金色了✨\n\n随手拿手机拍了几张，感觉每一张都可以当壁纸！\n\n#北京 #三里屯 #日落 #手机摄影 #日常分享',
+                location: '北京·三里屯太古里',
+                likes: 2048,
+                favorites: 856,
+                comments: [
+                    { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', replies: [
+                        { username: '生活记录者小张', text: 'iPhone 15 Pro Max～' }
+                    ]},
+                    { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', replies: [] }
+                ],
+                timestamp: '2小时前',
+                showFollowBtn: true
             };
         },
 
@@ -676,7 +760,9 @@ const componentCheck = {
     'iMessageEditor': !!iMessageEditor,
     'iMessagePreview': !!iMessagePreview,
     'WhatsAppEditor': !!WhatsAppEditor,
-    'WhatsAppPreview': !!WhatsAppPreview
+    'WhatsAppPreview': !!WhatsAppPreview,
+    'XiaohongshuEditor': !!XiaohongshuEditor,
+    'XiaohongshuPreview': !!XiaohongshuPreview
 };
 
 console.log('📦 组件检查:', componentCheck);
@@ -764,6 +850,20 @@ if (WhatsAppPreview) {
     console.log('✅ WhatsAppPreview 已注册');
 } else {
     console.error('❌ WhatsAppPreview 未加载，无法注册');
+}
+
+if (XiaohongshuEditor) {
+    app.component('xiaohongshu-editor', XiaohongshuEditor);
+    console.log('✅ XiaohongshuEditor 已注册');
+} else {
+    console.error('❌ XiaohongshuEditor 未加载，无法注册');
+}
+
+if (XiaohongshuPreview) {
+    app.component('xiaohongshu-preview', XiaohongshuPreview);
+    console.log('✅ XiaohongshuPreview 已注册');
+} else {
+    console.error('❌ XiaohongshuPreview 未加载，无法注册');
 }
 
 if (UniversalEditor) {

@@ -348,3 +348,35 @@
     text-align: center;
     margin: 4px auto;
 }
+
+.msg-call-record {
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    color: #8e8e93;
+}
+
+.msg-call-answered {
+    color: #34c759;
+}
+
+.msg-call-missed {
+    color: #ff3b30;
+}
+
+.msg-call-declined {
+    color: #ff9500;
+}
+
+.msg-call-icon {
+    margin-right: 4px;
+}
+
+.msg-call-text {
+    font-weight: 500;
+}
+
+.msg-call-duration {
+    margin-left: 4px;
+    color: #8e8e93;
+}

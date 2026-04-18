@@ -2,11 +2,13 @@
 
 ## 1. 项目概述
 
-一个纯前端社交媒体内容创作器，支持 5 个平台的模拟编辑与预览，可将多个平台内容组合为长篇社媒文章并导出。
+一个纯前端社交媒体内容创作器，支持 7 个平台的模拟编辑与预览，可将多个平台内容组合为长篇社媒文章并导出。
 
 - **运行方式**：直接用浏览器打开 `index.html`，无需服务器（兼容 `file://` 协议）
 - **技术栈**：Vue 3（CDN/本地）、原生 JS、CSS3、HTML5 Drag & Drop
 - **设计目标**：在完全离线环境下工作，导出 HTML 在目标发布平台保持格式
+- **支持平台**：小红书、Instagram、X (Twitter)、Reddit、YouTube、iMessage、WhatsApp
+- **平台分组**：国内平台（小红书）/ 国际平台（其余 6 个），通过 Tab 切换
 
 ---
 
@@ -15,13 +17,17 @@
 ```
 social-media-creator/
 ├── index.html                          # 主应用入口
+├── generate-platform-css.js            # 平台 CSS 生成脚本
+├── DESIGN.md                           # 项目设计文档
 ├── css/
 │   ├── app.css                         # 编辑器/预览面板/表单/弹窗样式
 │   ├── platform-instagram.css          # Instagram 预览样式（.ig-* 前缀）
 │   ├── platform-twitter.css            # X 预览样式（.tw-* 前缀）
 │   ├── platform-reddit.css             # Reddit 预览样式（.rd-* 前缀）
 │   ├── platform-youtube.css            # YouTube 预览样式（.yt-* 前缀）
-│   └── platform-imessage.css           # iMessage 预览样式（.msg-* 前缀）
+│   ├── platform-imessage.css           # iMessage 预览样式（.msg-* 前缀）
+│   ├── platform-whatsapp.css           # WhatsApp 预览样式（.wa-* 前缀）
+│   └── platform-xiaohongshu.css        # 小红书预览样式（.xhs-* 前缀）
 ├── js/
 │   ├── app.js                          # Vue 应用主逻辑、数据、方法
 │   ├── vendor/
@@ -31,13 +37,15 @@ social-media-creator/
 │   │   ├── twitter.js                  # TwitterEditor + TwitterPreview
 │   │   ├── reddit.js                   # RedditEditor + RedditPreview
 │   │   ├── youtube.js                  # YouTubeEditor + YouTubePreview
-│   │   └── imessage.js                 # iMessageEditor + iMessagePreview
+│   │   ├── imessage.js                 # iMessageEditor + iMessagePreview
+│   │   ├── whatsapp.js                 # WhatsAppEditor + WhatsAppPreview
+│   │   └── xiaohongshu.js              # XiaohongshuEditor + XiaohongshuPreview
 │   ├── components/
 │   │   └── universal-editor.js         # 综合页面编辑器组件
 │   └── utils/
 │       ├── storage.js                  # LocalStorage 操作工具
 │       ├── image.js                    # 图片上传/压缩/Base64 工具
-│       ├── exporter.js                 # HTML 导出引擎（普通+兼容模式）
+│       ├── exporter.js                 # HTML 导出引擎（普通+兼容模式+内联样式提取）
 │       └── platform-css.js             # 所有平台 CSS 内嵌为 JS 字符串（自动生成）
 ```
 
@@ -50,7 +58,7 @@ social-media-creator/
 ```html
 <!-- 1. CSS -->
 <link rel="stylesheet" href="css/app.css">
-<link rel="stylesheet" href="css/platform-*.css">  ×5
+<link rel="stylesheet" href="css/platform-*.css">  ×7
 
 <!-- 2. Vue 3（本地优先，CDN 备用） -->
 <script src="js/vendor/vue.global.prod.js"></script>
@@ -67,6 +75,8 @@ social-media-creator/
 <script src="js/platforms/reddit.js"></script>
 <script src="js/platforms/youtube.js"></script>
 <script src="js/platforms/imessage.js"></script>
+<script src="js/platforms/whatsapp.js"></script>
+<script src="js/platforms/xiaohongshu.js"></script>
 
 <!-- 5. 综合页面组件 -->
 <script src="js/components/universal-editor.js"></script>
@@ -91,6 +101,10 @@ social-media-creator/
 | `YouTubePreview` | `youtube-preview` | YouTube 预览渲染 |
 | `iMessageEditor` | `imessage-editor` | iMessage 编辑器表单 |
 | `iMessagePreview` | `imessage-preview` | iMessage 预览渲染 |
+| `WhatsAppEditor` | `whatsapp-editor` | WhatsApp 编辑器表单 |
+| `WhatsAppPreview` | `whatsapp-preview` | WhatsApp 预览渲染 |
+| `XiaohongshuEditor` | `xiaohongshu-editor` | 小红书编辑器表单 |
+| `XiaohongshuPreview` | `xiaohongshu-preview` | 小红书预览渲染 |
 | `UniversalEditor` | `universal-editor` | 综合页面管理+预览 |
 
 ### 3.3 数据流
@@ -118,20 +132,26 @@ UniversalEditor → @update 事件 → updateUniversalData()
 ```javascript
 projectData: {
     instagram: {
-        username, verified, location, avatar, imageUrl,
+        username, verified, location, avatar, avatarUrl,
+        imageUrl, imageUrlExt,
         likes, caption, showAllCaption, timestamp,
-        comments: [{ username, text, likes }],
+        comments: [{ username, text, likes, replies: [{ username, text }] }],
         imageWidth, imageHeight
     },
     twitter: {
-        displayName, username, verified, avatar, content, imageUrl,
+        displayName, username, verified, avatar, avatarUrl, content,
+        imageUrl, imageUrlExt,
         timestamp, replies, retweets, likes, views, bookmarks,
+        quoteTweet: null | {
+            displayName, username, verified, content,
+            imageUrl, imageUrlExt
+        },
         isThread, threadTweets: [],
-        comments: [{ username, text, likes, avatar }]
+        comments: [{ username, text, likes, avatar, avatarUrl, replies: [{ username, text }] }]
     },
     reddit: {
         subreddit, author, flair, flairColor,
-        title, body, imageUrl,
+        title, body, imageUrl, imageUrlExt,
         upvotes, downvotes, commentCount, awards: [],
         timeAgo,
         comments: [{
@@ -140,16 +160,42 @@ projectData: {
         }]
     },
     youtube: {
-        title, thumbnail, channelName, channelAvatar, subscribers,
-        views, dateText, likes, dislikes, description,
+        title, thumbnail, thumbnailUrl, channelName, channelAvatar, channelAvatarUrl,
+        subscribers, views, dateText, likes, dislikes, description,
         commentsCount,
-        comments: [{ author, text, likes, timeAgo, isPinned }]
+        comments: [{ author, text, likes, timeAgo, isPinned, replies: [{ author, text }] }]
     },
     imessage: {
-        contactName, contactAvatar,
+        contactName, contactAvatar, contactAvatarUrl,
         showTyping, showReadReceipt, readReceiptText,
         timeSeparator, dateSeparator,
-        messages: [{ id, type:'sent'|'received', text, image, time, reaction }]
+        messages: [{ id, type:'sent'|'received', text, image, imageUrl, time, reaction }]
+    },
+    whatsapp: {
+        contactName, contactAvatar, contactAvatarUrl, contactStatus,
+        dateSeparator, showTyping, showReadReceipt, readReceiptText,
+        theme: 'whatsapp'|'dark'|'ocean'|'lavender'|'rose'|'mint'|'sunset'|'custom',
+        customBgColor, customHeaderColor,
+        isGroup: boolean, groupName,
+        groupMembers: [{ name, avatar, avatarUrl, color }],
+        messages: [{
+            id, type:'sent'|'received', text, image, imageUrl,
+            time, reaction, ticks, sender,
+            isVoice: boolean, voiceDuration, voiceTranscription,
+            isCall: boolean, callType, callDuration, callStatus
+        }]
+    },
+    xiaohongshu: {
+        username, avatar, avatarUrl,
+        imageUrl, imageUrlExt,
+        title, content, location,
+        likes, favorites,
+        showFollowBtn: boolean,
+        timestamp,
+        comments: [{
+            username, text, likes, avatar, avatarUrl,
+            replies: [{ username, text, avatar, avatarUrl }]
+        }]
     }
 }
 ```
@@ -173,7 +219,7 @@ universalData: {
 
 ```javascript
 {
-    version: '2.0',
+    version: '3.8',
     data: { ...projectData },          // 单平台编辑数据
     universalData: { items: [...] },   // 综合页面模块列表
     exportedAt: 'ISO日期字符串'
@@ -223,10 +269,11 @@ Header 中 `📱 编辑` / `📋 综合` 切换按钮，同时当综合页面有
 | 清理项 | 处理方式 |
 |--------|---------|
 | `<svg>` 图标 | 替换为 emoji/Unicode 文本 |
-| `style=""` 属性 | 移除 |
+| `style=""` 属性 | 提取为 CSS class（`_extractInlineStyles()`），class 以 `xc` 前缀命名，`rgb()` 自动转十六进制 |
 | `<style>` 标签 | 移除（CSS 放在独立区域） |
 | `<input>`/`<button>`/`<label>` | 移除标签保留文本 |
 | `<svg>` 内的 `<circle>` | 替换为 `⋯` |
+| `data:image/...` 图片 | 替换为 `[图片]` 占位 span |
 | 不在白名单的标签 | 递归移除标签，保留子内容 |
 
 **HTML 标签白名单**：
@@ -354,6 +401,64 @@ writing-mode, z-index
 - 外部图片 URL 仅支持 JPG/GIF/PNG 格式
 - 数值最多两位小数，单位支持：cm, em, ex, in, mm, pc, pt, px
 
+#### AO3 图片处理
+
+AO3 不支持 `data:image/...` base64 URI，因此需要为每个图片字段提供外部链接：
+
+| 图片字段 | 外部链接字段 | 说明 |
+|----------|------------|------|
+| `avatar` | `avatarUrl` | Instagram/X 头像 |
+| `imageUrl` | `imageUrlExt` | Instagram/X/Reddit 帖子图片 |
+| `thumbnail` | `thumbnailUrl` | YouTube 封面 |
+| `channelAvatar` | `channelAvatarUrl` | YouTube 频道头像 |
+| `contactAvatar` | `contactAvatarUrl` | iMessage/WhatsApp 联系人头像 |
+| `messages[].image` | `messages[].imageUrl` | iMessage/WhatsApp 消息图片 |
+| `comments[].avatar` | `comments[].avatarUrl` | X 评论头像 |
+| `groupMembers[].avatar` | `groupMembers[].avatarUrl` | WhatsApp 群成员头像 |
+
+- **预览**：`base64图片 || 外部URL`（优先使用本地上传的 base64）
+- **AO3 导出**：外部 URL 保留为 `<img src>`，base64 图片替换为 `[图片]` 占位符
+- **普通导出**：所有图片正常保留
+
+编辑器中每个图片上传区域下方都有 `🔗` 外部链接输入框，标注"外部图片链接（AO3导出用）"。
+
+#### AO3 内联样式提取
+
+`_extractInlineStyles()` 方法在 sanitizer 运行之前处理所有 `style` 属性：
+
+1. 扫描所有带 `style` 的元素
+2. 提取所有 CSS 属性（不限于特定属性，提取全部）
+3. 浏览器会将颜色序列化为 `rgb()` 格式，自动转换为十六进制（如 `rgb(255,107,107)` → `#ff6b6b`），避免 AO3 不识别
+4. 每种独特的样式组合生成 CSS class（如 `.xc0 { color: #ff6b6b; }`），**不以 `_` 开头**（AO3 会清除下划线开头的 class）
+5. 用 class 替换内联 style
+6. 生成的 CSS 追加到输出的 `<style>` 中
+
+#### AO3 预览内嵌样式提取
+
+部分平台（如 WhatsApp 群聊成员颜色）通过 `mounted`/`updated` 钩子注入真实 `<style>` DOM 元素到预览组件内部。导出兼容 HTML 时：
+
+1. 在 `_sanitizeHTML()` 之前，提取克隆 DOM 中所有 `<style>` 元素的 `textContent`
+2. 移除这些 `<style>` 元素
+3. 将提取的 CSS 合并到输出的 `<style>` 区域
+
+这解决了 WhatsApp 群聊中每个成员名字颜色不同的问题——颜色通过 CSS class（`wa-sc-0`、`wa-sc-1` 等）+ `<style>` 规则传递，不依赖内联 `style` 属性。
+
+#### AO3 兼容性 CSS 补丁
+
+`COMPAT_FIXES` 对象为每个平台提供 fallback CSS，补充被 `_cleanCSS()` 移除的关键属性（如 `aspect-ratio`、`object-fit`）：
+
+```javascript
+COMPAT_FIXES: {
+    instagram: '.ig-image-container { height: 470px; } ...',
+    twitter: '.tw-image-container img { max-height: 500px; } ...',
+    youtube: '.yt-player { height: 338px; } ...',
+    imessage: '.msg-messages { height: auto; } ...',
+    whatsapp: '.wa-messages { height: auto; } .wa-bubble-image img { max-height: 400px; } ...',
+    reddit: '.rd-post-image img { max-height: 600px; } ...',
+    xiaohongshu: '.xhs-image-area { height: 520px; } ...'
+}
+```
+
 ---
 
 ## 7. CSS 编写规范
@@ -448,6 +553,8 @@ background: #efefef;
 | Reddit | `.rd-` | `platform-reddit.css` |
 | YouTube | `.yt-` | `platform-youtube.css` |
 | iMessage | `.msg-` | `platform-imessage.css` |
+| WhatsApp | `.wa-` | `platform-whatsapp.css` |
+| 小红书 | `.xhs-` | `platform-xiaohongshu.css` |
 
 ### 7.5 编辑器 vs 预览样式分离
 
@@ -468,19 +575,10 @@ background: #efefef;
 运行以下命令重新生成 `platform-css.js`：
 
 ```bash
-node -e "
-const fs = require('fs');
-const dir = 'css';
-const platforms = ['instagram', 'twitter', 'reddit', 'youtube', 'imessage'];
-let js = '/**\n * 平台 CSS 字符串（用于 HTML 导出）\n * 由构建脚本自动生成\n */\nconst PlatformCSS = {\n';
-for (const p of platforms) {
-    const css = fs.readFileSync(dir + '/platform-' + p + '.css', 'utf8');
-    js += '    ' + p + ': ' + JSON.stringify(css) + ',\n';
-}
-js += '};\n';
-fs.writeFileSync('js/utils/platform-css.js', js);
-"
+node generate-platform-css.js
 ```
+
+脚本会读取所有 `css/platform-*.css` 文件，生成 `js/utils/platform-css.js`。
 
 **重要**：每次修改 `css/platform-*.css` 后都必须重新运行此命令。
 
@@ -540,14 +638,155 @@ data.comments.length
 
 ## 11. 平台显示名称
 
-| platformId | 显示名 | 图标 |
-|------------|--------|------|
-| instagram | Instagram | 📸 |
-| twitter | X | 🐦 |
-| reddit | Reddit | 🔴 |
-| youtube | YouTube | ▶️ |
-| imessage | iMessage | 💬 |
+| platformId | 显示名 | 图标 | 分组 |
+|------------|--------|------|------|
+| xiaohongshu | 小红书 | 📕 | 国内 |
+| instagram | Instagram | 📸 | 国际 |
+| twitter | X | 🐦 | 国际 |
+| reddit | Reddit | 🔴 | 国际 |
+| youtube | YouTube | ▶️ | 国际 |
+| imessage | iMessage | 💬 | 国际 |
+| whatsapp | WhatsApp | 📱 | 国际 |
 
 名称映射在两处维护：
 - `app.js` → `platforms` 数组
 - `js/components/universal-editor.js` → `getPlatformName()` 方法
+
+---
+
+## 12. 平台特性详情
+
+### 12.1 WhatsApp
+
+**主题系统**：8 种预设主题，每种定义 `bg`（聊天气泡背景）、`header`（头部颜色）、`sent`（发送气泡色）。
+
+| 主题 ID | 名称 | 说明 |
+|---------|------|------|
+| whatsapp | 经典 | 默认 WhatsApp 绿色 |
+| dark | 深色 | 深色模式 |
+| ocean | 海洋 | 蓝色调 |
+| lavender | 薰衣草 | 紫色调 |
+| rose | 玫瑰 | 粉色调 |
+| mint | 薄荷 | 清新绿色调 |
+| sunset | 日落 | 暖色调 |
+| custom | 自定义 | 用户通过 `customBgColor`/`customHeaderColor` 自定义 |
+
+**群聊模式**（`isGroup: true`）：
+- 头部显示堆叠头像 + 群名
+- `groupMembers` 数组管理成员，每个成员有 `name`、`avatar`、`avatarUrl`、`color`
+- 收到的消息通过 `sender` 索引关联到 `groupMembers`，显示发送者名字（颜色取自成员 `color`）
+- `sender: -1` 表示"我"（发送方），`sender: 0/1/2...` 索引到 `groupMembers`
+
+**语音消息**（`isVoice: true`）：
+- 编辑器：开关切换语音模式，设置时长 (`voiceDuration`) 和转文字内容 (`voiceTranscription`)
+- 预览：绿色/白色气泡内显示 ▶ 播放按钮 + 20 条波形柱 + 时长
+- 转文字内容以斜体小字显示在语音气泡下方，带分隔线
+
+### 12.2 X (Twitter) 引用转发
+
+`quoteTweet` 字段：`null`（无引用）或对象 `{ displayName, username, verified, content, imageUrl, imageUrlExt }`
+
+- **编辑器**：开关启用后填写原推作者、内容、图片链接
+- **预览**：正文下方显示圆角边框的嵌套推文卡片（`.tw-quote-card`），包含头像占位、作者名、认证标、@用户名、正文和可选图片
+
+### 12.3 评论回复（Instagram / X / YouTube）
+
+三个平台的 `comments` 数组中每条评论新增 `replies: []` 字段：
+
+| 平台 | 回复字段 | 编辑器功能 |
+|------|---------|-----------|
+| Instagram | `replies: [{ username, text }]` | 添加/删除/编辑回复 |
+| X | `replies: [{ username, text }]` | 添加/删除/编辑回复 |
+| YouTube | `replies: [{ author, text }]` | 添加/删除/编辑回复 |
+| Reddit | `replies: [{ author, text, upvotes, timeAgo }]` | 已有，支持嵌套 |
+
+预览中回复以缩进+左边框方式显示在父评论下方。
+
+---
+
+## 13. 数据迁移
+
+当 `localStorage` 中保存了旧版本数据（缺少新字段）时，`_migrateData()` 方法自动补全：
+
+```javascript
+_migrateData() {
+    const platforms = ['instagram', 'twitter', 'youtube', 'xiaohongshu'];
+    for (const p of platforms) {
+        const comments = this.projectData[p] && this.projectData[p].comments;
+        if (Array.isArray(comments)) {
+            for (let i = 0; i < comments.length; i++) {
+                if (!comments[i].replies) {
+                    comments[i] = { ...comments[i], replies: [] };
+                }
+            }
+        }
+    }
+}
+```
+
+此方法在 `mounted()` 和 `loadProject()` 中调用，确保从 localStorage 加载的旧数据兼容新模板。
+
+---
+
+## 14. 变更日志
+
+### v3.5-v3.8 新增功能与优化
+
+#### 14.1 小红书平台模块（v3.5 新增）
+
+- **CSS 前缀**：`.xhs-*`（`platform-xiaohongshu.css`）
+- **编辑器**：用户信息、笔记图片（3:4 竖图）、标题/正文、位置、点赞/收藏、评论区（含嵌套回复+头像上传+外链）
+- **预览**：红色主题卡片、关注按钮、互动栏（❤️ 点赞 / 💬 评论 / ⭐ 收藏）、评论/回复带头像
+- **数据字段**：`username, avatar, avatarUrl, imageUrl, imageUrlExt, title, content, location, likes, favorites, showFollowBtn, timestamp, comments[{ username, text, likes, avatar, avatarUrl, replies[{ username, text, avatar, avatarUrl }] }]`
+- **图片导出**：`COMPAT_FIXES.xiaohongshu` 提供 `height: 520px` fallback（替代被移除的 `aspect-ratio: 3/4`）
+
+#### 14.2 平台 Tab 分组（v3.5）
+
+- 平台选择器分为「🇨🇳 国内平台」和「🌍 国际平台」两个 Tab
+- `platformRegion` 数据字段控制当前 Tab（`'domestic'` / `'international'`）
+- `filteredPlatforms` 计算属性根据 `platformRegion` 过滤显示
+- `switchPlatform()` 自动跳转到对应平台所在的 Tab
+
+#### 14.3 综合页面模块选中聚焦（v3.4）
+
+- 左侧模块列表项可点击选中（`selectedIndex` 状态）
+- 选中后右侧预览自动平滑滚动到对应模块（`scrollIntoView({ behavior: 'smooth', block: 'center' })`）
+- 左右两侧均有高亮样式（蓝色边框+背景）
+- 再次点击取消选中
+
+#### 14.4 综合页面「更新综合页面」按钮（v3.4）
+
+- 当 `editingUniversalIndex >= 0` 时显示「✅ 更新综合页面」和「❌ 取消编辑」按钮
+- 切换平台、切换视图、新建空白时自动清除 `editingUniversalIndex`
+
+#### 14.5 Instagram 评论回复格式优化（v3.5）
+
+- 去掉 `slice(0, 5)` 限制，显示全部评论
+- 回复区添加 20px 缩进 + 2px 灰色竖线（`.ig-reply-thread-line`），类似真实 Instagram
+- 评论用 `.ig-comment-group` 包裹分组
+
+#### 14.6 X/Twitter 评论显示优化（v3.4）
+
+- 去掉评论 `slice(0, 5)` 和回复 `slice(0, 3)` 限制，显示全部
+
+#### 14.7 WhatsApp 群聊成员颜色 AO3 导出修复（v3.8）
+
+**问题**：AO3 会清除元素的 `style` 属性，导致群聊不同成员的昵称颜色丢失。
+
+**解决方案**：
+1. 预览模板中发送者名字不再用 `:style`，改用 CSS class `wa-sc-{index}`
+2. `WhatsAppPreview` 组件通过 `mounted`/`updated` 钩子，用 `document.createElement('style')` 注入真实 `<style>` 到 DOM（如 `.wa-sc-0 { color: #ff6b6b !important; }`）
+3. 导出兼容 HTML 时，在 `_sanitizeHTML()` 之前提取克隆 DOM 中所有 `<style>` 的 `textContent`，合并到输出 CSS
+4. `_extractInlineStyles()` 生成的 class 前缀改为 `xc`（不以 `_` 开头，AO3 会清除下划线开头的 class）
+5. 浏览器序列化的 `rgb()` 颜色自动转换为十六进制
+
+#### 14.8 平台选择器 Grid 布局（v3.4）
+
+- `platform-tabs` 从 `display: flex` 改为 `display: grid; grid-template-columns: repeat(3, 1fr)`
+- 避免平台多时按钮拥挤遮挡
+
+#### 14.9 构建脚本（v3.4）
+
+- 新增 `generate-platform-css.js` 替代内联 Node 命令
+- 运行 `node generate-platform-css.js` 即可重新生成 `platform-css.js`
+- 包含所有 7 个平台（含 xiaohongshu）

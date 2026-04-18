@@ -17,7 +17,8 @@ const iMessageDefaults = {
         { id: 3, type: 'received', text: '周末要不要一起去三里屯拍照？听说那边新开了一家咖啡馆，装修特别好看', image: '', imageUrl: '', time: '下午 3:22', reaction: '' },
         { id: 4, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:23', reaction: '' },
         { id: 5, type: 'sent', text: '好啊！我正好想去！几点？', image: '', imageUrl: '', time: '下午 3:24', reaction: '❤️' },
-        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' }
+        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' },
+        { id: 7, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:25', reaction: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
     ]
 };
 
@@ -111,6 +112,8 @@ const iMessageEditor = {
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
+                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
+                            @click="insertMessage(idx, 'sent')">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
                             @click="toggleType(idx)" :title="msg.type === 'sent' ? '切换为收到' : '切换为发送'">⇄</button>
                         <button class="remove-comment" @click="removeMessage(idx)">✕</button>
@@ -145,6 +148,36 @@ const iMessageEditor = {
                         <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" placeholder="❤️👍😂" style="font-size:13px;">
                     </div>
                 </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <div class="toggle-group" style="margin-bottom:0;">
+                        <label class="toggle">
+                            <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size:12px;">通话记录</span>
+                    </div>
+                </div>
+                <template v-if="msg.isCall">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">通话类型</label>
+                        <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
+                            <option value="voice">📞 语音通话</option>
+                            <option value="video">📹 FaceTime</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">通话状态</label>
+                        <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
+                            <option value="answered">✅ 已接听</option>
+                            <option value="missed">❌ 未接听</option>
+                            <option value="declined">🚫 已拒绝</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">⏱ 通话时长</label>
+                        <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
+                    </div>
+                </template>
             </div>
             <div style="display:flex;gap:6px;">
                 <button class="add-comment-btn" @click="addMessage('sent')" style="flex:1;">➕ 发送消息</button>
@@ -190,8 +223,30 @@ const iMessageEditor = {
                 image: '', 
                 imageUrl: '',
                 time: '', 
-                reaction: '' 
+                reaction: '',
+                isCall: false,
+                callType: 'voice',
+                callDuration: '',
+                callStatus: 'answered'
             }];
+            this.updateField('messages', messages);
+        },
+        insertMessage(idx, type) {
+            const newMsg = { 
+                id: Date.now(), 
+                type, 
+                text: '', 
+                image: '', 
+                imageUrl: '',
+                time: '', 
+                reaction: '',
+                isCall: false,
+                callType: 'voice',
+                callDuration: '',
+                callStatus: 'answered'
+            };
+            const messages = [...this.data.messages];
+            messages.splice(idx + 1, 0, newMsg);
             this.updateField('messages', messages);
         },
         removeMessage(idx) {
@@ -308,7 +363,16 @@ const iMessagePreview = {
 
             <!-- Message bubbles -->
             <template v-for="(msg, idx) in data.messages" :key="idx">
-                <div :class="['msg-bubble', 
+                <div v-if="msg.isCall" :class="['msg-call-record', 'msg-call-' + (msg.callStatus || 'answered')]">
+                    <span class="msg-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
+                    <span class="msg-call-text">
+                        <template v-if="msg.callStatus === 'missed'">未接听</template>
+                        <template v-else-if="msg.callStatus === 'declined'">已拒绝</template>
+                        <template v-else>已接听</template>
+                    </span>
+                    <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="msg-call-duration">{{ msg.callDuration }}</span>
+                </div>
+                <div v-if="!msg.isCall" :class="['msg-bubble', 
                     msg.type === 'sent' ? 'msg-bubble-sent' : 'msg-bubble-received',
                     getMessageStyle(idx)
                 ]">
@@ -332,7 +396,7 @@ const iMessagePreview = {
                     </div>
                 </div>
                 <!-- Reaction -->
-                <div v-if="msg.reaction" :class="['msg-reaction', msg.type === 'sent' ? '' : '']">
+                <div v-if="!msg.isCall && msg.reaction" :class="['msg-reaction', msg.type === 'sent' ? '' : '']">
                     {{ msg.reaction }}
                 </div>
             </template>

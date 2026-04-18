@@ -486,7 +486,7 @@ const TwitterPreview = {
                 <div style="border-top:1px solid #e6ecf0; margin-top:12px; padding-top:12px;">
                     <div style="font-size:13px; color:#536471; margin-bottom:8px;">查看全部 {{ data.comments.length }} 条评论</div>
                     <div class="tw-comments">
-                        <div class="tw-comment" v-for="(comment, idx) in data.comments.slice(0, 5)" :key="idx">
+                        <div class="tw-comment" v-for="(comment, idx) in data.comments" :key="idx">
                             <img v-if="comment.avatar || comment.avatarUrl" class="tw-comment-avatar" :src="comment.avatar || comment.avatarUrl" :alt="comment.username">
                             <div v-else class="tw-comment-avatar">{{ (comment.username || 'U')[0].toUpperCase() }}</div>
                             <div class="tw-comment-content">
@@ -504,7 +504,7 @@ const TwitterPreview = {
                                     <span class="tw-comment-like-count">{{ comment.likes > 0 ? comment.likes : '' }}</span>
                                 </div>
                                 <div v-if="(comment.replies || []).length > 0" class="tw-comment-replies">
-                                    <div v-for="(reply, rIdx) in (comment.replies || []).slice(0, 3)" :key="rIdx" class="tw-comment-reply">
+                                    <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" class="tw-comment-reply">
                                         <span class="tw-comment-username" style="font-size:12px;">{{ reply.username }}</span>
                                         <span class="tw-comment-text" style="font-size:12px;">{{ reply.text }}</span>
                                     </div>
