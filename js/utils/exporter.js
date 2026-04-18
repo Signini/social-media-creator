@@ -156,6 +156,7 @@ img { max-width: 100%; }
 .ig-image-container img { max-height: 470px; }
 `,
         twitter: `
+.tw-image-container { max-height: 500px; overflow: hidden; }
 .tw-image-container img { max-height: 500px; }
 `,
         youtube: `
