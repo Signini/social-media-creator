@@ -790,3 +790,60 @@ _migrateData() {
 - 新增 `generate-platform-css.js` 替代内联 Node 命令
 - 运行 `node generate-platform-css.js` 即可重新生成 `platform-css.js`
 - 包含所有 7 个平台（含 xiaohongshu）
+
+#### 14.10 小红书评论独立时间（v4.0）
+
+- 评论和回复各有独立的 `time` 字段，不再共用主贴 `timestamp`
+- 编辑器中评论和回复各有「🕐 时间」输入框
+- 预览中评论显示 `comment.time`，回复显示 `reply.time`（小灰色文字）
+- 主贴时间修改不再影响评论/回复的时间显示
+
+#### 14.11 X/Twitter 图片导出变形修复（v4.1）
+
+**问题**：`_cleanCSS` 删除 `object-fit: cover` 后，图片只有 `width: 100%` 无高度约束，导出 HTML 中图片拉伸变形。
+
+**修复**：`COMPAT_FIXES.twitter` 为 `.tw-image-container` 和 `img` 设置固定 `height: 280px` + `overflow: hidden`。
+
+#### 14.12 全平台预览宽度统一（v4.2）
+
+**问题**：各平台预览 `max-width` 差距大（390px~800px），切换平台时视觉不统一。
+
+**修复**：
+- 所有平台根容器统一为 `max-width: 500px`
+- 每个平台 CSS 末尾添加 `@media (max-width: 540px) { .xx-root { max-width: 100%; } }`
+- 网页端折中宽度居中显示，手机端自动全宽
+
+| 平台 | 修改前 | 修改后 |
+|------|--------|--------|
+| 小红书 | 390px | 500px |
+| WhatsApp | 414px | 500px |
+| iMessage | 414px | 500px |
+| Instagram | 470px | 500px |
+| X/Twitter | 598px | 500px |
+| Reddit | 640px | 500px |
+| YouTube | 800px | 500px |
+
+#### 14.13 自动保存功能（v4.3）
+
+**问题**：用户关闭页面后未手动保存的数据丢失。
+
+**方案**：
+- **独立 localStorage key**：`social-media-creator-autosave`，与手动保存的项目列表互不干扰
+- **防抖监听**：`mounted()` 中通过 `this.$watch()` 监听 `projectData` + `universalData` 的 JSON 序列化，2 秒防抖写入
+- **页面关闭前保存**：`window.addEventListener('beforeunload', ...)` 立即写入
+- **启动时自动恢复**：检测 autosave key，有数据则恢复 `projectData`、`universalData`、`currentPlatform` 并提示
+- **手动保存时清除 autosave**：`confirmSaveProject()` 成功后 `localStorage.removeItem('social-media-creator-autosave')`
+
+```javascript
+// 监听数据变化，2秒防抖保存
+this.$watch(
+    () => JSON.stringify(this.projectData) + JSON.stringify(this.universalData),
+    () => { /* 防抖写入 localStorage */ },
+    { deep: false }
+);
+
+// 关闭页面前立即保存
+window.addEventListener('beforeunload', () => {
+    localStorage.setItem(autoSaveKey, JSON.stringify({...}));
+});
+```

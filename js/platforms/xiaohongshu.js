@@ -10,10 +10,10 @@ const XiaohongshuDefaults = {
     likes: 2048,
     favorites: 856,
     comments: [
-                        { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', replies: [
-                            { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '' }
+        { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', time: '1小时前', replies: [
+            { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '', time: '45分钟前' }
         ]},
-        { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', replies: [] }
+        { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', time: '30分钟前', replies: [] }
     ],
     timestamp: '2小时前',
     showFollowBtn: true
@@ -95,6 +95,10 @@ const XiaohongshuEditor = {
             <label>📍 位置</label>
             <input class="form-input" :value="data.location" @input="updateField('location', $event.target.value)" placeholder="添加位置（可选）">
         </div>
+        <div class="form-group">
+            <label>🕐 发布时间</label>
+            <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" placeholder="如: 2小时前、03-15 18:30">
+        </div>
 
         <div class="section-divider"></div>
 
@@ -151,6 +155,10 @@ const XiaohongshuEditor = {
                 <div class="form-group" style="margin-bottom:8px;">
                     <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" style="font-size:13px;">
                 </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label style="font-size:12px;">🕐 时间</label>
+                    <input class="form-input" :value="comment.time" @input="updateComment(idx, 'time', $event.target.value)" placeholder="如: 1小时前" style="font-size:12px;">
+                </div>
                 <div class="form-group" style="margin-bottom:0;">
                     <label style="font-size:12px;">喜欢</label>
                     <div class="number-input-group">
@@ -191,6 +199,9 @@ const XiaohongshuEditor = {
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
                                 <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:4px;">
+                                <input class="form-input" :value="reply.time" @input="updateReply(idx, rIdx, 'time', $event.target.value)" placeholder="🕐 时间" style="font-size:11px;padding:3px 6px;">
                             </div>
                         </div>
                     </div>
@@ -240,7 +251,7 @@ const XiaohongshuEditor = {
             this.updateField(field, Math.max(0, current + delta));
         },
         addComment() {
-            const comments = [...(this.data.comments || []), { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, avatar: '', avatarUrl: '', replies: [] }];
+            const comments = [...(this.data.comments || []), { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, avatar: '', avatarUrl: '', time: '', replies: [] }];
             this.updateField('comments', comments);
         },
         removeComment(idx) {
@@ -260,7 +271,7 @@ const XiaohongshuEditor = {
         },
         addReply(commentIdx) {
             const comments = [...(this.data.comments || [])];
-            const replies = [...(comments[commentIdx].replies || []), { username: 'user_' + Math.floor(Math.random()*999), text: '', avatar: '', avatarUrl: '' }];
+            const replies = [...(comments[commentIdx].replies || []), { username: 'user_' + Math.floor(Math.random()*999), text: '', avatar: '', avatarUrl: '', time: '' }];
             comments[commentIdx] = { ...comments[commentIdx], replies };
             this.updateField('comments', comments);
         },
@@ -344,7 +355,7 @@ const XiaohongshuPreview = {
                     <div class="xhs-comment-name">{{ comment.username }}</div>
                     <div class="xhs-comment-text">{{ comment.text }}</div>
                     <div class="xhs-comment-meta">
-                        <span>{{ data.timestamp || '刚刚' }}</span>
+                        <span>{{ comment.time || '刚刚' }}</span>
                         <span class="xhs-comment-like">
                             <svg viewBox="0 0 24 24"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.725-2.96 7.098-6.378 9.566a.998.998 0 0 1-1.244 0C10.46 16.22 7.5 12.847 7.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 .679-.938z"/></svg>
                             {{ comment.likes > 0 ? comment.likes : '' }}
@@ -361,6 +372,7 @@ const XiaohongshuPreview = {
                             <div class="xhs-reply-body">
                                 <span class="xhs-reply-name">{{ reply.username }}</span>
                                 <span class="xhs-reply-text">{{ reply.text }}</span>
+                                <span v-if="reply.time" class="xhs-reply-time">{{ reply.time }}</span>
                             </div>
                         </div>
                     </div>

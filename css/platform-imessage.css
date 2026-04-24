@@ -5,7 +5,7 @@
 .msg-conversation {
     background: #fff;
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-    max-width: 414px;
+    max-width: 500px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -379,4 +379,8 @@
 .msg-call-duration {
     margin-left: 4px;
     color: #8e8e93;
+}
+
+@media (max-width: 540px) {
+    .msg-conversation { max-width: 100%; }
 }

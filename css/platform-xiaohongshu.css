@@ -5,7 +5,7 @@
 .xhs-post {
     background: #fff;
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Helvetica Neue', sans-serif;
-    max-width: 390px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -312,8 +312,18 @@
     line-height: 1.4;
 }
 
+.xhs-reply-time {
+    font-size: 10px;
+    color: #bbb;
+    margin-left: 6px;
+}
+
 .xhs-date {
     padding: 0 16px 16px;
     font-size: 11px;
     color: #bbb;
+}
+
+@media (max-width: 540px) {
+    .xhs-post { max-width: 100%; }
 }

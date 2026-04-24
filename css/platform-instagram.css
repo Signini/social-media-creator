@@ -6,7 +6,7 @@
 .ig-post {
     background: #fff;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-    max-width: 470px;
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -306,4 +306,8 @@
 /* Emoji in caption */
 .ig-emoji {
     font-style: normal;
+}
+
+@media (max-width: 540px) {
+    .ig-post { max-width: 100%; }
 }

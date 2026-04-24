@@ -5,7 +5,7 @@
 .wa-chat {
     background: #efeae2;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-    max-width: 414px;
+    max-width: 500px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -504,4 +504,8 @@
 
 .wa-call-duration {
     margin-left: 6px;
+}
+
+@media (max-width: 540px) {
+    .wa-chat { max-width: 100%; }
 }

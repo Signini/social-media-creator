@@ -172,10 +172,10 @@ if (typeof Vue === 'undefined') {
                     likes: 2048,
                     favorites: 856,
                     comments: [
-                        { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', replies: [
-                            { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '' }
-                        ]},
-                        { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', replies: [] }
+                    { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', time: '1小时前', replies: [
+                        { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '', time: '45分钟前' }
+                    ]},
+                    { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', time: '30分钟前', replies: [] }
                     ],
                     timestamp: '2小时前',
                     showFollowBtn: true
@@ -197,35 +197,82 @@ if (typeof Vue === 'undefined') {
     mounted() {
         console.log('🔧 Vue 应用已挂载，开始初始化...');
 
-        // 先关闭所有弹窗，避免加载项目列表时触发
         this.showLoadModal = false;
         this.showSaveModal = false;
 
-        // 检查 localStorage 中的数据
         const savedData = localStorage.getItem(StorageUtil.STORAGE_KEY);
         console.log('📦 localStorage 数据:', savedData ? JSON.parse(savedData) : '无数据');
 
-        // 加载项目列表
         this.loadSavedProjectsList();
-
-        // 数据迁移：为旧数据补充 replies 字段
         this._migrateData();
 
-        // 再次确保所有弹窗关闭（防止加载项目列表时触发）
         this.$nextTick(() => {
             this.showLoadModal = false;
             this.showSaveModal = false;
-            console.log('✅ 弹窗状态已确认:', {
-                showLoadModal: this.showLoadModal,
-                showSaveModal: this.showSaveModal
-            });
         });
 
-        // 检查数据是否正确加载
-        console.log('📊 当前平台:', this.currentPlatform);
-        console.log('📊 Instagram 数据:', this.projectData.instagram);
+        const autoSaveKey = 'social-media-creator-autosave';
+        const autoData = localStorage.getItem(autoSaveKey);
+        if (autoData) {
+            try {
+                const parsed = JSON.parse(autoData);
+                if (parsed.data) {
+                    for (const key of Object.keys(parsed.data)) {
+                        if (this.projectData[key]) {
+                            this.projectData[key] = parsed.data[key];
+                        }
+                    }
+                }
+                if (parsed.universalData) {
+                    this.universalData = parsed.universalData;
+                }
+                if (parsed.platform) {
+                    this.currentPlatform = parsed.platform;
+                    const p = this.platforms.find(pl => pl.id === parsed.platform);
+                    if (p) this.platformRegion = p.region;
+                }
+                console.log('🔄 已自动恢复上次编辑内容');
+                this.showToast('🔄 已自动恢复上次编辑内容');
+            } catch (e) {
+                console.error('自动恢复失败:', e);
+            }
+        }
 
-        // 显示欢迎信息
+        let autoSaveTimer = null;
+        const triggerAutoSave = () => {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                try {
+                    localStorage.setItem(autoSaveKey, JSON.stringify({
+                        data: this.projectData,
+                        universalData: this.universalData,
+                        platform: this.currentPlatform,
+                        savedAt: new Date().toLocaleString('zh-CN')
+                    }));
+                } catch (e) {
+                    console.error('自动保存失败:', e);
+                }
+            }, 2000);
+        };
+
+        this.$watch(
+            () => JSON.stringify(this.projectData) + JSON.stringify(this.universalData),
+            triggerAutoSave,
+            { deep: false }
+        );
+
+        window.addEventListener('beforeunload', () => {
+            try {
+                localStorage.setItem(autoSaveKey, JSON.stringify({
+                    data: this.projectData,
+                    universalData: this.universalData,
+                    platform: this.currentPlatform,
+                    savedAt: new Date().toLocaleString('zh-CN')
+                }));
+            } catch (e) {}
+        });
+
+        console.log('📊 当前平台:', this.currentPlatform);
         this.showToast('🎉 社交媒体创作器已就绪！');
     },
 
@@ -358,6 +405,7 @@ if (typeof Vue === 'undefined') {
                 this.projectId = project.id;
                 this.showSaveModal = false;
                 this.loadSavedProjectsList();
+                localStorage.removeItem('social-media-creator-autosave');
                 this.showToast('✅ 项目保存成功！');
             } else {
                 this.showToast('❌ 保存失败，请重试');
