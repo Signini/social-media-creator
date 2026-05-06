@@ -452,8 +452,7 @@ const WeChatPreview = {
                 <!-- Normal Message -->
                 <div v-else :class="['wx-msg-row', msg.type === 'sent' ? 'wx-msg-row-sent' : '']">
                     <!-- Avatar -->
-                    <div v-if="msg.type === 'sent'" class="wx-msg-avatar" :style="{ background: '#07c160' }">我</div>
-                    <div v-else class="wx-msg-avatar" :style="getAvatarStyle(msg)">
+                    <div v-if="msg.type !== 'sent'" class="wx-msg-avatar" :style="getAvatarStyle(msg)">
                         <img v-if="getAvatarSrc(msg)" :src="getAvatarSrc(msg)">
                         <span v-else>{{ getAvatarLetter(msg) }}</span>
                     </div>
@@ -474,6 +473,7 @@ const WeChatPreview = {
                             <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wx-bubble-empty">（空消息）</div>
                         </div>
                     </div>
+                    <div v-if="msg.type === 'sent'" class="wx-msg-avatar" :style="{ background: '#07c160' }">我</div>
                 </div>
             </template>
 

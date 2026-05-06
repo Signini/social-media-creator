@@ -194,7 +194,7 @@
 }
 
 .wx-msg-row-sent {
-    justify-content: flex-end;
+    flex-direction: row-reverse;
 }
 
 .wx-msg-avatar {
@@ -202,7 +202,7 @@
     height: 36px;
     border-radius: 4px;
     margin-right: 8px;
-    background: #ccc;
+    background: #07c160;
     text-align: center;
     line-height: 36px;
     color: #fff;
@@ -213,8 +213,9 @@
 }
 
 .wx-msg-row-sent .wx-msg-avatar {
-    margin-right: 0;
-    margin-left: 8px;
+    margin-left: 0;
+    margin-right: 8px;
+    background: #07c160;
 }
 
 .wx-msg-avatar img {
