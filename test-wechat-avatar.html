@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信头像修复测试</title>
+    <link rel="stylesheet" href="css/platform-wechat.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f7;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 微信头像位置测试</h1>
+        <p>请检查以下消息布局，确认头像位置是否正确：</p>
+        
+        <div class="wx-chat">
+            <div class="wx-messages">
+                <!-- 接收到的消息（头像应该在左侧） -->
+                <div class="wx-msg-row">
+                    <div class="wx-msg-avatar">张</div>
+                    <div class="wx-msg-content">
+                        <div class="wx-sender-name">张三</div>
+                        <div class="wx-bubble wx-bubble-received">
+                            <div class="wx-bubble-text">你好！这是接收到的消息，头像应该在左侧。</div>
+                        </div>
+                        <div class="wx-bubble-meta">
+                            <div class="wx-bubble-time">10:30</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 发送的消息（头像应该在右侧） -->
+                <div class="wx-msg-row wx-msg-row-sent">
+                    <div class="wx-msg-content">
+                        <div class="wx-bubble wx-bubble-sent">
+                            <div class="wx-bubble-text">这是发送的消息，头像现在应该在右侧了！</div>
+                        </div>
+                        <div class="wx-bubble-meta">
+                            <div class="wx-bubble-time">10:32</div>
+                        </div>
+                    </div>
+                    <div class="wx-msg-avatar">我</div>
+                </div>
+
+                <!-- 接收到的消息（头像应该在左侧） -->
+                <div class="wx-msg-row">
+                    <div class="wx-msg-avatar">李</div>
+                    <div class="wx-msg-content">
+                        <div class="wx-sender-name">李四</div>
+                        <div class="wx-bubble wx-bubble-received">
+                            <div class="wx-bubble-text">很好，现在头像位置正确了。</div>
+                        </div>
+                        <div class="wx-bubble-meta">
+                            <div class="wx-bubble-time">10:35</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 发送的消息（头像应该在右侧） -->
+                <div class="wx-msg-row wx-msg-row-sent">
+                    <div class="wx-msg-content">
+                        <div class="wx-bubble wx-bubble-sent">
+                            <div class="wx-bubble-text">是的，已发送消息头像现在在右侧，接收消息头像在左侧，符合微信的交互习惯。</div>
+                        </div>
+                        <div class="wx-bubble-meta">
+                            <div class="wx-bubble-time">10:36</div>
+                        </div>
+                    </div>
+                    <div class="wx-msg-avatar">我</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e8f4fd; border-radius: 8px;">
+            <h3>🎯 期望效果：</h3>
+            <ul>
+                <li>✓ 接收消息：头像在左侧，消息气泡在右侧</li>
+                <li>✓ 发送消息：头像在右侧，消息气泡在左侧</li>
+                <li>✓ 头像背景为绿色 (#07c160)</li>
+                <li>✓ 消息间距合适，不重叠</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('微信头像修复测试页面已加载');
+            
+            // 验证接收消息的布局
+            const receivedMsg = document.querySelector('.wx-msg-row:not(.wx-msg-row-sent)');
+            if (receivedMsg) {
+                const avatar = receivedMsg.querySelector('.wx-msg-avatar');
+                const content = receivedMsg.querySelector('.wx-msg-content');
+                
+                if (avatar && content) {
+                    const avatarRect = avatar.getBoundingClientRect();
+                    const contentRect = content.getBoundingClientRect();
+                    
+                    if (avatarRect.left < contentRect.left) {
+                        console.log('✅ 接收消息头像在左侧，正确');
+                    } else {
+                        console.error('❌ 接收消息头像位置错误');
+                    }
+                }
+            }
+            
+            // 验证发送消息的布局
+            const sentMsg = document.querySelector('.wx-msg-row-sent');
+            if (sentMsg) {
+                const avatar = sentMsg.querySelector('.wx-msg-avatar');
+                const content = sentMsg.querySelector('.wx-msg-content');
+                
+                if (avatar && content) {
+                    const avatarRect = avatar.getBoundingClientRect();
+                    const contentRect = content.getBoundingClientRect();
+                    
+                    if (avatarRect.right > contentRect.right) {
+                        console.log('✅ 发送消息头像在右侧，正确');
+                    } else {
+                        console.error('❌ 发送消息头像位置错误');
+                    }
+                }
+            }
+            
+            setTimeout(() => {
+                alert('🎉 测试完成！请检查页面中的头像位置是否正确。\n\n接收消息头像应该在左侧，发送消息头像应该在右侧。');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
