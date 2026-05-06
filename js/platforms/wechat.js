@@ -451,11 +451,7 @@ const WeChatPreview = {
 
                 <!-- Normal Message -->
                 <div v-else :class="['wx-msg-row', msg.type === 'sent' ? 'wx-msg-row-sent' : '']">
-                    <!-- Avatar -->
-                    <div v-if="msg.type !== 'sent'" class="wx-msg-avatar" :style="getAvatarStyle(msg)">
-                        <img v-if="getAvatarSrc(msg)" :src="getAvatarSrc(msg)">
-                        <span v-else>{{ getAvatarLetter(msg) }}</span>
-                    </div>
+                    <div v-if="msg.type === 'sent'" class="wx-msg-avatar" :style="{ background: '#07c160' }">我</div>
                     <div class="wx-msg-content">
                         <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wx-sender-name" :style="{ color: getSender(msg).color || '#888' }">{{ getSender(msg).name }}</div>
                         <div :class="['wx-bubble', msg.type === 'sent' ? 'wx-bubble-sent' : 'wx-bubble-received']">
@@ -473,7 +469,10 @@ const WeChatPreview = {
                             <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wx-bubble-empty">（空消息）</div>
                         </div>
                     </div>
-                    <div v-if="msg.type === 'sent'" class="wx-msg-avatar" :style="{ background: '#07c160' }">我</div>
+                    <div v-if="msg.type !== 'sent'" class="wx-msg-avatar" :style="getAvatarStyle(msg)">
+                        <img v-if="getAvatarSrc(msg)" :src="getAvatarSrc(msg)">
+                        <span v-else>{{ getAvatarLetter(msg) }}</span>
+                    </div>
                 </div>
             </template>
 
