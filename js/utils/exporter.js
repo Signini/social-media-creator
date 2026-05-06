@@ -35,7 +35,7 @@ const ExporterUtil = {
     ],
 
     BLOCKED_CSS_PROPS: [
-        'aspect-ratio', 'object-fit', 'backdrop-filter', '-webkit-overflow-scrolling',
+        'backdrop-filter', '-webkit-overflow-scrolling',
         '-webkit-font-smoothing', '-moz-osx-font-smoothing', '-webkit-appearance',
         '-webkit-tap-highlight-color', '-webkit-touch-callout', '-webkit-text-size-adjust',
         '-webkit-mask', '-webkit-clip-path', 'clip-path', 'image-rendering',
@@ -86,6 +86,8 @@ img { max-width: 100%; }
 }
 .social-media-export img {
     max-width: 100%;
+    height: auto;
+    object-fit: cover;
 }
 `;
     },
@@ -152,8 +154,8 @@ img { max-width: 100%; }
 
     COMPAT_FIXES: {
         instagram: `
-.ig-image-container { height: 470px; }
-.ig-image-container img { max-height: 470px; }
+.ig-image-container { width: 100%; aspect-ratio: 1; max-height: 470px; overflow: hidden; }
+.ig-image-container img { width: 100%; height: 100%; object-fit: cover; }
 `,
         twitter: `
 .tw-image-container { overflow: hidden; }
@@ -182,8 +184,8 @@ img { max-width: 100%; }
 .rd-post-image img { max-height: 600px; }
 `,
         xiaohongshu: `
-.xhs-image-area { width: 100%; height: 520px; overflow: hidden; }
-.xhs-image-area img { width: 100%; height: auto; max-height: 520px; }
+.xhs-image-area { width: 100%; aspect-ratio: 3/4; max-height: 520px; overflow: hidden; }
+.xhs-image-area img { width: 100%; height: 100%; object-fit: cover; }
 `
     },
 
