@@ -194,7 +194,7 @@
 }
 
 .wx-msg-row-sent {
-    flex-direction: row-reverse;
+    justify-content: flex-end;
 }
 
 .wx-msg-avatar {
@@ -233,7 +233,7 @@
 
 /* Bubble */
 .wx-bubble {
-    max-width: 70%;
+    max-width: calc(100% - 48px);
     position: relative;
     border-radius: 4px;
     padding: 8px 10px;
@@ -241,6 +241,10 @@
     line-height: 1.5;
     word-break: break-word;
     white-space: pre-wrap;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    flex-shrink: 0;
+    min-width: 0;
 }
 
 .wx-bubble-received {
@@ -258,7 +262,8 @@
     line-height: 1.5;
     color: #181818;
     white-space: pre-wrap;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .wx-bubble-image {
@@ -480,6 +485,14 @@
 }
 
 /* Typing */
+/* Message Content Container */
+.wx-msg-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100% - 48px);
+}
+
 .wx-typing {
     align-self: flex-start;
     background: #fff;

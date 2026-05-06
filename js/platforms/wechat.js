@@ -457,7 +457,7 @@ const WeChatPreview = {
                         <img v-if="getAvatarSrc(msg)" :src="getAvatarSrc(msg)">
                         <span v-else>{{ getAvatarLetter(msg) }}</span>
                     </div>
-                    <div style="display:flex;flex-direction:column;">
+                    <div class="wx-msg-content">
                         <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wx-sender-name" :style="{ color: getSender(msg).color || '#888' }">{{ getSender(msg).name }}</div>
                         <div :class="['wx-bubble', msg.type === 'sent' ? 'wx-bubble-sent' : 'wx-bubble-received']">
                             <div v-if="msg.isVoice" :class="['wx-voice-msg', msg.type === 'sent' ? 'wx-voice-sent' : '']">
