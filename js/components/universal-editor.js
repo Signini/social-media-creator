@@ -101,7 +101,8 @@ const UniversalEditor = {
             const map = {
                 xiaohongshu: '小红书', instagram: 'Instagram',                 twitter: 'X', reddit: 'Reddit',
                 youtube: 'YouTube', imessage: 'iMessage',
-                whatsapp: 'WhatsApp', wechat: '微信'
+                whatsapp: 'WhatsApp', wechat: '微信', qq: 'QQ',
+                wechatMoments: '朋友圈'
             };
             return map[platformId] || platformId;
         },

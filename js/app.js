@@ -22,6 +22,8 @@ if (typeof Vue === 'undefined') {
             platforms: [
                 { id: 'xiaohongshu', name: '小红书', icon: '📕', status: 'ready', region: 'domestic' },
                 { id: 'wechat', name: '微信', icon: '💚', status: 'ready', region: 'domestic' },
+                { id: 'wechatMoments', name: '朋友圈', icon: '🔄', status: 'ready', region: 'domestic' },
+                { id: 'qq', name: 'QQ', icon: '🐧', status: 'ready', region: 'domestic' },
                 { id: 'instagram', name: 'Instagram', icon: '📸', status: 'ready', region: 'international' },
                 { id: 'twitter', name: 'X', icon: '🐦', status: 'ready', region: 'international' },
                 { id: 'reddit', name: 'Reddit', icon: '🔴', status: 'ready', region: 'international' },
@@ -179,6 +181,53 @@ if (typeof Vue === 'undefined') {
                         { id: 2, type: 'sent', text: '在的，怎么了？', image: '', imageUrl: '', time: '14:31', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
                         { id: 3, type: 'received', text: '周末有空一起吃饭吗 🍜', image: '', imageUrl: '', time: '14:32', sender: 1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
                         { id: 4, type: 'sent', text: '好啊！', image: '', imageUrl: '', time: '14:33', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' }
+                    ]
+                },
+                qq: {
+                    myName: '我',
+                    myAvatar: '',
+                    myAvatarUrl: '',
+                    contactName: '好友',
+                    contactAvatar: '',
+                    contactAvatarUrl: '',
+                    isGroup: false,
+                    groupName: 'QQ群',
+                    groupMembers: [
+                        { name: '张三', avatar: '', avatarUrl: '', color: '#12B7F5' },
+                        { name: '李四', avatar: '', avatarUrl: '', color: '#FA5151' },
+                        { name: '王五', avatar: '', avatarUrl: '', color: '#07C160' }
+                    ],
+                    dateSeparator: '昨天',
+                    showTyping: false,
+                    messages: [
+                        { id: 1, type: 'received', text: '在吗？', image: '', imageUrl: '', time: '14:30', sender: 0, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 2, type: 'sent', text: '在的！', image: '', imageUrl: '', time: '14:31', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 3, type: 'received', text: '周末一起打球？🏀', image: '', imageUrl: '', time: '14:32', sender: 1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 4, type: 'sent', text: '好啊！几点？', image: '', imageUrl: '', time: '14:33', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' }
+                    ]
+                },
+                wechatMoments: {
+                    ownerName: '张三',
+                    ownerAvatar: '',
+                    ownerAvatarUrl: '',
+                    coverImage: '',
+                    coverImageUrl: '',
+                    posts: [
+                        {
+                            id: 1, authorName: '李四', authorAvatar: '', authorAvatarUrl: '',
+                            text: '今天天气真好，出去走走～ 🌞',
+                            images: [{ image: '', imageUrl: '' }],
+                            location: '北京市·朝阳区', timestamp: '2小时前',
+                            likes: [{ name: '王五' }, { name: '赵六' }],
+                            comments: [{ username: '王五', replyTo: '', text: '好看！' }, { username: '赵六', replyTo: '李四', text: '在哪里呀？' }]
+                        },
+                        {
+                            id: 2, authorName: '张三', authorAvatar: '', authorAvatarUrl: '',
+                            text: '刚吃了一碗超好吃的牛肉面 🍜\n推荐给大家！',
+                            images: [], location: '', timestamp: '5小时前',
+                            likes: [{ name: '李四' }],
+                            comments: [{ username: '李四', replyTo: '', text: '哪家店？' }]
+                        }
                     ]
                 },
                 xiaohongshu: {
@@ -502,7 +551,9 @@ if (typeof Vue === 'undefined') {
                 youtube: this.getDefaultYoutubeData(),
                 imessage: this.getDefaultImessageData(),
                 whatsapp: this.getDefaultWhatsAppData(),
+                qq: this.getDefaultQQData(),
                 wechat: this.getDefaultWechatData(),
+                wechatMoments: this.getDefaultWechatMomentsData(),
                 xiaohongshu: this.getDefaultXiaohongshuData()
             };
         },
@@ -674,6 +725,27 @@ if (typeof Vue === 'undefined') {
             };
         },
 
+        getDefaultQQData() {
+            return {
+                myName: '我',
+                myAvatar: '',
+                myAvatarUrl: '',
+                contactName: '好友',
+                contactAvatar: '',
+                contactAvatarUrl: '',
+                isGroup: false,
+                groupName: 'QQ群',
+                groupMembers: [
+                    { name: '张三', avatar: '', avatarUrl: '', color: '#12B7F5' },
+                    { name: '李四', avatar: '', avatarUrl: '', color: '#FA5151' },
+                    { name: '王五', avatar: '', avatarUrl: '', color: '#07C160' }
+                ],
+                dateSeparator: '昨天',
+                showTyping: false,
+                messages: []
+            };
+        },
+
         getDefaultWechatData() {
             return {
                 contactName: '张三',
@@ -689,6 +761,17 @@ if (typeof Vue === 'undefined') {
                 dateSeparator: '昨天',
                 showTyping: false,
                 messages: []
+            };
+        },
+
+        getDefaultWechatMomentsData() {
+            return {
+                ownerName: '张三',
+                ownerAvatar: '',
+                ownerAvatarUrl: '',
+                coverImage: '',
+                coverImageUrl: '',
+                posts: []
             };
         },
 
@@ -858,7 +941,11 @@ const componentCheck = {
     'WhatsAppEditor': !!WhatsAppEditor,
     'WhatsAppPreview': !!WhatsAppPreview,
     'XiaohongshuEditor': !!XiaohongshuEditor,
-    'XiaohongshuPreview': !!XiaohongshuPreview
+    'XiaohongshuPreview': !!XiaohongshuPreview,
+    'QQEditor': !!QQEditor,
+    'QQPreview': !!QQPreview,
+    'WeChatMomentsEditor': !!WeChatMomentsEditor,
+    'WeChatMomentsPreview': !!WeChatMomentsPreview
 };
 
 console.log('📦 组件检查:', componentCheck);
@@ -974,6 +1061,34 @@ if (XiaohongshuPreview) {
     console.log('✅ XiaohongshuPreview 已注册');
 } else {
     console.error('❌ XiaohongshuPreview 未加载，无法注册');
+}
+
+if (QQEditor) {
+    app.component('qq-editor', QQEditor);
+    console.log('✅ QQEditor 已注册');
+} else {
+    console.error('❌ QQEditor 未加载，无法注册');
+}
+
+if (QQPreview) {
+    app.component('qq-preview', QQPreview);
+    console.log('✅ QQPreview 已注册');
+} else {
+    console.error('❌ QQPreview 未加载，无法注册');
+}
+
+if (WeChatMomentsEditor) {
+    app.component('wechat-moments-editor', WeChatMomentsEditor);
+    console.log('✅ WeChatMomentsEditor 已注册');
+} else {
+    console.error('❌ WeChatMomentsEditor 未加载，无法注册');
+}
+
+if (WeChatMomentsPreview) {
+    app.component('wechat-moments-preview', WeChatMomentsPreview);
+    console.log('✅ WeChatMomentsPreview 已注册');
+} else {
+    console.error('❌ WeChatMomentsPreview 未加载，无法注册');
 }
 
 if (UniversalEditor) {

@@ -180,12 +180,19 @@ img { max-width: 100%; }
 .wx-messages { height: auto; }
 .wx-bubble-image img { max-height: 400px; }
 `,
+        qq: `
+.qq-messages { height: auto; }
+.qq-bubble-image img { max-height: 400px; }
+`,
         reddit: `
 .rd-post-image img { max-height: 600px; }
 `,
         xiaohongshu: `
 .xhs-image-area { width: 100%; aspect-ratio: 3/4; max-height: 520px; overflow: hidden; }
 .xhs-image-area img { width: 100%; height: 100%; object-fit: cover; }
+`,
+        wechatMoments: `
+.wm-img-item img { max-height: 200px; }
 `
     },
 

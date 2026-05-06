@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/platform-imessage.css">
     <link rel="stylesheet" href="css/platform-whatsapp.css">
     <link rel="stylesheet" href="css/platform-wechat.css">
+    <link rel="stylesheet" href="css/platform-qq.css">
+    <link rel="stylesheet" href="css/platform-wechat-moments.css">
     <link rel="stylesheet" href="css/platform-xiaohongshu.css">
 </head>
 <body>
@@ -109,6 +111,18 @@
                         @update="updatePlatformData('wechat', $event)">
                     </wechat-editor>
 
+                    <!-- QQ 编辑器 -->
+                    <qq-editor v-if="currentPlatform === 'qq'"
+                        :data="projectData.qq"
+                        @update="updatePlatformData('qq', $event)">
+                    </qq-editor>
+
+                    <!-- 朋友圈 编辑器 -->
+                    <wechat-moments-editor v-if="currentPlatform === 'wechatMoments'"
+                        :data="projectData.wechatMoments"
+                        @update="updatePlatformData('wechatMoments', $event)">
+                    </wechat-moments-editor>
+
                     <!-- 小红书 编辑器 -->
                     <xiaohongshu-editor v-if="currentPlatform === 'xiaohongshu'"
                         :data="projectData.xiaohongshu"
@@ -171,6 +185,16 @@
                             <wechat-preview v-if="currentPlatform === 'wechat'"
                                 :data="projectData.wechat">
                             </wechat-preview>
+
+                            <!-- QQ 预览 -->
+                            <qq-preview v-if="currentPlatform === 'qq'"
+                                :data="projectData.qq">
+                            </qq-preview>
+
+                            <!-- 朋友圈 预览 -->
+                            <wechat-moments-preview v-if="currentPlatform === 'wechatMoments'"
+                                :data="projectData.wechatMoments">
+                            </wechat-moments-preview>
 
                             <!-- 小红书 预览 -->
                             <xiaohongshu-preview v-if="currentPlatform === 'xiaohongshu'"
@@ -260,6 +284,8 @@
     <script src="js/platforms/imessage.js?v=3.7"></script>
     <script src="js/platforms/whatsapp.js?v=3.7"></script>
     <script src="js/platforms/wechat.js?v=3.7"></script>
+    <script src="js/platforms/qq.js?v=3.8"></script>
+    <script src="js/platforms/wechat-moments.js?v=3.8"></script>
     <script src="js/platforms/xiaohongshu.js?v=3.7"></script>
 
     <!-- 综合页面组件 -->
