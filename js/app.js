@@ -21,6 +21,7 @@ if (typeof Vue === 'undefined') {
             toast: { visible: false, message: '' },
             platforms: [
                 { id: 'xiaohongshu', name: '小红书', icon: '📕', status: 'ready', region: 'domestic' },
+                { id: 'wechat', name: '微信', icon: '💚', status: 'ready', region: 'domestic' },
                 { id: 'instagram', name: 'Instagram', icon: '📸', status: 'ready', region: 'international' },
                 { id: 'twitter', name: 'X', icon: '🐦', status: 'ready', region: 'international' },
                 { id: 'reddit', name: 'Reddit', icon: '🔴', status: 'ready', region: 'international' },
@@ -160,6 +161,26 @@ if (typeof Vue === 'undefined') {
                         { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                     ]
                 },
+                wechat: {
+                    contactName: '张三',
+                    contactAvatar: '',
+                    contactAvatarUrl: '',
+                    isGroup: false,
+                    groupName: '好友群',
+                    groupMembers: [
+                        { name: '张三', avatar: '', avatarUrl: '', color: '#576b95' },
+                        { name: '李四', avatar: '', avatarUrl: '', color: '#fa5151' },
+                        { name: '王五', avatar: '', avatarUrl: '', color: '#07c160' }
+                    ],
+                    dateSeparator: '昨天',
+                    showTyping: false,
+                    messages: [
+                        { id: 1, type: 'received', text: '在吗？', image: '', imageUrl: '', time: '14:30', sender: 0, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 2, type: 'sent', text: '在的，怎么了？', image: '', imageUrl: '', time: '14:31', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 3, type: 'received', text: '周末有空一起吃饭吗 🍜', image: '', imageUrl: '', time: '14:32', sender: 1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' },
+                        { id: 4, type: 'sent', text: '好啊！', image: '', imageUrl: '', time: '14:33', sender: -1, isVoice: false, voiceDuration: '', isCall: false, callType: '', callDuration: '', callStatus: '' }
+                    ]
+                },
                 xiaohongshu: {
                     username: '生活记录者小张',
                     avatar: '',
@@ -286,6 +307,14 @@ if (typeof Vue === 'undefined') {
                         if (!comments[i].replies) {
                             comments[i] = { ...comments[i], replies: [] };
                         }
+                    }
+                }
+            }
+            const waMsgs = this.projectData.whatsapp && this.projectData.whatsapp.messages;
+            if (Array.isArray(waMsgs)) {
+                for (let i = 0; i < waMsgs.length; i++) {
+                    if (waMsgs[i].type === 'system' && waMsgs[i].systemType === undefined) {
+                        waMsgs[i] = { ...waMsgs[i], systemType: 'custom', systemActor: -1, systemTarget: 0, systemText: waMsgs[i].text || '' };
                     }
                 }
             }
@@ -473,6 +502,7 @@ if (typeof Vue === 'undefined') {
                 youtube: this.getDefaultYoutubeData(),
                 imessage: this.getDefaultImessageData(),
                 whatsapp: this.getDefaultWhatsAppData(),
+                wechat: this.getDefaultWechatData(),
                 xiaohongshu: this.getDefaultXiaohongshuData()
             };
         },
@@ -641,6 +671,24 @@ if (typeof Vue === 'undefined') {
                     { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
                     { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
                 ]
+            };
+        },
+
+        getDefaultWechatData() {
+            return {
+                contactName: '张三',
+                contactAvatar: '',
+                contactAvatarUrl: '',
+                isGroup: false,
+                groupName: '好友群',
+                groupMembers: [
+                    { name: '张三', avatar: '', avatarUrl: '', color: '#576b95' },
+                    { name: '李四', avatar: '', avatarUrl: '', color: '#fa5151' },
+                    { name: '王五', avatar: '', avatarUrl: '', color: '#07c160' }
+                ],
+                dateSeparator: '昨天',
+                showTyping: false,
+                messages: []
             };
         },
 
@@ -898,6 +946,20 @@ if (WhatsAppPreview) {
     console.log('✅ WhatsAppPreview 已注册');
 } else {
     console.error('❌ WhatsAppPreview 未加载，无法注册');
+}
+
+if (WeChatEditor) {
+    app.component('wechat-editor', WeChatEditor);
+    console.log('✅ WeChatEditor 已注册');
+} else {
+    console.error('❌ WeChatEditor 未加载，无法注册');
+}
+
+if (WeChatPreview) {
+    app.component('wechat-preview', WeChatPreview);
+    console.log('✅ WeChatPreview 已注册');
+} else {
+    console.error('❌ WeChatPreview 未加载，无法注册');
 }
 
 if (XiaohongshuEditor) {

@@ -37,9 +37,10 @@ const WhatsAppDefaults = {
         { id: 2, type: 'sent', text: '挺好的！你呢？', image: '', imageUrl: '', time: '下午 2:31', reaction: '', ticks: 'read', sender: -1 },
         { id: 3, type: 'received', text: '我也不错 😊 周末有空一起吃饭吗？', image: '', imageUrl: '', time: '下午 2:32', reaction: '', ticks: '', sender: 1 },
         { id: 4, type: 'sent', text: '好啊！去哪里？', image: '', imageUrl: '', time: '下午 2:33', reaction: '❤️', ticks: 'read', sender: -1 },
-        { id: 5, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
-        { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
-        { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
+        { id: 5, type: 'system', systemType: 'addMember', systemActor: 0, systemTarget: 2, systemText: '' },
+        { id: 6, type: 'received', text: '', image: '', imageUrl: '', time: '下午 2:35', reaction: '', ticks: '', sender: 0, isVoice: true, voiceDuration: '0:08', voiceTranscription: '好的，那我们周末见！' },
+        { id: 7, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:36', reaction: '', ticks: 'read', sender: -1, isVoice: true, voiceDuration: '0:03', voiceTranscription: '' },
+        { id: 8, type: 'sent', text: '', image: '', imageUrl: '', time: '下午 2:37', reaction: '', ticks: '', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
     ]
 };
 
@@ -197,12 +198,12 @@ const WhatsAppEditor = {
                 @dragover.prevent="onDragOver(msg, idx, $event)"
                 @dragleave="onDragLeave(msg, idx, $event)"
                 @drop="onDrop(msg, idx, $event)"
-                :style="{ borderLeft: msg.type === 'sent' ? '3px solid #25d366' : '3px solid #fff' }">
+                :style="{ borderLeft: msg.type === 'sent' ? '3px solid #25d366' : msg.type === 'system' ? '3px solid #ff9500' : msg.type === 'timeSeparator' ? '3px solid #007aff' : '3px solid #fff' }">
                 <div class="drag-handle">⋮⋮</div>
                 <div class="comment-header">
                     <span>
-                        <strong :style="{ color: msg.type === 'sent' ? '#075e54' : '#333' }">
-                            {{ msg.type === 'sent' ? '→ 发送' : '← 收到' }}
+                        <strong :style="{ color: msg.type === 'sent' ? '#075e54' : msg.type === 'system' ? '#ff9500' : msg.type === 'timeSeparator' ? '#007aff' : '#333' }">
+                            {{ msg.type === 'sent' ? '→ 发送' : msg.type === 'received' ? '← 收到' : msg.type === 'system' ? '🔔 系统' : '🕐 时间' }}
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
@@ -213,104 +214,171 @@ const WhatsAppEditor = {
                         <button class="remove-comment" @click="removeMessage(idx)">✕</button>
                     </div>
                 </div>
-                <div v-if="data.isGroup && msg.type === 'received'" class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">发送者</label>
-                    <select class="form-input" :value="msg.sender || 0" @change="updateMessage(idx, 'sender', parseInt($event.target.value))" style="font-size:12px;">
-                        <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <textarea class="form-input" :value="msg.text"
-                        @input="updateMessage(idx, 'text', $event.target.value)"
-                        placeholder="消息内容" rows="2"
-                        style="font-size:13px;min-height:36px;"></textarea>
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">图片</label>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <div v-if="msg.image" style="position:relative;">
-                            <img :src="msg.image" style="width:60px;height:40px;border-radius:4px;object-fit:cover;">
-                            <button style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ff3b30;color:#fff;border:none;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;" @click.stop="updateMessage(idx, 'image', '')">✕</button>
-                        </div>
-                        <label v-else class="btn btn-small btn-outline" style="cursor:pointer;">
-                            📷
-                            <input type="file" accept="image/*" @change="handleMsgImage(idx, $event)" hidden>
-                        </label>
+
+                <!-- System Message Editor -->
+                <template v-if="msg.type === 'system'">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">模板类型</label>
+                        <select class="form-input" :value="msg.systemType || 'custom'" @change="updateMessage(idx, 'systemType', $event.target.value)" style="font-size:12px;">
+                            <option value="addMember">➕ 添加成员</option>
+                            <option value="join">🔗 通过链接加入</option>
+                            <option value="leave">🚪 退出群聊</option>
+                            <option value="remove">❌ 移出群聊</option>
+                            <option value="changeName">✏️ 修改群名</option>
+                            <option value="changeDesc">📝 修改群描述</option>
+                            <option value="setAdmin">👑 设为管理员</option>
+                            <option value="revokeAdmin">👤 撤销管理员</option>
+                            <option value="custom">💬 自定义</option>
+                        </select>
                     </div>
-                    <div class="ext-url-row" style="margin-top:4px;">
-                        <span class="ext-url-label">🔗</span>
-                        <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）" style="font-size:11px;">
-                    </div>
-                </div>
+                    <template v-if="msg.systemType === 'custom'">
                         <div class="form-group" style="margin-bottom:8px;">
-                            <div class="toggle-group" style="margin-bottom:0;">
-                                <label class="toggle">
-                                    <input type="checkbox" :checked="msg.isVoice" @change="updateMessage(idx, 'isVoice', $event.target.checked)">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span style="font-size:12px;">语音消息</span>
-                            </div>
+                            <label style="font-size:12px;">自定义内容</label>
+                            <textarea class="form-input" :value="msg.systemText || ''"
+                                @input="updateMessage(idx, 'systemText', $event.target.value)"
+                                placeholder="输入自定义系统消息" rows="2"
+                                style="font-size:13px;min-height:36px;"></textarea>
                         </div>
-                        <template v-if="msg.isVoice">
-                            <div class="form-group" style="margin-bottom:8px;">
-                                <label style="font-size:12px;">⏱ 时长</label>
-                                <input class="form-input" :value="msg.voiceDuration" @input="updateMessage(idx, 'voiceDuration', $event.target.value)" placeholder="0:05" style="font-size:12px;">
-                            </div>
-                            <div class="form-group" style="margin-bottom:8px;">
-                                <label style="font-size:12px;">📝 转文字内容</label>
-                                <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" placeholder="语音转文字内容（可选）" style="font-size:12px;">
-                            </div>
-                        </template>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <div class="toggle-group" style="margin-bottom:0;">
-                        <label class="toggle">
-                            <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span style="font-size:12px;">通话记录</span>
-                    </div>
-                </div>
-                <template v-if="msg.isCall">
-                    <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">通话类型</label>
-                        <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
-                            <option value="voice">📞 语音通话</option>
-                            <option value="video">📹 视频通话</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">通话状态</label>
-                        <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
-                            <option value="answered">✅ 已接听</option>
-                            <option value="missed">❌ 未接听</option>
-                            <option value="declined">🚫 已拒绝</option>
-                        </select>
-                    </div>
-                    <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">⏱ 通话时长</label>
-                        <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
+                    </template>
+                    <template v-else>
+                        <div v-if="needsActor(msg.systemType)" class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">操作者</label>
+                            <select class="form-input" :value="msg.systemActor !== undefined ? msg.systemActor : -1" @change="updateMessage(idx, 'systemActor', parseInt($event.target.value))" style="font-size:12px;">
+                                <option value="-1">我</option>
+                                <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
+                            </select>
+                        </div>
+                        <div v-if="needsTarget(msg.systemType)" class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">目标成员</label>
+                            <select class="form-input" :value="msg.systemTarget || 0" @change="updateMessage(idx, 'systemTarget', parseInt($event.target.value))" style="font-size:12px;">
+                                <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
+                            </select>
+                        </div>
+                        <div v-if="needsText(msg.systemType)" class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">{{ msg.systemType === 'changeName' ? '新群名' : '内容' }}</label>
+                            <input class="form-input" :value="msg.systemText || ''" @input="updateMessage(idx, 'systemText', $event.target.value)" :placeholder="msg.systemType === 'changeName' ? '输入新群名' : '输入内容'" style="font-size:12px;">
+                        </div>
+                    </template>
+                    <div style="font-size:11px;color:#888;margin-top:4px;padding:4px 8px;background:#f5f5f5;border-radius:4px;">
+                        预览：{{ getSystemPreview(msg) }}
                     </div>
                 </template>
-                <div class="form-row" style="margin-bottom:0;">
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">时间</label>
-                        <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" placeholder="时间" style="font-size:12px;">
+
+                <!-- Time Separator Editor -->
+                <template v-else-if="msg.type === 'timeSeparator'">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">时间文字</label>
+                        <input class="form-input" :value="msg.text || ''"
+                            @input="updateMessage(idx, 'text', $event.target.value)"
+                            placeholder="如：上午 11:00" style="font-size:13px;">
                     </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">表情回应</label>
-                        <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" placeholder="如: ❤️" style="font-size:12px;">
-                    </div>
-                    <div v-if="msg.type === 'sent'" class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">已读状态</label>
-                        <select class="form-input" :value="msg.ticks || 'sent'" @change="updateMessage(idx, 'ticks', $event.target.value)" style="font-size:12px;">
-                            <option value="sent">已发送 ✓</option>
-                            <option value="delivered">已送达 ✓✓</option>
-                            <option value="read">已读 ✓✓</option>
+                </template>
+
+                <!-- Normal Message Editor (sent/received) -->
+                <template v-else>
+                    <div v-if="data.isGroup && msg.type === 'received'" class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">发送者</label>
+                        <select class="form-input" :value="msg.sender || 0" @change="updateMessage(idx, 'sender', parseInt($event.target.value))" style="font-size:12px;">
+                            <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
                         </select>
                     </div>
-                </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <textarea class="form-input" :value="msg.text"
+                            @input="updateMessage(idx, 'text', $event.target.value)"
+                            placeholder="消息内容" rows="2"
+                            style="font-size:13px;min-height:36px;"></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">图片</label>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <div v-if="msg.image" style="position:relative;">
+                                <img :src="msg.image" style="width:60px;height:40px;border-radius:4px;object-fit:cover;">
+                                <button style="position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ff3b30;color:#fff;border:none;font-size:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;" @click.stop="updateMessage(idx, 'image', '')">✕</button>
+                            </div>
+                            <label v-else class="btn btn-small btn-outline" style="cursor:pointer;">
+                                📷
+                                <input type="file" accept="image/*" @change="handleMsgImage(idx, $event)" hidden>
+                            </label>
+                        </div>
+                        <div class="ext-url-row" style="margin-top:4px;">
+                            <span class="ext-url-label">🔗</span>
+                            <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）" style="font-size:11px;">
+                        </div>
+                    </div>
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <div class="toggle-group" style="margin-bottom:0;">
+                                    <label class="toggle">
+                                        <input type="checkbox" :checked="msg.isVoice" @change="updateMessage(idx, 'isVoice', $event.target.checked)">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span style="font-size:12px;">语音消息</span>
+                                </div>
+                            </div>
+                            <template v-if="msg.isVoice">
+                                <div class="form-group" style="margin-bottom:8px;">
+                                    <label style="font-size:12px;">⏱ 时长</label>
+                                    <input class="form-input" :value="msg.voiceDuration" @input="updateMessage(idx, 'voiceDuration', $event.target.value)" placeholder="0:05" style="font-size:12px;">
+                                </div>
+                                <div class="form-group" style="margin-bottom:8px;">
+                                    <label style="font-size:12px;">📝 转文字内容</label>
+                                    <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" placeholder="语音转文字内容（可选）" style="font-size:12px;">
+                                </div>
+                            </template>
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <div class="toggle-group" style="margin-bottom:0;">
+                            <label class="toggle">
+                                <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span style="font-size:12px;">通话记录</span>
+                        </div>
+                    </div>
+                    <template v-if="msg.isCall">
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">通话类型</label>
+                            <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
+                                <option value="voice">📞 语音通话</option>
+                                <option value="video">📹 视频通话</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">通话状态</label>
+                            <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
+                                <option value="answered">✅ 已接听</option>
+                                <option value="missed">❌ 未接听</option>
+                                <option value="declined">🚫 已拒绝</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:8px;">
+                            <label style="font-size:12px;">⏱ 通话时长</label>
+                            <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
+                        </div>
+                    </template>
+                    <div class="form-row" style="margin-bottom:0;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:12px;">时间</label>
+                            <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" placeholder="时间" style="font-size:12px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:12px;">表情回应</label>
+                            <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" placeholder="如: ❤️" style="font-size:12px;">
+                        </div>
+                        <div v-if="msg.type === 'sent'" class="form-group" style="margin-bottom:0;">
+                            <label style="font-size:12px;">已读状态</label>
+                            <select class="form-input" :value="msg.ticks || 'sent'" @change="updateMessage(idx, 'ticks', $event.target.value)" style="font-size:12px;">
+                                <option value="sent">已发送 ✓</option>
+                                <option value="delivered">已送达 ✓✓</option>
+                                <option value="read">已读 ✓✓</option>
+                            </select>
+                        </div>
+                    </div>
+                </template>
             </div>
             <button class="add-comment-btn" @click="addMessage">➕ 添加消息</button>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+                <button class="add-comment-btn" style="background:#ff9500;" @click="addSystemMessage">🔔 系统消息</button>
+                <button class="add-comment-btn" style="background:#007aff;" @click="addTimeSeparator">🕐 时间标签</button>
+            </div>
         </div>
     </div>
     `,
@@ -372,6 +440,14 @@ const WhatsAppEditor = {
             const messages = [...this.data.messages, { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: false, callType: 'voice', callDuration: '', callStatus: 'answered' }];
             this.updateField('messages', messages);
         },
+        addSystemMessage() {
+            const messages = [...this.data.messages, { id: Date.now(), type: 'system', systemType: 'addMember', systemActor: -1, systemTarget: 0, systemText: '' }];
+            this.updateField('messages', messages);
+        },
+        addTimeSeparator() {
+            const messages = [...this.data.messages, { id: Date.now(), type: 'timeSeparator', text: '' }];
+            this.updateField('messages', messages);
+        },
         insertMessage(idx) {
             const newMsg = { id: Date.now(), type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '', ticks: 'sent', sender: -1, isVoice: false, voiceDuration: '0:01', voiceTranscription: '', isCall: false, callType: 'voice', callDuration: '', callStatus: 'answered' };
             const messages = [...this.data.messages];
@@ -385,9 +461,52 @@ const WhatsAppEditor = {
         },
         toggleType(idx) {
             const messages = [...this.data.messages];
-            const newType = messages[idx].type === 'sent' ? 'received' : 'sent';
-            messages[idx] = { ...messages[idx], type: newType, sender: newType === 'sent' ? -1 : (this.data.isGroup ? 0 : 0) };
+            const msg = messages[idx];
+            const typeOrder = ['sent', 'received', 'system', 'timeSeparator'];
+            const currentIdx = typeOrder.indexOf(msg.type);
+            const newType = typeOrder[(currentIdx + 1) % typeOrder.length];
+            if (newType === 'system') {
+                messages[idx] = { ...msg, type: 'system', systemType: msg.systemType || 'addMember', systemActor: msg.systemActor !== undefined ? msg.systemActor : -1, systemTarget: msg.systemTarget || 0, systemText: msg.systemText || '' };
+            } else if (newType === 'timeSeparator') {
+                messages[idx] = { ...msg, type: 'timeSeparator', text: msg.text || '' };
+            } else {
+                messages[idx] = { ...msg, type: newType, sender: newType === 'sent' ? -1 : (this.data.isGroup ? 0 : 0) };
+            }
             this.updateField('messages', messages);
+        },
+        needsActor(systemType) {
+            return ['addMember', 'leave', 'remove', 'changeName', 'changeDesc', 'setAdmin', 'revokeAdmin'].includes(systemType);
+        },
+        needsTarget(systemType) {
+            return ['addMember', 'remove', 'setAdmin', 'revokeAdmin'].includes(systemType);
+        },
+        needsText(systemType) {
+            return ['changeName', 'custom'].includes(systemType);
+        },
+        getMemberName(index) {
+            if (index === -1) return '我';
+            const members = this.data.groupMembers || [];
+            return members[index] ? members[index].name : '未知';
+        },
+        getSystemPreview(msg) {
+            if (msg.systemType === 'custom') return msg.systemText || '（自定义内容）';
+            return this.generateSystemText(msg);
+        },
+        generateSystemText(msg) {
+            const actor = this.getMemberName(msg.systemActor !== undefined ? msg.systemActor : -1);
+            const target = this.getMemberName(msg.systemTarget || 0);
+            const text = msg.systemText || '';
+            switch (msg.systemType) {
+                case 'addMember': return actor + ' 将 ' + target + ' 添加到群聊';
+                case 'join': return target + ' 通过邀请链接加入群聊';
+                case 'leave': return actor + ' 退出群聊';
+                case 'remove': return actor + ' 将 ' + target + ' 移出群聊';
+                case 'changeName': return actor + ' 将群名称更改为「' + text + '」';
+                case 'changeDesc': return actor + ' 更改了群描述';
+                case 'setAdmin': return actor + ' 将 ' + target + ' 设为管理员';
+                case 'revokeAdmin': return actor + ' 撤销了 ' + target + ' 的管理员身份';
+                default: return text || '（系统消息）';
+            }
         },
         updateMessage(idx, field, value) {
             const messages = [...this.data.messages];
@@ -395,6 +514,7 @@ const WhatsAppEditor = {
             this.updateField('messages', messages);
         },
         onDragStart(msg, idx, event) {
+            event.dataTransfer.setData('text/plain', String(idx));
             const el = event.target.closest('.comment-item');
             if (el) el.classList.add('dragging');
         },
@@ -412,10 +532,11 @@ const WhatsAppEditor = {
         onDrop(msg, idx, event) {
             event.preventDefault();
             const data = [...this.data.messages];
-            const dragIdx = data.findIndex(m => m === this.data.messages[data.indexOf(msg)]);
+            const dragIdx = data.findIndex(m => m.id === msg.id);
             if (dragIdx === -1) return;
             const [removed] = data.splice(dragIdx, 1);
-            data.splice(idx, 0, removed);
+            const targetIdx = dragIdx < idx ? idx : idx;
+            data.splice(targetIdx, 0, removed);
             this.updateField('messages', data);
             document.querySelectorAll('.comment-item').forEach(el => el.classList.remove('dragging', 'drag-over', 'drag-over-bottom'));
         }
@@ -466,7 +587,18 @@ const WhatsAppPreview = {
             </div>
 
             <template v-for="(msg, idx) in data.messages" :key="idx">
-                <div v-if="msg.isCall" :class="['wa-call-record', 'wa-call-' + (msg.callStatus || 'answered')]">
+                <!-- Time Separator -->
+                <div v-if="msg.type === 'timeSeparator'" class="wa-time-separator">
+                    <span class="wa-time-separator-label">{{ msg.text || '' }}</span>
+                </div>
+
+                <!-- System Message -->
+                <div v-else-if="msg.type === 'system'" class="wa-system-message">
+                    <span class="wa-system-message-inner" v-html="renderSystemText(msg)"></span>
+                </div>
+
+                <!-- Call Record -->
+                <div v-else-if="msg.isCall" :class="['wa-call-record', 'wa-call-' + (msg.callStatus || 'answered')]">
                     <span class="wa-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
                     <span class="wa-call-text">
                         <template v-if="msg.callStatus === 'missed'">未接听</template>
@@ -475,7 +607,9 @@ const WhatsAppPreview = {
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="wa-call-duration">{{ msg.callDuration }}</span>
                 </div>
-                <div v-if="!msg.isCall" :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
+
+                <!-- Normal Message Bubble -->
+                <div v-else :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
                     <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :class="'wa-sc-' + (msg.sender || 0)">{{ getSender(msg).name }}</div>
                     <div v-if="msg.isVoice" class="wa-voice-msg">
                         <div class="wa-voice-play">▶</div>
@@ -499,7 +633,7 @@ const WhatsAppPreview = {
                         </span>
                     </div>
                 </div>
-                <div v-if="msg.reaction && !msg.isCall" class="wa-reaction">
+                <div v-if="msg.reaction && !msg.isCall && msg.type !== 'system' && msg.type !== 'timeSeparator'" class="wa-reaction">
                     {{ msg.reaction }}
                 </div>
             </template>
@@ -552,6 +686,35 @@ const WhatsAppPreview = {
             if (!this.data.isGroup || msg.type === 'sent') return null;
             const members = this.data.groupMembers || [];
             return members[msg.sender] || null;
+        },
+        getMemberName(index) {
+            if (index === -1) return '我';
+            const members = this.data.groupMembers || [];
+            return members[index] ? members[index].name : '未知';
+        },
+        renderSystemText(msg) {
+            if (msg.systemType === 'custom') {
+                return this.escapeHtml(msg.systemText || '');
+            }
+            const actor = this.escapeHtml(this.getMemberName(msg.systemActor !== undefined ? msg.systemActor : -1));
+            const target = this.escapeHtml(this.getMemberName(msg.systemTarget || 0));
+            const text = this.escapeHtml(msg.systemText || '');
+            switch (msg.systemType) {
+                case 'addMember': return '<span class="wa-system-highlight">' + actor + '</span> 将 <span class="wa-system-highlight">' + target + '</span> 添加到群聊';
+                case 'join': return '<span class="wa-system-highlight">' + target + '</span> 通过邀请链接加入群聊';
+                case 'leave': return '<span class="wa-system-highlight">' + actor + '</span> 退出群聊';
+                case 'remove': return '<span class="wa-system-highlight">' + actor + '</span> 将 <span class="wa-system-highlight">' + target + '</span> 移出群聊';
+                case 'changeName': return '<span class="wa-system-highlight">' + actor + '</span> 将群名称更改为「' + text + '」';
+                case 'changeDesc': return '<span class="wa-system-highlight">' + actor + '</span> 更改了群描述';
+                case 'setAdmin': return '<span class="wa-system-highlight">' + actor + '</span> 将 <span class="wa-system-highlight">' + target + '</span> 设为管理员';
+                case 'revokeAdmin': return '<span class="wa-system-highlight">' + actor + '</span> 撤销了 <span class="wa-system-highlight">' + target + '</span> 的管理员身份';
+                default: return text || '（系统消息）';
+            }
+        },
+        escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
         },
         _injectMemberColors() {
             if (!this.data.isGroup) return;

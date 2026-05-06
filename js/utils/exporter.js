@@ -156,8 +156,8 @@ img { max-width: 100%; }
 .ig-image-container img { max-height: 470px; }
 `,
         twitter: `
-.tw-image-container { height: 280px; overflow: hidden; }
-.tw-image-container img { height: 280px; }
+.tw-image-container { overflow: hidden; }
+.tw-image-container img { width: 100%; height: auto; }
 `,
         youtube: `
 .yt-player { height: 338px; }
@@ -174,12 +174,16 @@ img { max-width: 100%; }
 .wa-messages { height: auto; }
 .wa-bubble-image img { max-height: 400px; }
 `,
+        wechat: `
+.wx-messages { height: auto; }
+.wx-bubble-image img { max-height: 400px; }
+`,
         reddit: `
 .rd-post-image img { max-height: 600px; }
 `,
         xiaohongshu: `
-.xhs-image-area { height: 520px; }
-.xhs-image-area img { max-height: 520px; }
+.xhs-image-area { width: 100%; height: 520px; overflow: hidden; }
+.xhs-image-area img { width: 100%; height: auto; max-height: 520px; }
 `
     },
 

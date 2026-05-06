@@ -214,6 +214,7 @@ const RedditEditor = {
         },
         // 拖拽排序方法
         onDragStart(comment, idx, event) {
+            event.dataTransfer.setData('text/plain', String(idx));
             const el = event.target.closest('.comment-item');
             if (el) {
                 el.classList.add('dragging');
@@ -248,7 +249,8 @@ const RedditEditor = {
             event.preventDefault();
             
             const data = [...this.data.comments];
-            const dragIndex = data.findIndex(c => c === this.data.comments[data.indexOf(comment)]);
+            const dragIndex = parseInt(event.dataTransfer.getData('text/plain'));
+            if (isNaN(dragIndex) || dragIndex === idx) return;
             
             if (dragIndex !== -1) {
                 const [removed] = data.splice(dragIndex, 1);

@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/platform-youtube.css">
     <link rel="stylesheet" href="css/platform-imessage.css">
     <link rel="stylesheet" href="css/platform-whatsapp.css">
+    <link rel="stylesheet" href="css/platform-wechat.css">
     <link rel="stylesheet" href="css/platform-xiaohongshu.css">
 </head>
 <body>
@@ -102,6 +103,12 @@
                         @update="updatePlatformData('whatsapp', $event)">
                     </whatsapp-editor>
 
+                    <!-- 微信 编辑器 -->
+                    <wechat-editor v-if="currentPlatform === 'wechat'"
+                        :data="projectData.wechat"
+                        @update="updatePlatformData('wechat', $event)">
+                    </wechat-editor>
+
                     <!-- 小红书 编辑器 -->
                     <xiaohongshu-editor v-if="currentPlatform === 'xiaohongshu'"
                         :data="projectData.xiaohongshu"
@@ -159,6 +166,11 @@
                             <whatsapp-preview v-if="currentPlatform === 'whatsapp'"
                                 :data="projectData.whatsapp">
                             </whatsapp-preview>
+
+                            <!-- 微信 预览 -->
+                            <wechat-preview v-if="currentPlatform === 'wechat'"
+                                :data="projectData.wechat">
+                            </wechat-preview>
 
                             <!-- 小红书 预览 -->
                             <xiaohongshu-preview v-if="currentPlatform === 'xiaohongshu'"
@@ -247,6 +259,7 @@
     <script src="js/platforms/youtube.js?v=3.6"></script>
     <script src="js/platforms/imessage.js?v=3.6"></script>
     <script src="js/platforms/whatsapp.js?v=3.6"></script>
+    <script src="js/platforms/wechat.js?v=3.6"></script>
     <script src="js/platforms/xiaohongshu.js?v=3.6"></script>
 
     <!-- 综合页面组件 -->

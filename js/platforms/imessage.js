@@ -266,6 +266,7 @@ const iMessageEditor = {
         },
         // 拖拽排序方法
         onDragStart(msg, idx, event) {
+            event.dataTransfer.setData('text/plain', String(idx));
             const el = event.target.closest('.comment-item');
             if (el) {
                 el.classList.add('dragging');
@@ -300,7 +301,7 @@ const iMessageEditor = {
             event.preventDefault();
             
             const data = [...this.data.messages];
-            const dragIndex = data.findIndex(m => m === this.data.messages[data.indexOf(msg)]);
+            const dragIndex = data.findIndex(m => m.id === msg.id);
             
             if (dragIndex !== -1) {
                 const [removed] = data.splice(dragIndex, 1);

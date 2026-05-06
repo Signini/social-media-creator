@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const platforms = ['instagram', 'twitter', 'reddit', 'youtube', 'imessage', 'whatsapp', 'xiaohongshu'];
+const platforms = ['instagram', 'twitter', 'reddit', 'youtube', 'imessage', 'whatsapp', 'wechat', 'xiaohongshu'];
 const cssDir = path.join(__dirname, 'css');
 const outFile = path.join(__dirname, 'js', 'utils', 'platform-css.js');
 

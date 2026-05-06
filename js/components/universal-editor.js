@@ -69,6 +69,7 @@ const UniversalEditor = {
                         <youtube-preview v-if="item.platform === 'youtube'" :data="item.data"></youtube-preview>
                         <imessage-preview v-if="item.platform === 'imessage'" :data="item.data"></imessage-preview>
                         <whatsapp-preview v-if="item.platform === 'whatsapp'" :data="item.data"></whatsapp-preview>
+                        <wechat-preview v-if="item.platform === 'wechat'" :data="item.data"></wechat-preview>
                         <xiaohongshu-preview v-if="item.platform === 'xiaohongshu'" :data="item.data"></xiaohongshu-preview>
                     </div>
                 </div>
@@ -92,7 +93,7 @@ const UniversalEditor = {
         getPlatformIcon(platformId) {
             const map = {
                 xiaohongshu: '📕', instagram: '📸', twitter: '🐦', reddit: '🔴',
-                youtube: '▶️', imessage: '💬', whatsapp: '📱'
+                youtube: '▶️', imessage: '💬', whatsapp: '📱', wechat: '💚'
             };
             return map[platformId] || '📱';
         },
@@ -100,7 +101,7 @@ const UniversalEditor = {
             const map = {
                 xiaohongshu: '小红书', instagram: 'Instagram',                 twitter: 'X', reddit: 'Reddit',
                 youtube: 'YouTube', imessage: 'iMessage',
-                whatsapp: 'WhatsApp'
+                whatsapp: 'WhatsApp', wechat: '微信'
             };
             return map[platformId] || platformId;
         },
