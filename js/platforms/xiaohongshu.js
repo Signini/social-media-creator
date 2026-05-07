@@ -9,6 +9,7 @@ const XiaohongshuDefaults = {
     location: '北京·三里屯太古里',
     likes: 2048,
     favorites: 856,
+    commentCount: 2,
     comments: [
         { username: '摄影爱好者小李', text: '太好看了吧！请问用什么手机拍的？', likes: 23, avatar: '', avatarUrl: '', time: '1小时前', replies: [
             { username: '生活记录者小张', text: 'iPhone 15 Pro Max～', avatar: '', avatarUrl: '', time: '45分钟前' }
@@ -125,6 +126,12 @@ const XiaohongshuEditor = {
         <div class="section-divider"></div>
 
         <div class="sub-title">💬 评论区 <span class="hint">({{ (data.comments || []).length }}条)</span></div>
+        <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:12px;">显示评论数</label>
+                <input class="form-input" type="number" min="0" :value="data.commentCount || (data.comments || []).length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
+            </div>
+        </div>
         <div class="comment-list">
             <div class="comment-item" v-for="(comment, idx) in (data.comments || [])" :key="idx">
                 <div class="comment-header">
@@ -252,12 +259,12 @@ const XiaohongshuEditor = {
         },
         addComment() {
             const comments = [...(this.data.comments || []), { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, avatar: '', avatarUrl: '', time: '', replies: [] }];
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         removeComment(idx) {
             const comments = [...(this.data.comments || [])];
             comments.splice(idx, 1);
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         updateComment(idx, field, value) {
             const comments = [...(this.data.comments || [])];
@@ -334,7 +341,7 @@ const XiaohongshuPreview = {
                 </div>
                 <div class="xhs-interact-item">
                     <svg viewBox="0 0 24 24"><path d="M17.5 3H6.5C5.12 3 4 4.12 4 5.5v13l4-3h9.5c1.38 0 2.5-1.12 2.5-2.5v-7.5C20 4.12 18.88 3 17.5 3z" stroke-linejoin="round"/></svg>
-                    <span>{{ (data.comments || []).length }}</span>
+                    <span>{{ data.commentCount || (data.comments || []).length }}</span>
                 </div>
                 <div class="xhs-interact-item">
                     <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
@@ -343,7 +350,7 @@ const XiaohongshuPreview = {
             </div>
         </div>
         <div class="xhs-comment-section" v-if="(data.comments || []).length > 0">
-            <div class="xhs-comment-header">共 {{ (data.comments || []).length }} 条评论</div>
+            <div class="xhs-comment-header">共 {{ data.commentCount || (data.comments || []).length }} 条评论</div>
             <div v-for="(comment, idx) in (data.comments || [])" :key="idx" class="xhs-comment-item">
                 <template v-if="comment.avatar || comment.avatarUrl">
                     <img class="xhs-comment-avatar" :src="comment.avatar || comment.avatarUrl" :alt="comment.username">

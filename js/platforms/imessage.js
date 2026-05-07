@@ -346,6 +346,8 @@ const iMessagePreview = {
                 <span style="font-size:17px;">返回</span>
             </div>
             <div class="msg-navbar-center">
+                <img v-if="data.contactAvatar || data.contactAvatarUrl" class="msg-nav-avatar" :src="data.contactAvatar || data.contactAvatarUrl" :alt="data.contactName">
+                <div v-else class="msg-nav-avatar-placeholder">{{ (data.contactName || '联')[0] }}</div>
                 <div class="msg-navbar-title">{{ data.contactName || '联系人' }}</div>
                 <div v-if="data.navSubtitle" class="msg-navbar-subtitle">{{ data.navSubtitle }}</div>
             </div>
@@ -373,10 +375,14 @@ const iMessagePreview = {
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="msg-call-duration">{{ msg.callDuration }}</span>
                 </div>
-                <div v-if="!msg.isCall" :class="['msg-bubble', 
-                    msg.type === 'sent' ? 'msg-bubble-sent' : 'msg-bubble-received',
-                    getMessageStyle(idx)
-                ]">
+                <div v-if="!msg.isCall" :class="['msg-bubble-row', msg.type === 'sent' ? 'msg-row-sent' : 'msg-row-received']">
+                    <img v-if="msg.type === 'received' && (data.contactAvatar || data.contactAvatarUrl) && isAvatarVisible(idx)" class="msg-contact-avatar" :src="data.contactAvatar || data.contactAvatarUrl" alt="">
+                    <div v-else-if="msg.type === 'received' && isAvatarVisible(idx)" class="msg-contact-avatar msg-avatar-placeholder">{{ (data.contactName || '联')[0] }}</div>
+                    <div v-if="msg.type === 'received' && !isAvatarVisible(idx) && isAvatarSpacerNeeded(idx)" class="msg-avatar-spacer"></div>
+                    <div :class="['msg-bubble',
+                        msg.type === 'sent' ? 'msg-bubble-sent' : 'msg-bubble-received',
+                        getMessageStyle(idx)
+                    ]">
                     <!-- Text message -->
                     <div v-if="msg.text && !msg.image && !msg.imageUrl" class="msg-bubble-text">{{ msg.text }}</div>
                     
@@ -395,6 +401,7 @@ const iMessagePreview = {
                     <div v-if="!msg.text && !msg.image && !msg.imageUrl" class="msg-bubble-text" style="color:#c7c7cc; font-style:italic;">
                         {{ msg.type === 'sent' ? '（空消息）' : '（空消息）' }}
                     </div>
+                </div>
                 </div>
                 <!-- Reaction -->
                 <div v-if="!msg.isCall && msg.reaction" :class="['msg-reaction', msg.type === 'sent' ? '' : '']">
@@ -440,6 +447,19 @@ const iMessagePreview = {
             if (sameAsPrev && sameAsNext) return '';
             if (sameAsPrev && !sameAsNext) return 'msg-last';
             return 'msg-single';
+        },
+        isAvatarVisible(idx) {
+            const msgs = this.data.messages;
+            const current = msgs[idx];
+            if (current.type !== 'received') return false;
+            const style = this.getMessageStyle(idx);
+            return style === 'msg-tail' || style === 'msg-single';
+        },
+        isAvatarSpacerNeeded(idx) {
+            const msgs = this.data.messages;
+            const current = msgs[idx];
+            if (current.type !== 'received') return false;
+            return !this.isAvatarVisible(idx);
         }
     }
 };

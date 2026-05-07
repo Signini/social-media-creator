@@ -9,6 +9,7 @@ const QQDefaults = {
     contactName: '好友',
     contactAvatar: '',
     contactAvatarUrl: '',
+    contactColor: '#576b95',
     isGroup: false,
     groupName: 'QQ群',
     groupMembers: [
@@ -16,6 +17,8 @@ const QQDefaults = {
         { name: '李四', avatar: '', avatarUrl: '', color: '#FA5151' },
         { name: '王五', avatar: '', avatarUrl: '', color: '#07C160' }
     ],
+    headerColor: '#12B7F5',
+    showOnlineStatus: true,
     dateSeparator: '昨天',
     showTyping: false,
     messages: [
@@ -59,6 +62,29 @@ const QQEditor = {
         <div class="form-group">
             <label>我的昵称</label>
             <input class="form-input" :value="data.myName" @input="updateField('myName', $event.target.value)" placeholder="发送方昵称">
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 界面设置 -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>顶部颜色</label>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input type="color" :value="data.headerColor || '#12B7F5'" @input="updateField('headerColor', $event.target.value)" style="width:36px;height:28px;padding:0;border:none;cursor:pointer;">
+                    <input class="form-input" :value="data.headerColor || '#12B7F5'" @input="updateField('headerColor', $event.target.value)" placeholder="#12B7F5" style="width:90px;font-size:12px;">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <div class="toggle-group">
+                    <label class="toggle">
+                        <input type="checkbox" :checked="data.showOnlineStatus" @change="updateField('showOnlineStatus', $event.target.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span style="font-size:13px;">在线状态</span>
+                </div>
+            </div>
         </div>
 
         <div class="section-divider"></div>
@@ -134,7 +160,10 @@ const QQEditor = {
             </div>
             <div class="form-group">
                 <label>联系人名称</label>
-                <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" placeholder="联系人名称">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" placeholder="联系人名称" style="flex:1;">
+                    <input type="color" :value="data.contactColor || '#576b95'" @input="updateField('contactColor', $event.target.value)" style="width:30px;height:28px;padding:0;border:none;cursor:pointer;">
+                </div>
             </div>
         </template>
 
@@ -423,25 +452,29 @@ const QQPreview = {
     template: `
     <div class="qq-chat">
         <!-- Header -->
-        <div class="qq-header">
+        <div class="qq-header" :style="{ background: data.headerColor || '#12B7F5' }">
             <span class="qq-header-back">‹</span>
             <template v-if="data.isGroup">
                 <div class="qq-header-avatars">
                     <div v-for="(m, mi) in (data.groupMembers || []).slice(0, 3)" :key="mi"
                         class="qq-header-avatar-item"
-                        :style="{ background: (m.avatar || m.avatarUrl) ? 'transparent' : (m.color || '#ccc') }">
+                        :style="{ background: (m.avatar || m.avatarUrl) ? 'transparent' : (m.color || '#ccc'), borderColor: data.headerColor || '#12B7F5' }">
                         <img v-if="m.avatar || m.avatarUrl" :src="m.avatar || m.avatarUrl">
                         <span v-else>{{ (m.name || 'U')[0] }}</span>
                     </div>
                 </div>
             </template>
             <template v-else>
-                <div v-if="data.contactAvatar || data.contactAvatarUrl" class="qq-header-avatar"><img :src="data.contactAvatar || data.contactAvatarUrl" alt=""></div>
-                <div v-else class="qq-header-avatar">{{ (data.contactName || 'U')[0] }}</div>
+                <div class="qq-header-avatar-wrap">
+                    <div v-if="data.contactAvatar || data.contactAvatarUrl" class="qq-header-avatar"><img :src="data.contactAvatar || data.contactAvatarUrl" alt=""></div>
+                    <div v-else class="qq-header-avatar">{{ (data.contactName || 'U')[0] }}</div>
+                    <span v-if="data.showOnlineStatus" class="qq-online-dot"></span>
+                </div>
             </template>
             <div class="qq-header-info">
                 <div class="qq-header-name">{{ data.isGroup ? (data.groupName || '群聊') : (data.contactName || '联系人') }}</div>
                 <div v-if="data.isGroup" class="qq-header-status">{{ (data.groupMembers || []).length }}位成员</div>
+                <div v-else-if="data.showOnlineStatus" class="qq-header-status">在线</div>
             </div>
             <div class="qq-header-actions">
                 <span class="qq-header-action">⋯</span>
@@ -516,13 +549,17 @@ const QQPreview = {
 
         <!-- Input Bar -->
         <div class="qq-input-bar">
-            <span class="qq-input-voice">🎙️</span>
-            <div class="qq-input-field">
-                <span class="qq-input-placeholder">输入消息...</span>
+            <div class="qq-input-row">
+                <div class="qq-input-field">
+                    <span class="qq-input-placeholder">输入消息...</span>
+                </div>
             </div>
-            <div class="qq-input-actions">
-                <span class="qq-input-action">😊</span>
-                <span class="qq-input-action">➕</span>
+            <div class="qq-input-toolbar">
+                <span class="qq-toolbar-btn">🎙️</span>
+                <span class="qq-toolbar-btn">🖼️</span>
+                <span class="qq-toolbar-btn">📷</span>
+                <span class="qq-toolbar-btn">🏷️</span>
+                <span class="qq-toolbar-btn">➕</span>
             </div>
         </div>
     </div>
@@ -558,7 +595,7 @@ const QQPreview = {
                 const hasImg = this.data.myAvatar || this.data.myAvatarUrl;
                 return { background: hasImg ? 'transparent' : '#12B7F5' };
             }
-            if (!this.data.isGroup) return { background: '#576b95' };
+            if (!this.data.isGroup) return { background: this.data.contactColor || '#576b95' };
             const members = this.data.groupMembers || [];
             const member = members[msg.sender];
             const hasImg = member && (member.avatar || member.avatarUrl);

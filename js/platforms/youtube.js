@@ -17,8 +17,8 @@ const YouTubeDefaults = {
     description: '今天在北京三里屯拍到了超美的日落！\n\n设备：iPhone 15 Pro Max\n地点：北京三里屯太古里\n\n#北京 #三里屯 #日落 #手机摄影 #VLOG',
     commentsCount: 89,
     comments: [
-        { author: '李四VLOG', text: '拍得真的太好了！请问是什么设备拍的？', likes: 234, timeAgo: '2天前', isPinned: false, replies: [] },
-        { author: '摄影小王', text: '三里屯的日落确实很美，下次去北京一定要去看看 😍', likes: 56, timeAgo: '1天前', isPinned: false, replies: [] }
+        { author: '李四VLOG', text: '拍得真的太好了！请问是什么设备拍的？', likes: 234, timeAgo: '2天前', isPinned: false, avatar: '', avatarUrl: '', replies: [] },
+        { author: '摄影小王', text: '三里屯的日落确实很美，下次去北京一定要去看看 😍', likes: 56, timeAgo: '1天前', isPinned: false, avatar: '', avatarUrl: '', replies: [] }
     ]
 };
 
@@ -117,6 +117,12 @@ const YouTubeEditor = {
         <div class="section-divider"></div>
 
         <div class="sub-title">💬 评论 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:12px;">显示评论数</label>
+                <input class="form-input" type="number" min="0" :value="data.commentsCount || data.comments.length" @input="updateField('commentsCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
+            </div>
+        </div>
         <div class="comment-list">
             <div class="comment-item" v-for="(comment, idx) in data.comments" :key="idx"
                 draggable="true"
@@ -136,6 +142,17 @@ const YouTubeEditor = {
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
                     <input class="form-input" :value="comment.author" @input="updateComment(idx, 'author', $event.target.value)" placeholder="评论者" style="font-size:13px;">
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <label class="btn btn-small btn-outline" style="cursor:pointer;font-size:11px;padding:1px 6px;">
+                        📷 头像
+                        <input type="file" accept="image/*" @change="handleCommentAvatar(idx, $event)" hidden>
+                    </label>
+                    <div v-if="comment.avatar" style="position:relative;width:28px;height:28px;">
+                        <img :src="comment.avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
+                        <button style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:#ff3b30;color:#fff;border:none;font-size:7px;cursor:pointer;line-height:1;" @click.stop="updateComment(idx, 'avatar', '')">✕</button>
+                    </div>
+                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" placeholder="外部头像链接" style="font-size:11px;flex:1;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
                     <textarea class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" rows="2" style="font-size:13px;min-height:40px;"></textarea>
@@ -187,18 +204,28 @@ const YouTubeEditor = {
             } catch (e) { console.error('图片上传失败:', e.message); }
         },
         addComment() {
-            const comments = [...this.data.comments, { author: 'user_' + Math.floor(Math.random()*999), text: '', likes: 0, timeAgo: '刚刚', isPinned: false, replies: [] }];
-            this.updateField('comments', comments);
+            const comments = [...this.data.comments, { author: 'user_' + Math.floor(Math.random()*999), text: '', likes: 0, timeAgo: '刚刚', isPinned: false, avatar: '', avatarUrl: '', replies: [] }];
+            this.$emit('update', { ...this.data, comments, commentsCount: comments.length });
         },
         removeComment(idx) {
             const comments = [...this.data.comments];
             comments.splice(idx, 1);
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentsCount: comments.length });
         },
         updateComment(idx, field, value) {
             const comments = [...this.data.comments];
             comments[idx] = { ...comments[idx], [field]: value };
             this.updateField('comments', comments);
+        },
+        async handleCommentAvatar(idx, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const base64 = await ImageUtil.fileToBase64(file);
+                const compressed = await ImageUtil.compressImage(base64);
+                this.updateComment(idx, 'avatar', compressed);
+            } catch (e) { console.error('头像上传失败:', e.message); }
+            event.target.value = '';
         },
         addReply(commentIdx) {
             const comments = [...this.data.comments];
@@ -304,7 +331,7 @@ const YouTubePreview = {
             </template>
             <template v-else>
                 <div class="yt-player-placeholder">
-                    <span>▶</span>
+                    <span class="yt-emoji-icon">▶</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="48" height="48" fill="rgba(255,255,255,0.8)"><path d="M8 5v14l11-7z"/></svg>
                     <small>视频封面区域</small>
                 </div>
             </template>
@@ -318,14 +345,16 @@ const YouTubePreview = {
                 <div class="yt-view-info">{{ formatViews(data.views) }}次观看 · {{ data.dateText || '今天' }}</div>
                 <div class="yt-actions">
                     <div class="yt-action-btn liked">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                        <span class="yt-emoji-icon">👍</span>
+                        <svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
                         {{ formatCount(data.likes) }}
                     </div>
                     <div class="yt-action-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#0f0f0f" stroke-width="2" style="transform:rotate(180deg);"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                        <span class="yt-emoji-icon">👎</span>
+                        <svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
                     </div>
-                    <div class="yt-action-btn">分享</div>
-                    <div class="yt-action-btn">下载</div>
+                    <div class="yt-action-btn"><span class="yt-emoji-icon">分享</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span class="yt-hd-icon-text">分享</span></div>
+                    <div class="yt-action-btn"><span class="yt-emoji-icon">下载</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="yt-hd-icon-text">下载</span></div>
                 </div>
             </div>
         </div>
@@ -357,7 +386,7 @@ const YouTubePreview = {
         <!-- Comments -->
         <div class="yt-comments">
             <div class="yt-comments-header">
-                <span class="yt-comments-count">{{ data.comments.length }} 条评论</span>
+                <span class="yt-comments-count">{{ data.commentsCount || data.comments.length }} 条评论</span>
                 <span class="yt-sort-btn">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M3 4h18M3 12h12M3 20h6"/></svg>
                     排序方式
@@ -366,10 +395,10 @@ const YouTubePreview = {
             <div v-for="(comment, idx) in data.comments" :key="idx">
                 <div class="yt-comment" :class="{ 'yt-comment-pinned': comment.isPinned }">
                     <template v-if="comment.isPinned">
-                        <div class="yt-pinned-label">📌 由作者置顶</div>
+                        <div class="yt-pinned-label"><span class="yt-emoji-icon">📌</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="#606060"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg> 由作者置顶</div>
                     </template>
-                    <template v-if="data.channelAvatar || data.channelAvatarUrl">
-                        <img class="yt-comment-avatar" :src="data.channelAvatar || data.channelAvatarUrl" alt="">
+                    <template v-if="comment.avatar || comment.avatarUrl">
+                        <img class="yt-comment-avatar" :src="comment.avatar || comment.avatarUrl" alt="">
                     </template>
                     <template v-else>
                         <div class="yt-comment-avatar-placeholder">{{ (comment.author || 'U')[0].toUpperCase() }}</div>
@@ -381,13 +410,15 @@ const YouTubePreview = {
                         </div>
                         <div class="yt-comment-body">{{ comment.text }}</div>
                         <div class="yt-comment-actions">
-                            <div class="yt-comment-action">
-                                <svg viewBox="0 0 24 24"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
-                            </div>
-                            <div class="yt-comment-action">
-                                <svg viewBox="0 0 24 24" style="transform:rotate(180deg);"><path d="M18.77 11h-4.23l1.52-4.94C16.38 5.03 15.54 4 14.38 4c-.58 0-1.14.24-1.52.65L7 11H1v10h6l6.73-1.77c.84-.22 1.57-.67 2.13-1.27L22 12.5c.23-.24.36-.56.36-.9 0-.74-.59-1.35-1.32-1.35h-1.27z"/></svg>
+                            <div class="yt-comment-action yt-like-btn">
+                                <span class="yt-emoji-icon">👍</span>
+                                <svg class="yt-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="#606060"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 2 7.59 8.59C7.22 8.95 7 9.45 7 10v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
                             </div>
                             <span class="yt-comment-likes" v-if="comment.likes > 0">{{ comment.likes }}</span>
+                            <div class="yt-comment-action yt-dislike-btn">
+                                <span class="yt-emoji-icon">👎</span>
+                                <svg class="yt-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="#606060"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+                            </div>
                             <span class="yt-comment-action" style="margin-left:8px;">回复</span>
                         </div>
                     </div>

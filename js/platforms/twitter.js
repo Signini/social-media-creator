@@ -20,6 +20,7 @@ const TwitterDefaults = {
     isThread: false,
     threadTweets: [],
     quoteTweet: null,
+    commentCount: 2,
     comments: [
         { username: '李四', text: '太美了！在哪里拍的？', likes: 5, replies: [] },
         { username: '王五', text: '求拍照参数！📸', likes: 3, replies: [] },
@@ -184,6 +185,12 @@ const TwitterEditor = {
 
         <!-- 评论 -->
         <div class="sub-title">💬 评论区 <span class="hint">({{ (data.comments || []).length }}条)</span></div>
+        <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:12px;">显示评论数</label>
+                <input class="form-input" type="number" min="0" :value="data.commentCount || (data.comments || []).length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
+            </div>
+        </div>
         <div class="comment-list">
             <div class="comment-item" v-for="(comment, idx) in (data.comments || [])" :key="idx"
                 draggable="true"
@@ -296,12 +303,12 @@ const TwitterEditor = {
         },
         addComment() {
             const comments = [...(this.data.comments || []), { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, avatar: '', avatarUrl: '', replies: [] }];
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         removeComment(idx) {
             const comments = [...(this.data.comments || [])];
             comments.splice(idx, 1);
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         updateComment(idx, field, value) {
             const comments = [...(this.data.comments || [])];
@@ -467,26 +474,31 @@ const TwitterPreview = {
             <!-- Actions -->
             <div class="tw-action-row">
                 <div class="tw-action-row-item" title="回复">
-                    <svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.26-.88 4.27-2.37 5.77l-5.47 5.47c-.29.29-.77.29-1.06 0l-5.47-5.47c-1.5-1.5-2.37-3.52-2.37-5.77z"/></svg>
+                    <span class="tw-emoji-icon">💬</span>
+                    <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                 </div>
                 <div class="tw-action-row-item" title="转推">
-                    <svg viewBox="0 0 24 24"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
+                    <span class="tw-emoji-icon">🔁</span>
+                    <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
                 </div>
                 <div class="tw-action-row-item" title="喜欢">
-                    <svg viewBox="0 0 24 24"><path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.92-.32-6.64C4.05 8.49 5.96 7.5 7.91 7.5c1.57 0 3.09.69 4.08 1.83.99-1.14 2.51-1.83 4.08-1.83 1.96 0 3.87.99 5.12 3.05 1.13 1.72 1.04 4.14-.32 6.64z"/></svg>
+                    <span class="tw-emoji-icon">❤️</span>
+                    <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </div>
                 <div class="tw-action-row-item" title="浏览量">
-                    <svg viewBox="0 0 24 24"><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"/></svg>
+                    <span class="tw-emoji-icon">👁️</span>
+                    <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"/></svg>
                 </div>
                 <div class="tw-action-row-item" title="分享">
-                    <svg viewBox="0 0 24 24"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 14l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 20 3 18.88 3 17.5V14h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 14h2z"/></svg>
+                    <span class="tw-emoji-icon">↗️</span>
+                    <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 14l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 20 3 18.88 3 17.5V14h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 14h2z"/></svg>
                 </div>
             </div>
 
             <!-- Comments -->
             <template v-if="data.comments && data.comments.length > 0">
                 <div style="border-top:1px solid #e6ecf0; margin-top:12px; padding-top:12px;">
-                    <div style="font-size:13px; color:#536471; margin-bottom:8px;">查看全部 {{ data.comments.length }} 条评论</div>
+                    <div style="font-size:13px; color:#536471; margin-bottom:8px;">查看全部 {{ data.commentCount || data.comments.length }} 条评论</div>
                     <div class="tw-comments">
                         <div class="tw-comment" v-for="(comment, idx) in data.comments" :key="idx">
                             <img v-if="comment.avatar || comment.avatarUrl" class="tw-comment-avatar" :src="comment.avatar || comment.avatarUrl" :alt="comment.username">
@@ -497,13 +509,15 @@ const TwitterPreview = {
                                     <span class="tw-comment-text">{{ comment.text }}</span>
                                 </div>
                                 <div class="tw-comment-actions">
-                                    <span class="tw-comment-action" title="喜欢">
-                                        <svg viewBox="0 0 24 24"><path d="M20.884 13.19c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.45-4.92-.32-6.64C4.05 8.49 5.96 7.5 7.91 7.5c1.57 0 3.09.69 4.08 1.83.99-1.14 2.51-1.83 4.08-1.83 1.96 0 3.87.99 5.12 3.05 1.13 1.72 1.04 4.14-.32 6.64z"/></svg>
-                                    </span>
                                     <span class="tw-comment-action" title="回复">
-                                        <svg viewBox="0 0 24 24"><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.26-.88 4.27-2.37 5.77l-5.47 5.47c-.29.29-.77.29-1.06 0l-5.47-5.47c-1.5-1.5-2.37-3.52-2.37-5.77z"/></svg>
+                                        <span class="tw-emoji-icon">💬</span>
+                                        <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                                     </span>
-                                    <span class="tw-comment-like-count">{{ comment.likes > 0 ? comment.likes : '' }}</span>
+                                    <span class="tw-comment-action" title="喜欢">
+                                        <span class="tw-emoji-icon">❤️</span>
+                                        <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        <span class="tw-comment-like-count" v-if="comment.likes > 0">{{ comment.likes }}</span>
+                                    </span>
                                 </div>
                                 <div v-if="(comment.replies || []).length > 0" class="tw-comment-replies">
                                     <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" class="tw-comment-reply">

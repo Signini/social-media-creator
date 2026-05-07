@@ -137,6 +137,7 @@
                     <div class="preview-device">
                         <button :class="['device-btn', { active: deviceMode === 'phone' }]" @click="deviceMode = 'phone'">📱 手机</button>
                         <button :class="['device-btn', { active: deviceMode === 'desktop' }]" @click="deviceMode = 'desktop'">🖥️ 桌面</button>
+                        <button :class="['device-btn', { active: previewMode === 'hd' }]" @click="previewMode = previewMode === 'hd' ? 'standard' : 'hd'">✨ 高清</button>
                     </div>
                     <div class="preview-actions">
                         <button class="btn btn-primary" @click="addToUniversal">➕ 添加到综合页面</button>
@@ -146,9 +147,10 @@
                         <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
                         <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
                         <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
+                        <button class="btn btn-secondary" @click="exportImage">🖼️ 导出图片</button>
                     </div>
                 </div>
-                <div class="preview-container" :class="'device-' + deviceMode">
+                <div class="preview-container" :class="['device-' + deviceMode, previewMode === 'hd' ? 'preview-hd' : '']">
                     <div class="preview-scroll">
                         <div class="preview-content" ref="previewContent">
                             <!-- Instagram 预览 -->
@@ -269,6 +271,7 @@
 
     <!-- Vue 3 (本地) -->
     <script src="js/vendor/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <!-- 工具模块 -->
     <script src="js/utils/storage.js?v=3.7"></script>

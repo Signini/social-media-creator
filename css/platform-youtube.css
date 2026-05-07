@@ -359,9 +359,6 @@
 .yt-comment-action svg {
     width: 16px;
     height: 16px;
-    fill: none;
-    stroke: #606060;
-    stroke-width: 1.5;
 }
 
 .yt-comment-likes {
@@ -391,4 +388,67 @@
 
 @media (max-width: 540px) {
     .yt-page { max-width: 100%; }
+}
+
+/* ===== 高清模式增强 ===== */
+
+/* Icon toggle */
+.yt-hd-icon { display: none; }
+.yt-hd-icon-text { display: none; }
+.preview-hd .yt-hd-icon { display: inline-block; vertical-align: middle; }
+.preview-hd .yt-hd-icon-text { display: inline; }
+.preview-hd .yt-emoji-icon { display: none; }
+
+/* Emoji icon sizing for like/dislike */
+.yt-action-btn .yt-emoji-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.yt-comment-action .yt-emoji-icon {
+    font-size: 13px;
+    line-height: 1;
+}
+
+/* Video player shadow */
+.preview-hd .yt-player {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+/* Action buttons */
+.preview-hd .yt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 6px 12px;
+    background: #f2f2f2;
+    transition: background 0.15s;
+}
+
+.preview-hd .yt-action-btn.liked {
+    background: #e8f0fe;
+}
+
+/* Subscribe button */
+.preview-hd .yt-subscribe-btn {
+    border-radius: 20px;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Comment avatars */
+.preview-hd .yt-channel-avatar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.preview-hd .yt-comment-avatar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Pinned label icon */
+.preview-hd .yt-pinned-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }

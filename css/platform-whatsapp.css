@@ -193,11 +193,49 @@
     box-shadow: 0 1px 1px rgba(0,0,0,0.06);
 }
 
+/* Message Row (avatar + bubble) */
+.wa-msg-row {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 4px;
+}
+
+.wa-row-sent {
+    justify-content: flex-end;
+}
+
+.wa-row-received {
+    justify-content: flex-start;
+}
+
+.wa-msg-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.wa-msg-avatar.wa-msg-avatar-placeholder {
+    background: #ccc;
+    text-align: center;
+    line-height: 45px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    font-size: 12px;
+}
+
+.wa-msg-avatar-spacer {
+    width: 51px;
+    flex-shrink: 0;
+}
+
 /* Message Bubble */
 .wa-bubble {
     max-width: 80%;
     position: relative;
-    margin-bottom: 4px;
     border-radius: 8px;
     padding: 6px 7px 8px 9px;
     box-shadow: 0 1px 1px rgba(0,0,0,0.06);
@@ -562,4 +600,78 @@
 
 @media (max-width: 540px) {
     .wa-chat { max-width: 100%; }
+}
+
+/* ===== 高清模式增强 ===== */
+
+/* Icon toggle: hide SVG by default, show in HD mode */
+.wa-hd-icon { display: none; }
+.preview-hd .wa-hd-icon { display: inline-block; vertical-align: middle; }
+.preview-hd .wa-emoji-icon { display: none; }
+
+/* Header */
+.preview-hd .wa-header {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.preview-hd .wa-header-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Bubbles */
+.preview-hd .wa-bubble {
+    box-shadow: 0 1px 1px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.preview-hd .wa-msg-avatar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.preview-hd .wa-header-avatar {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+/* Tick mark colors */
+.preview-hd .wa-bubble-ticks {
+    display: inline-flex;
+    align-items: center;
+}
+.preview-hd .wa-ticks-sent .wa-hd-icon { fill: #8696a0; }
+.preview-hd .wa-ticks-read .wa-hd-icon { fill: #53bdeb; }
+
+/* Voice play button */
+.preview-hd .wa-bubble-sent .wa-voice-play {
+    background: #075e54;
+}
+.preview-hd .wa-bubble-sent .wa-voice-play .wa-hd-icon { fill: #fff; }
+.preview-hd .wa-bubble-received .wa-voice-play {
+    background: #e9edef;
+}
+.preview-hd .wa-bubble-received .wa-voice-play .wa-hd-icon { fill: #54656f; }
+
+/* Input bar */
+.preview-hd .wa-input-emoji {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-hd .wa-input-attach {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-hd .wa-send-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.preview-hd .wa-send-btn .wa-hd-icon { fill: #fff; }
+
+/* Call record icon */
+.preview-hd .wa-call-icon {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
 }

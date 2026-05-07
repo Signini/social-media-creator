@@ -311,3 +311,65 @@
 @media (max-width: 540px) {
     .ig-post { max-width: 100%; }
 }
+
+/* ===== 高清模式增强 ===== */
+
+/* Icon toggle */
+.ig-hd-icon { display: none; }
+.preview-hd .ig-hd-icon { display: inline-flex; vertical-align: middle; }
+.preview-hd .ig-std-icon { display: none; }
+.preview-hd .ig-emoji-icon { display: none; }
+
+/* Emoji icon sizing */
+.ig-action-btn .ig-emoji-icon {
+    font-size: 18px;
+    line-height: 24px;
+}
+.ig-comment-like .ig-emoji-icon {
+    font-size: 12px;
+}
+
+/* Action buttons */
+.preview-hd .ig-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.15s;
+}
+
+.preview-hd .ig-action-btn:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+/* Post card shadow */
+.preview-hd .ig-post {
+    border: 1px solid #dbdbdb;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Image container rounded */
+.preview-hd .ig-image-container {
+    border-radius: 0;
+}
+
+/* Header avatar ring */
+.preview-hd .ig-avatar {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Comment like heart hover */
+.preview-hd .ig-comment-like {
+    transition: transform 0.2s;
+}
+
+.preview-hd .ig-comment-like:hover {
+    transform: scale(1.2);
+}
+
+/* Add comment input */
+.preview-hd .ig-add-comment {
+    background: #fafafa;
+}

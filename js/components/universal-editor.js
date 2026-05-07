@@ -51,6 +51,7 @@ const UniversalEditor = {
                     <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
                     <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
                     <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
+                    <button class="btn btn-secondary" @click="exportImages">🖼️ 批量导出图片</button>
                 </div>
             </div>
             <div class="universal-preview-scroll" ref="universalPreview">
@@ -70,6 +71,8 @@ const UniversalEditor = {
                         <imessage-preview v-if="item.platform === 'imessage'" :data="item.data"></imessage-preview>
                         <whatsapp-preview v-if="item.platform === 'whatsapp'" :data="item.data"></whatsapp-preview>
                         <wechat-preview v-if="item.platform === 'wechat'" :data="item.data"></wechat-preview>
+                        <qq-preview v-if="item.platform === 'qq'" :data="item.data"></qq-preview>
+                        <wechat-moments-preview v-if="item.platform === 'wechatMoments'" :data="item.data"></wechat-moments-preview>
                         <xiaohongshu-preview v-if="item.platform === 'xiaohongshu'" :data="item.data"></xiaohongshu-preview>
                     </div>
                 </div>
@@ -93,7 +96,8 @@ const UniversalEditor = {
         getPlatformIcon(platformId) {
             const map = {
                 xiaohongshu: '📕', instagram: '📸', twitter: '🐦', reddit: '🔴',
-                youtube: '▶️', imessage: '💬', whatsapp: '📱', wechat: '💚'
+                youtube: '▶️', imessage: '💬', whatsapp: '📱', wechat: '💚',
+                qq: '🐧', wechatMoments: '🔄'
             };
             return map[platformId] || '📱';
         },
@@ -212,6 +216,69 @@ const UniversalEditor = {
                     this.$emit('export-complete', '❌ 复制失败');
                 }
             }
+        },
+        async exportImages() {
+            if (typeof html2canvas === 'undefined') {
+                this.$emit('export-complete', '❌ html2canvas 库未加载，请检查网络');
+                return;
+            }
+            const items = this.universalData.items;
+            if (!items || items.length === 0) {
+                this.$emit('export-complete', '❌ 没有可导出的内容');
+                return;
+            }
+            this.$emit('export-complete', '⏳ 正在生成图片 (0/' + items.length + ')...');
+            const pad = String(items.length).length;
+            for (let i = 0; i < items.length; i++) {
+                const sectionEl = this.sectionRefs[i];
+                if (!sectionEl) continue;
+                this.$emit('export-complete', '⏳ 正在生成图片 (' + (i + 1) + '/' + items.length + ')...');
+                try {
+                    const wasHd = sectionEl.classList.contains('preview-hd');
+                    if (!wasHd) sectionEl.classList.add('preview-hd');
+
+                    // Expand chat containers to show all messages
+                    const scrollContainers = sectionEl.querySelectorAll('.msg-messages, .wa-messages, .qq-messages, .wx-messages');
+                    const savedStyles = [];
+                    scrollContainers.forEach(el => {
+                        savedStyles.push({
+                            el,
+                            maxHeight: el.style.maxHeight,
+                            overflow: el.style.overflow
+                        });
+                        el.style.maxHeight = 'none';
+                        el.style.overflow = 'visible';
+                    });
+
+                    const canvas = await html2canvas(sectionEl, {
+                        backgroundColor: null,
+                        scale: 2,
+                        useCORS: true,
+                        logging: false
+                    });
+
+                    // Restore chat container styles
+                    savedStyles.forEach(({ el, maxHeight, overflow }) => {
+                        el.style.maxHeight = maxHeight;
+                        el.style.overflow = overflow;
+                    });
+
+                    if (!wasHd) sectionEl.classList.remove('preview-hd');
+
+                    const platformName = this.getPlatformName(items[i].platform);
+                    const num = String(i + 1).padStart(pad, '0');
+                    const link = document.createElement('a');
+                    link.download = num + '-' + platformName + '.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                } catch (e) {
+                    console.error('导出图片失败:', e);
+                    if (sectionEl.classList.contains('preview-hd') && !sectionEl.dataset.wasHd) {
+                        sectionEl.classList.remove('preview-hd');
+                    }
+                }
+            }
+            this.$emit('export-complete', '🖼️ 已导出 ' + items.length + ' 张图片！');
         }
     }
 };

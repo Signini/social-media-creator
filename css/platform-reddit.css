@@ -271,3 +271,37 @@
 @media (max-width: 540px) {
     .rd-post { max-width: 100%; }
 }
+
+/* ===== 高清模式增强 ===== */
+
+/* Icon toggle */
+.rd-hd-icon { display: none; }
+.preview-hd .rd-hd-icon { display: inline-block; vertical-align: middle; }
+.preview-hd .rd-emoji-icon { display: none; }
+
+/* Vote icon colors */
+.preview-hd .rd-vote-up {
+    color: #ff4500;
+}
+.preview-hd .rd-vote-up .rd-hd-icon {
+    stroke: #ff4500;
+}
+.preview-hd .rd-vote-down {
+    color: #7a7a7a;
+}
+.preview-hd .rd-vote-down .rd-hd-icon {
+    stroke: #7a7a7a;
+}
+
+/* Post card shadow */
+.preview-hd .rd-post-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 8px;
+}
+
+/* Comment action alignment */
+.preview-hd .rd-comment-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}

@@ -550,7 +550,7 @@ const WhatsAppPreview = {
     <div :class="['wa-chat', 'wa-theme-' + (data.theme || 'whatsapp')]" :style="data.theme === 'custom' ? { background: data.customBgColor } : {}">
         <!-- Header -->
         <div class="wa-header" :style="data.theme === 'custom' ? { background: data.customHeaderColor } : {}">
-            <span class="wa-header-back">←</span>
+            <span class="wa-header-back"><span class="wa-emoji-icon">←</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></span>
             <template v-if="data.isGroup">
                 <div class="wa-header-avatars">
                     <div v-for="(m, mi) in (data.groupMembers || []).slice(0, 3)" :key="mi"
@@ -570,9 +570,9 @@ const WhatsAppPreview = {
                 <div class="wa-header-status">{{ data.isGroup ? groupMembersText : (data.contactStatus || '在线') }}</div>
             </div>
             <div class="wa-header-actions">
-                <span class="wa-header-action">📹</span>
-                <span class="wa-header-action">📞</span>
-                <span class="wa-header-action">⋯</span>
+                <span class="wa-header-action"><span class="wa-emoji-icon">📹</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></span>
+                <span class="wa-header-action"><span class="wa-emoji-icon">📞</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></span>
+                <span class="wa-header-action"><span class="wa-emoji-icon">⋯</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></span>
             </div>
         </div>
 
@@ -599,7 +599,7 @@ const WhatsAppPreview = {
 
                 <!-- Call Record -->
                 <div v-else-if="msg.isCall" :class="['wa-call-record', 'wa-call-' + (msg.callStatus || 'answered')]">
-                    <span class="wa-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
+                    <span class="wa-call-icon"><template v-if="msg.callType === 'video'"><span class="wa-emoji-icon">📹</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></template><template v-else><span class="wa-emoji-icon">📞</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></template></span>
                     <span class="wa-call-text">
                         <template v-if="msg.callStatus === 'missed'">未接听</template>
                         <template v-else-if="msg.callStatus === 'declined'">已拒绝</template>
@@ -609,10 +609,22 @@ const WhatsAppPreview = {
                 </div>
 
                 <!-- Normal Message Bubble -->
-                <div v-else :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
-                    <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :class="'wa-sc-' + (msg.sender || 0)">{{ getSender(msg).name }}</div>
+                <div v-else :class="['wa-msg-row', msg.type === 'sent' ? 'wa-row-sent' : 'wa-row-received']">
+                    <template v-if="msg.type === 'received' && isWaAvatarVisible(idx)">
+                        <template v-if="data.isGroup && getSender(msg)">
+                            <img v-if="getSender(msg).avatar || getSender(msg).avatarUrl" class="wa-msg-avatar" :src="getSender(msg).avatar || getSender(msg).avatarUrl" alt="">
+                            <div v-else class="wa-msg-avatar wa-msg-avatar-placeholder" :style="{ background: getSender(msg).color || '#ccc' }">{{ (getSender(msg).name || 'U')[0].toUpperCase() }}</div>
+                        </template>
+                        <template v-else>
+                            <img v-if="data.contactAvatar || data.contactAvatarUrl" class="wa-msg-avatar" :src="data.contactAvatar || data.contactAvatarUrl" alt="">
+                            <div v-else class="wa-msg-avatar wa-msg-avatar-placeholder">{{ (data.contactName || 'U')[0].toUpperCase() }}</div>
+                        </template>
+                    </template>
+                    <div v-if="msg.type === 'received' && !isWaAvatarVisible(idx)" class="wa-msg-avatar-spacer"></div>
+                    <div :class="['wa-bubble', msg.type === 'sent' ? 'wa-bubble-sent' : 'wa-bubble-received']">
+                    <div v-if="data.isGroup && msg.type === 'received' && getSender(msg)" class="wa-sender-name" :style="{ color: getSender(msg).color || '#075e54' }">{{ getSender(msg).name }}</div>
                     <div v-if="msg.isVoice" class="wa-voice-msg">
-                        <div class="wa-voice-play">▶</div>
+                        <div class="wa-voice-play"><span class="wa-emoji-icon">▶</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
                         <div class="wa-voice-waveform">
                             <div class="wa-voice-bar" v-for="i in 20" :key="i" :style="{ height: (Math.sin(i * 0.8) * 8 + 10) + 'px' }"></div>
                         </div>
@@ -629,9 +641,12 @@ const WhatsAppPreview = {
                     <div class="wa-bubble-meta">
                         <span class="wa-bubble-time">{{ msg.time }}</span>
                         <span v-if="msg.type === 'sent' && msg.ticks" :class="['wa-bubble-ticks', msg.ticks === 'read' ? 'wa-ticks-read' : 'wa-ticks-sent']">
-                            {{ msg.ticks === 'sent' ? '✓' : '✓✓' }}
+                            <span class="wa-emoji-icon">{{ msg.ticks === 'sent' ? '✓' : '✓✓' }}</span>
+                            <svg v-if="msg.ticks === 'sent'" class="wa-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            <svg v-else class="wa-hd-icon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18 7l-1.41-1.41-6.34 6.34 1.41 1.41L18 7zm4.24-1.41L11.66 16.17 7.48 12l-1.41 1.41L11.66 19l12-12-1.42-1.41zM.41 13.41L6 19l1.41-1.41L1.83 12 .41 13.41z"/></svg>
                         </span>
                     </div>
+                </div>
                 </div>
                 <div v-if="msg.reaction && !msg.isCall && msg.type !== 'system' && msg.type !== 'timeSeparator'" class="wa-reaction">
                     {{ msg.reaction }}
@@ -651,12 +666,12 @@ const WhatsAppPreview = {
 
         <!-- Input Bar -->
         <div class="wa-input-bar">
-            <span class="wa-input-emoji">😀</span>
+            <span class="wa-input-emoji"><span class="wa-emoji-icon">😀</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></span>
             <div class="wa-input-field">
                 <span class="wa-input-placeholder">输入消息</span>
             </div>
-            <span class="wa-input-attach">📎</span>
-            <span class="wa-send-btn">➤</span>
+            <span class="wa-input-attach"><span class="wa-emoji-icon">📎</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg></span>
+            <span class="wa-send-btn"><span class="wa-emoji-icon">➤</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></span>
         </div>
     </div>
     `,
@@ -664,22 +679,7 @@ const WhatsAppPreview = {
         groupMembersText() {
             const members = this.data.groupMembers || [];
             return members.map(m => m.name).join('、');
-        },
-        memberColorCSS() {
-            const members = this.data.groupMembers || [];
-            if (!this.data.isGroup || members.length === 0) return '';
-            let css = '';
-            for (let i = 0; i < members.length; i++) {
-                css += '.wa-sc-' + i + ' { color: ' + (members[i].color || '#075e54') + ' !important; }\n';
-            }
-            return css;
         }
-    },
-    mounted() {
-        this._injectMemberColors();
-    },
-    updated() {
-        this._injectMemberColors();
     },
     methods: {
         getSender(msg) {
@@ -716,17 +716,21 @@ const WhatsAppPreview = {
             div.textContent = str;
             return div.innerHTML;
         },
-        _injectMemberColors() {
-            if (!this.data.isGroup) return;
-            const el = this.$el;
-            if (!el) return;
-            let styleEl = el.querySelector(':scope > style.wa-member-colors');
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.className = 'wa-member-colors';
-                el.insertBefore(styleEl, el.firstChild);
+        isWaAvatarVisible(idx) {
+            const msgs = this.data.messages;
+            const current = msgs[idx];
+            if (!current || current.type !== 'received') return false;
+            let prevIdx = idx - 1;
+            while (prevIdx >= 0 && (msgs[prevIdx].type === 'system' || msgs[prevIdx].type === 'timeSeparator')) {
+                prevIdx--;
             }
-            styleEl.textContent = this.memberColorCSS;
+            if (prevIdx < 0) return true;
+            const prev = msgs[prevIdx];
+            if (prev.type !== 'received') return true;
+            if (this.data.isGroup) {
+                return current.sender !== prev.sender;
+            }
+            return false;
         }
     }
 };

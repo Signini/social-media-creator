@@ -103,6 +103,12 @@ const RedditEditor = {
         <div class="section-divider"></div>
 
         <div class="sub-title">💬 评论 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:12px;">显示评论数</label>
+                <input class="form-input" type="number" min="0" :value="data.commentCount || data.comments.length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
+            </div>
+        </div>
         <div class="comment-list">
             <div class="comment-item" v-for="(comment, idx) in data.comments" :key="idx"
                 draggable="true"
@@ -180,12 +186,12 @@ const RedditEditor = {
         },
         addComment() {
             const comments = [...this.data.comments, { author: 'user_' + Math.floor(Math.random()*999), text: '', upvotes: 0, timeAgo: '刚刚', replies: [] }];
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         removeComment(idx) {
             const comments = [...this.data.comments];
             comments.splice(idx, 1);
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         updateComment(idx, field, value) {
             const comments = [...this.data.comments];
@@ -318,7 +324,7 @@ const RedditPreview = {
                 <div class="rd-post-actions">
                     <div class="rd-action-btn">
                         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                        {{ data.comments ? data.comments.length : 0 }} 评论
+                        {{ data.commentCount || (data.comments ? data.comments.length : 0) }} 评论
                     </div>
                     <div class="rd-action-btn">
                         <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
@@ -333,7 +339,7 @@ const RedditPreview = {
                 <!-- Comments -->
                 <div class="rd-comments" v-if="data.comments && data.comments.length > 0">
                     <div class="rd-comments-header">
-                        <span class="rd-comments-title">{{ data.comments.length }} 条评论</span>
+                        <span class="rd-comments-title">{{ data.commentCount || data.comments.length }} 条评论</span>
                     </div>
                     <div v-for="(comment, idx) in data.comments" :key="idx" class="rd-comment">
                         <div class="rd-comment-header">
@@ -343,8 +349,8 @@ const RedditPreview = {
                         </div>
                         <div class="rd-comment-body">{{ comment.text }}</div>
                         <div class="rd-comment-actions">
-                            <span class="rd-comment-action">👍 {{ comment.upvotes || 0 }}</span>
-                            <span class="rd-comment-action">👎</span>
+                            <span class="rd-comment-action rd-vote-up"><span class="rd-emoji-icon">👍</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg> {{ comment.upvotes || 0 }}</span>
+                            <span class="rd-comment-action rd-vote-down"><span class="rd-emoji-icon">👎</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
                             <span class="rd-comment-action">回复</span>
                         </div>
                         <!-- Nested Replies -->
@@ -357,7 +363,7 @@ const RedditPreview = {
                                 </div>
                                 <div class="rd-comment-body">{{ reply.text }}</div>
                                 <div class="rd-comment-actions">
-                                    <span class="rd-comment-action">👍 {{ reply.upvotes || 0 }}</span>
+                                    <span class="rd-comment-action rd-vote-up"><span class="rd-emoji-icon">👍</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg> {{ reply.upvotes || 0 }}</span>
                                     <span class="rd-comment-action">回复</span>
                                 </div>
                             </div>

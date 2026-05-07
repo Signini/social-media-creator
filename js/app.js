@@ -13,6 +13,7 @@ if (typeof Vue === 'undefined') {
         return {
             currentPlatform: 'xiaohongshu',
             deviceMode: 'phone',
+            previewMode: 'standard',
             platformRegion: 'domestic',
             showLoadModal: false,
             showSaveModal: false,
@@ -48,6 +49,7 @@ if (typeof Vue === 'undefined') {
                         { username: 'lisi_photo', text: '拍得真好看！', likes: 12, replies: [] },
                         { username: 'wangwu_art', text: '这个角度绝了 🔥', likes: 5, replies: [] }
                     ],
+                    commentCount: 2,
                     imageWidth: 1080,
                     imageHeight: 1080
                 },
@@ -73,7 +75,8 @@ if (typeof Vue === 'undefined') {
                         { username: '李四', text: '太美了！在哪里拍的？', likes: 5, avatar: '', avatarUrl: '', replies: [] },
                         { username: '王五', text: '求拍照参数！📸', likes: 3, avatar: '', avatarUrl: '', replies: [] },
                         { username: '赵六', text: '这个角度绝了 🔥', likes: 2, avatar: '', avatarUrl: '', replies: [] }
-                    ]
+                    ],
+                    commentCount: 3
                 },
                 reddit: {
                     subreddit: 'r/Beijing',
@@ -190,6 +193,7 @@ if (typeof Vue === 'undefined') {
                     contactName: '好友',
                     contactAvatar: '',
                     contactAvatarUrl: '',
+                    contactColor: '#576b95',
                     isGroup: false,
                     groupName: 'QQ群',
                     groupMembers: [
@@ -197,6 +201,8 @@ if (typeof Vue === 'undefined') {
                         { name: '李四', avatar: '', avatarUrl: '', color: '#FA5151' },
                         { name: '王五', avatar: '', avatarUrl: '', color: '#07C160' }
                     ],
+                    headerColor: '#12B7F5',
+                    showOnlineStatus: true,
                     dateSeparator: '昨天',
                     showTyping: false,
                     messages: [
@@ -248,7 +254,8 @@ if (typeof Vue === 'undefined') {
                     { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', time: '30分钟前', replies: [] }
                     ],
                     timestamp: '2小时前',
-                    showFollowBtn: true
+                    showFollowBtn: true,
+                    commentCount: 2
                 }
             },
             currentView: 'single',
@@ -578,6 +585,7 @@ if (typeof Vue === 'undefined') {
                     { username: 'lisi_photo', text: '拍得真好看！', likes: 12, replies: [] },
                     { username: 'wangwu_art', text: '这个角度绝了 🔥', likes: 5, replies: [] }
                 ],
+                commentCount: 0,
                 imageWidth: 1080,
                 imageHeight: 1080
             };
@@ -609,7 +617,8 @@ if (typeof Vue === 'undefined') {
                     { username: '李四', text: '太美了！在哪里拍的？', likes: 5, avatar: '', avatarUrl: '', replies: [] },
                     { username: '王五', text: '求拍照参数！📸', likes: 3, avatar: '', avatarUrl: '', replies: [] },
                     { username: '赵六', text: '这个角度绝了 🔥', likes: 2, avatar: '', avatarUrl: '', replies: [] }
-                ]
+                ],
+                commentCount: 0
             };
         },
 
@@ -733,6 +742,7 @@ if (typeof Vue === 'undefined') {
                 contactName: '好友',
                 contactAvatar: '',
                 contactAvatarUrl: '',
+                contactColor: '#576b95',
                 isGroup: false,
                 groupName: 'QQ群',
                 groupMembers: [
@@ -740,6 +750,8 @@ if (typeof Vue === 'undefined') {
                     { name: '李四', avatar: '', avatarUrl: '', color: '#FA5151' },
                     { name: '王五', avatar: '', avatarUrl: '', color: '#07C160' }
                 ],
+                headerColor: '#12B7F5',
+                showOnlineStatus: true,
                 dateSeparator: '昨天',
                 showTyping: false,
                 messages: []
@@ -793,6 +805,7 @@ if (typeof Vue === 'undefined') {
                     ]},
                     { username: '旅行达人小王', text: '三里屯的日落确实很绝 🔥', likes: 8, avatar: '', avatarUrl: '', replies: [] }
                 ],
+                commentCount: 0,
                 timestamp: '2小时前',
                 showFollowBtn: true
             };
@@ -921,6 +934,62 @@ if (typeof Vue === 'undefined') {
             } catch (e) {
                 console.error('导出失败:', e);
                 this.showToast('❌ 导出失败：' + e.message);
+            }
+        },
+
+        async exportImage() {
+            const previewEl = this.$refs.previewContent;
+            if (!previewEl) {
+                this.showToast('❌ 没有可导出的内容');
+                return;
+            }
+            if (typeof html2canvas === 'undefined') {
+                this.showToast('❌ html2canvas 库未加载，请检查网络');
+                return;
+            }
+            try {
+                this.showToast('⏳ 正在生成图片...');
+                const hdTarget = previewEl.closest('.preview-container') || previewEl;
+                const wasHd = hdTarget.classList.contains('preview-hd');
+                if (!wasHd) hdTarget.classList.add('preview-hd');
+
+                // Expand chat containers to show all messages
+                const scrollContainers = previewEl.querySelectorAll('.msg-messages, .wa-messages, .qq-messages, .wx-messages');
+                const savedStyles = [];
+                scrollContainers.forEach(el => {
+                    savedStyles.push({
+                        el,
+                        maxHeight: el.style.maxHeight,
+                        overflow: el.style.overflow
+                    });
+                    el.style.maxHeight = 'none';
+                    el.style.overflow = 'visible';
+                });
+
+                const canvas = await html2canvas(previewEl, {
+                    backgroundColor: null,
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                // Restore chat container styles
+                savedStyles.forEach(({ el, maxHeight, overflow }) => {
+                    el.style.maxHeight = maxHeight;
+                    el.style.overflow = overflow;
+                });
+
+                if (!wasHd) hdTarget.classList.remove('preview-hd');
+
+                const link = document.createElement('a');
+                const platformName = this.platforms.find(p => p.id === this.currentPlatform)?.name || 'social';
+                link.download = `${platformName}-content.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                this.showToast('🖼️ 图片已下载！');
+            } catch (e) {
+                console.error('导出图片失败:', e);
+                this.showToast('❌ 导出图片失败：' + e.message);
             }
         }
     }

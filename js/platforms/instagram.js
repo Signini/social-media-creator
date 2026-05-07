@@ -19,6 +19,7 @@ const InstagramDefaults = {
         { username: 'lisi_photo', text: '拍得真好看！', likes: 12, replies: [] },
         { username: 'wangwu_art', text: '这个角度绝了 🔥', likes: 5, replies: [] }
     ],
+    commentCount: 2,
     imageWidth: 1080,
     imageHeight: 1080
 };
@@ -120,6 +121,12 @@ const InstagramEditor = {
 
         <!-- 评论 -->
         <div class="sub-title">💬 评论区 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="form-row" style="margin-bottom:8px;">
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="font-size:12px;">显示评论数</label>
+                <input class="form-input" type="number" min="0" :value="data.commentCount || data.comments.length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
+            </div>
+        </div>
         <div class="comment-list">
             <div class="comment-item" v-for="(comment, idx) in data.comments" :key="idx"
                 draggable="true"
@@ -211,12 +218,12 @@ const InstagramEditor = {
         },
         addComment() {
             const comments = [...this.data.comments, { username: 'user_' + Math.floor(Math.random() * 999), text: '', likes: 0, replies: [] }];
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         removeComment(idx) {
             const comments = [...this.data.comments];
             comments.splice(idx, 1);
-            this.updateField('comments', comments);
+            this.$emit('update', { ...this.data, comments, commentCount: comments.length });
         },
         updateComment(idx, field, value) {
             const comments = [...this.data.comments];
@@ -364,18 +371,22 @@ const InstagramPreview = {
         <div class="ig-actions">
             <div class="ig-actions-left">
                 <div class="ig-action-btn">
-                    <svg viewBox="0 0 24 24"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.725-2.96 7.098-6.378 9.566a.998.998 0 0 1-1.244 0C10.46 16.22 7.5 12.847 7.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 .679-.938z" fill="none" stroke="#262626" stroke-width="1.5"/></svg>
+                    <span class="ig-emoji-icon">❤️</span>
+                    <svg class="ig-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="#262626" stroke-width="1.5"/></svg>
                 </div>
                 <div class="ig-action-btn">
-                    <svg viewBox="0 0 24 24"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="#262626" stroke-linejoin="round" stroke-width="1.5"/></svg>
+                    <span class="ig-emoji-icon">💬</span>
+                    <svg class="ig-hd-icon" viewBox="0 0 24 24"><path d="M20.656 17.008a9.993 9.993 0 1 0-3.59 3.615L22 22Z" fill="none" stroke="#262626" stroke-linejoin="round" stroke-width="1.5"/></svg>
                 </div>
                 <div class="ig-action-btn">
-                    <svg viewBox="0 0 24 24"><line fill="none" stroke="#262626" stroke-linejoin="round" stroke-width="1.5" x1="22" x2="9.218" y1="3" y2="10.083"/><polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="#262626" stroke-linejoin="round" stroke-width="1.5"/></svg>
+                    <span class="ig-emoji-icon">✈️</span>
+                    <svg class="ig-hd-icon" viewBox="0 0 24 24"><line fill="none" stroke="#262626" stroke-linejoin="round" stroke-width="1.5" x1="22" x2="9.218" y1="3" y2="10.083"/><polygon fill="none" points="11.698 20.334 22 3.001 2 3.001 9.218 10.084 11.698 20.334" stroke="#262626" stroke-linejoin="round" stroke-width="1.5"/></svg>
                 </div>
             </div>
             <div class="ig-actions-right">
                 <div class="ig-action-btn">
-                    <svg viewBox="0 0 24 24"><polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="#262626" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
+                    <span class="ig-emoji-icon">🔖</span>
+                    <svg class="ig-hd-icon" viewBox="0 0 24 24"><polygon fill="none" points="20 21 12 13.44 4 21 4 3 20 3 20 21" stroke="#262626" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"/></svg>
                 </div>
             </div>
         </div>
@@ -392,7 +403,7 @@ const InstagramPreview = {
         <!-- Comments -->
         <template v-if="data.comments && data.comments.length > 0">
             <div class="ig-view-comments" v-if="data.comments.length > 2">
-                查看 {{ data.comments.length }} 条评论
+                查看 {{ data.commentCount || data.comments.length }} 条评论
             </div>
             <div class="ig-comments">
                 <div v-for="(comment, idx) in data.comments" :key="idx" class="ig-comment-group">
@@ -400,7 +411,8 @@ const InstagramPreview = {
                         <span class="ig-comment-username">{{ comment.username }}</span>
                         <span v-html="renderCaption(comment.text)"></span>
                         <span class="ig-comment-like" v-if="comment.likes > 0">
-                            <svg viewBox="0 0 24 24"><path d="M16.792 3.904A4.989 4.989 0 0 1 21.5 9.122c0 3.725-2.96 7.098-6.378 9.566a.998.998 0 0 1-1.244 0C10.46 16.22 7.5 12.847 7.5 9.122a4.989 4.989 0 0 1 4.708-5.218 4.21 4.21 0 0 1 3.675 1.941c.84 1.175.98 1.763 1.12 1.763s.278-.588 1.11-1.766a4.17 4.17 0 0 1 .679-.938z"/></svg>
+                            <span class="ig-emoji-icon">❤️</span>
+                            <svg class="ig-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         </span>
                     </div>
                     <div v-if="(comment.replies || []).length > 0" class="ig-replies">

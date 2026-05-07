@@ -22,8 +22,10 @@ const ExporterUtil = {
         { path: 'M12 4L4 12h5v8h6v-8h5z', text: '▲' },
         { path: 'M12 20l8-8h-5V4H9v8H4z', text: '▼' },
         { path: 'M1.751 10c0-4.42', text: '💬' },
+        { path: 'M20 2H4c-1.1', text: '💬' },
         { path: 'M4.5 3.88l4.432', text: '🔄' },
         { path: 'M20.884 13.19c-1.351', text: '❤️' },
+        { path: 'M12 21.35l-1.45', text: '❤️' },
         { path: 'M12 2.59l5.7', text: '📤' },
         { path: 'M8.75 21V3h2', text: '📊' },
         { path: 'M18 16.08c-.76', text: '🔗' },
@@ -263,6 +265,10 @@ img { max-width: 100%; }
     },
 
     _replaceSVG(svgEl) {
+        const classes = svgEl.getAttribute('class') || '';
+        if (classes.includes('-hd-icon')) {
+            return document.createTextNode('');
+        }
         const pathEl = svgEl.querySelector('path');
         if (pathEl) {
             const d = pathEl.getAttribute('d') || '';

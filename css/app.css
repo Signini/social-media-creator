@@ -562,6 +562,20 @@ textarea.form-input {
     min-height: 400px;
 }
 
+/* 高清模式 */
+.preview-container.preview-hd .preview-scroll {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.preview-container.preview-hd .qq-messages,
+.preview-container.preview-hd .wx-messages,
+.preview-container.preview-hd .msg-messages,
+.preview-container.preview-hd .wa-messages {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
 /* Modal */
 .modal-overlay {
     position: fixed;

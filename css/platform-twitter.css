@@ -355,6 +355,9 @@
 }
 
 .tw-comment-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 12px;
     color: #536471;
     cursor: pointer;
@@ -445,4 +448,37 @@
 
 @media (max-width: 540px) {
     .tw-tweet { max-width: 100%; }
+}
+
+/* ===== 高清模式增强 ===== */
+
+/* Icon toggle */
+.tw-hd-icon { display: none; }
+.preview-hd .tw-hd-icon { display: inline-flex; vertical-align: middle; }
+.preview-hd .tw-emoji-icon { display: none; }
+
+/* Action row icons */
+.preview-hd .tw-action-row-item .tw-hd-icon {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: #536471;
+    stroke-width: 1.8;
+}
+
+/* Comment action icons */
+.preview-hd .tw-comment-action .tw-hd-icon {
+    width: 16px;
+    height: 16px;
+    fill: #536471;
+}
+
+/* Emoji icon sizing */
+.tw-action-row-item .tw-emoji-icon {
+    font-size: 16px;
+    line-height: 36px;
+}
+
+.tw-comment-action .tw-emoji-icon {
+    font-size: 13px;
 }
