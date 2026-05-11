@@ -111,6 +111,18 @@ img { max-width: 100%; }
             css = css.replace(new RegExp('^\\s*' + escaped + '\\s*:[^;]*;', 'gim'), '\n');
         }
 
+        // Convert gap to margin fallback before removing it
+        css = css.replace(/([^\n{}]+)\s*\{([^}]*)\}/g, (match, selector, body) => {
+            const gapMatch = body.match(/gap:\s*([\d.]+)(px|em|rem)/i);
+            if (!gapMatch) return match;
+            const val = gapMatch[1] + gapMatch[2];
+            const sel = selector.trim();
+            // Use adjacent sibling selector as margin fallback
+            return match + '\n' + sel + ' > * + * { margin-left: ' + val + '; }';
+        });
+
+        css = css.replace(/^\s*gap\s*:[^;]+;/gim, '\n');
+
         // Replace calc(X% - Ypx) with just X% for AO3 compatibility
         css = css.replace(/calc\(\s*([\d.]+%)\s*[-+]\s*[\d.]+(?:px|em|rem)\s*\)/gi, '$1');
 
