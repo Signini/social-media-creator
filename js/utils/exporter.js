@@ -44,6 +44,7 @@ const ExporterUtil = {
         'scroll-behavior', 'overscroll-behavior', 'touch-action',
         'cursor', 'fill', 'stroke-width', 'pointer-events', 'user-select',
         'resize', 'content', 'flex-shrink',
+        'object-fit', 'object-position', 'aspect-ratio',
         'animation', 'animation-delay', 'animation-direction', 'animation-duration',
         'animation-fill-mode', 'animation-iteration-count', 'animation-name',
         'animation-play-state', 'animation-timing-function'
@@ -89,7 +90,6 @@ img { max-width: 100%; }
 .social-media-export img {
     max-width: 100%;
     height: auto;
-    object-fit: cover;
 }
 `;
     },
@@ -103,12 +103,18 @@ img { max-width: 100%; }
 
         css = css.replace(/^\s*stroke\s*:[^;]+;/gim, '\n');
 
+        // Remove HD preview rules entirely (SVG-based, not compatible)
+        css = css.replace(/[^{}\n]*\.preview-hd[^{\n]*\{[^}]*\}/gi, '');
+
         for (const prop of this.BLOCKED_CSS_PROPS) {
             const escaped = prop.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             css = css.replace(new RegExp('^\\s*' + escaped + '\\s*:[^;]*;', 'gim'), '\n');
         }
 
         css = css.replace(/^\s*gap\s*:[^;]+;/gim, '\n');
+
+        // Replace calc(X% - Ypx) with just X% for AO3 compatibility
+        css = css.replace(/calc\(\s*([\d.]+%)\s*[-+]\s*[\d.]+(?:px|em|rem)\s*\)/gi, '$1');
 
         css = css.replace(/[^{}\n]*svg[^{\n]*\{[^}]*\}/gi, '');
 
@@ -118,8 +124,11 @@ img { max-width: 100%; }
 
         css = css.replace(/[^{}\n]*nth-child[^{\n]*\{[^}]*\}/gi, '');
 
-        css = css.replace(/[^{\n]+\{\s*\}/g, '');
-        css = css.replace(/\w[\w\-]*\s*\{\s*\n?\s*\}/g, '');
+        // Thoroughly remove empty rules (including multi-line and complex selectors)
+        css = css.replace(/[^{}]+\{\s*\}/g, '');
+        for (let i = 0; i < 3; i++) {
+            css = css.replace(/[^{}]+\{[\s\n]*\}/g, '');
+        }
 
         css = css.replace(/\n\s*\n\s*\n/g, '\n');
 
@@ -156,8 +165,8 @@ img { max-width: 100%; }
 
     COMPAT_FIXES: {
         instagram: `
-.ig-image-container { width: 100%; aspect-ratio: 1; max-height: 470px; overflow: hidden; }
-.ig-image-container img { width: 100%; height: 100%; object-fit: cover; }
+.ig-image-container { width: 100%; max-height: 470px; overflow: hidden; }
+.ig-image-container img { width: 100%; height: auto; }
 `,
         twitter: `
 .tw-image-container { overflow: hidden; }
@@ -190,8 +199,8 @@ img { max-width: 100%; }
 .rd-post-image img { max-height: 600px; }
 `,
         xiaohongshu: `
-.xhs-image-area { width: 100%; aspect-ratio: 3/4; max-height: 520px; overflow: hidden; }
-.xhs-image-area img { width: 100%; height: 100%; object-fit: cover; }
+.xhs-image-area { width: 100%; max-height: 520px; overflow: hidden; }
+.xhs-image-area img { width: 100%; height: auto; }
 `,
         wechatMoments: `
 .wm-img-item img { max-height: 200px; }
@@ -370,7 +379,7 @@ ${content.innerHTML}
             el.removeAttribute('data-v-');
         });
 
-        const extractedCSS = this._extractInlineStyles(content);
+        const extractedCSS = this._cleanCSS(this._extractInlineStyles(content));
 
         let previewStyleCSS = '';
         content.querySelectorAll('style').forEach(styleEl => {
@@ -378,6 +387,7 @@ ${content.innerHTML}
             if (text) previewStyleCSS += text + '\n';
             styleEl.remove();
         });
+        previewStyleCSS = this._cleanCSS(previewStyleCSS);
 
         content.querySelectorAll('img').forEach(img => {
             const src = img.getAttribute('src') || '';
