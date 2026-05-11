@@ -387,7 +387,7 @@ ${content.innerHTML}
 </html>`;
     },
 
-    exportCompatibleHTML(previewElement, platform) {
+    exportCompatibleHTML(previewElement, platform, options) {
         if (!previewElement) {
             throw new Error('没有可导出的内容');
         }
@@ -398,6 +398,13 @@ ${content.innerHTML}
         });
 
         const extractedCSS = this._cleanCSS(this._extractInlineStyles(content));
+
+        if (options && options.excludeIndices && options.excludeIndices.length > 0) {
+            const sections = content.querySelectorAll('.universal-preview-section');
+            [...options.excludeIndices].sort((a, b) => b - a).forEach(idx => {
+                if (sections[idx]) sections[idx].remove();
+            });
+        }
 
         let previewStyleCSS = '';
         content.querySelectorAll('style').forEach(styleEl => {
