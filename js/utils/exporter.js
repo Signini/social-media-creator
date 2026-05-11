@@ -171,6 +171,7 @@ img { max-width: 100%; }
         twitter: `
 .tw-image-container { overflow: hidden; }
 .tw-image-container img { width: 100%; height: auto; }
+.tw-quote-image img { width: 100%; max-height: 200px; height: auto; }
 `,
         youtube: `
 .yt-player { height: 338px; }
