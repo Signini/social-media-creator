@@ -18,7 +18,8 @@ const iMessageDefaults = {
         { id: 4, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:23', reaction: '' },
         { id: 5, type: 'sent', text: '好啊！我正好想去！几点？', image: '', imageUrl: '', time: '下午 3:24', reaction: '❤️' },
         { id: 6, type: 'sent', text: '', image: '', imageUrl: '', time: '', reaction: '' },
-        { id: 7, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:25', reaction: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' }
+        { id: 7, type: 'received', text: '', image: '', imageUrl: '', time: '下午 3:25', reaction: '', isCall: true, callType: 'voice', callDuration: '5:23', callStatus: 'answered' },
+        { id: 8, type: 'notification', text: '该发件人不在你的联系人列表中', image: '', imageUrl: '', time: '', reaction: '', notificationColor: '#8e8e93' }
     ]
 };
 
@@ -103,28 +104,38 @@ const iMessageEditor = {
                 @dragover.prevent="onDragOver(msg, idx, $event)"
                 @dragleave="onDragLeave(msg, idx, $event)"
                 @drop="onDrop(msg, idx, $event)"
-                :style="{ borderLeft: msg.type === 'sent' ? '3px solid #007aff' : '3px solid #e9e9eb' }">
+                :style="{ borderLeft: msg.type === 'sent' ? '3px solid #007aff' : msg.type === 'notification' ? '3px solid #ff9500' : '3px solid #e9e9eb' }">
                 <div class="drag-handle">⋮⋮</div>
                 <div class="comment-header">
                     <span>
-                        <strong :style="{ color: msg.type === 'sent' ? '#007aff' : '#333' }">
-                            {{ msg.type === 'sent' ? '→ 发送' : '← 收到' }}
+                        <strong :style="{ color: msg.type === 'sent' ? '#007aff' : msg.type === 'notification' ? '#ff9500' : '#333' }">
+                            {{ msg.type === 'sent' ? '→ 发送' : msg.type === 'notification' ? '🔔 通知' : '← 收到' }}
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
                             @click="insertMessage(idx, 'sent')">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
-                            @click="toggleType(idx)" :title="msg.type === 'sent' ? '切换为收到' : '切换为发送'">⇄</button>
+                            @click="toggleType(idx)" :title="'切换类型（当前: ' + msg.type + ')'">⇄</button>
                         <button class="remove-comment" @click="removeMessage(idx)">✕</button>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <textarea class="form-input" :value="msg.text" 
-                        @input="updateMessage(idx, 'text', $event.target.value)" 
-                        placeholder="消息内容（留空则为纯图片消息）" rows="2" 
+                    <textarea class="form-input" :value="msg.text"
+                        @input="updateMessage(idx, 'text', $event.target.value)"
+                        :placeholder="msg.type === 'notification' ? '通知内容（如：该发件人不在你的联系人列表中）' : '消息内容（留空则为纯图片消息）'" rows="2"
                         style="font-size:13px;min-height:36px;"></textarea>
                 </div>
+                <template v-if="msg.type === 'notification'">
+                    <div class="form-group" style="margin-bottom:8px;">
+                        <label style="font-size:12px;">🎨 文字颜色</label>
+                        <div style="display:flex;gap:6px;align-items:center;">
+                            <input type="color" :value="msg.notificationColor || '#8e8e93'" @input="updateMessage(idx, 'notificationColor', $event.target.value)" style="width:32px;height:28px;border:1px solid #ddd;border-radius:4px;padding:1px;cursor:pointer;">
+                            <input class="form-input" :value="msg.notificationColor || '#8e8e93'" @input="updateMessage(idx, 'notificationColor', $event.target.value)" placeholder="#8e8e93" style="font-size:12px;width:100px;">
+                        </div>
+                    </div>
+                </template>
+                <template v-if="msg.type !== 'notification'">
                 <div class="form-group" style="margin-bottom:8px;">
                     <label style="font-size:12px;">📎 图片</label>
                     <div style="display:flex;gap:8px;align-items:center;">
@@ -178,10 +189,12 @@ const iMessageEditor = {
                         <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
                     </div>
                 </template>
+                </template>
             </div>
             <div style="display:flex;gap:6px;">
                 <button class="add-comment-btn" @click="addMessage('sent')" style="flex:1;">➕ 发送消息</button>
                 <button class="add-comment-btn" @click="addMessage('received')" style="flex:1;">➕ 收到消息</button>
+                <button class="add-comment-btn" @click="addMessage('notification')" style="flex:1;">➕ 通知消息</button>
             </div>
         </div>
     </div>
@@ -216,35 +229,42 @@ const iMessageEditor = {
             } catch (e) { console.error('消息图片上传失败:', e.message); }
         },
         addMessage(type) {
-            const messages = [...this.data.messages, { 
-                id: Date.now(), 
-                type, 
-                text: '', 
-                image: '', 
+            const newMsg = {
+                id: Date.now(),
+                type,
+                text: '',
+                image: '',
                 imageUrl: '',
-                time: '', 
-                reaction: '',
-                isCall: false,
-                callType: 'voice',
-                callDuration: '',
-                callStatus: 'answered'
-            }];
-            this.updateField('messages', messages);
-        },
-        insertMessage(idx, type) {
-            const newMsg = { 
-                id: Date.now(), 
-                type, 
-                text: '', 
-                image: '', 
-                imageUrl: '',
-                time: '', 
+                time: '',
                 reaction: '',
                 isCall: false,
                 callType: 'voice',
                 callDuration: '',
                 callStatus: 'answered'
             };
+            if (type === 'notification') {
+                newMsg.notificationColor = '#8e8e93';
+            }
+            const messages = [...this.data.messages, newMsg];
+            this.updateField('messages', messages);
+        },
+        insertMessage(idx, type) {
+            const newMsg = {
+                id: Date.now(),
+                type,
+                text: '',
+                image: '',
+                imageUrl: '',
+                time: '',
+                reaction: '',
+                isCall: false,
+                callType: 'voice',
+                callDuration: '',
+                callStatus: 'answered'
+            };
+            if (type === 'notification') {
+                newMsg.notificationColor = '#8e8e93';
+            }
             const messages = [...this.data.messages];
             messages.splice(idx + 1, 0, newMsg);
             this.updateField('messages', messages);
@@ -256,7 +276,15 @@ const iMessageEditor = {
         },
         toggleType(idx) {
             const messages = [...this.data.messages];
-            messages[idx] = { ...messages[idx], type: messages[idx].type === 'sent' ? 'received' : 'sent' };
+            const msg = messages[idx];
+            const types = ['sent', 'received', 'notification'];
+            const currentIdx = types.indexOf(msg.type);
+            const nextType = types[(currentIdx + 1) % types.length];
+            const updated = { ...msg, type: nextType };
+            if (nextType === 'notification' && !updated.notificationColor) {
+                updated.notificationColor = '#8e8e93';
+            }
+            messages[idx] = updated;
             this.updateField('messages', messages);
         },
         updateMessage(idx, field, value) {
@@ -375,7 +403,10 @@ const iMessagePreview = {
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="msg-call-duration">{{ msg.callDuration }}</span>
                 </div>
-                <div v-if="!msg.isCall" :class="['msg-bubble-row', msg.type === 'sent' ? 'msg-row-sent' : 'msg-row-received']">
+                <div v-else-if="msg.type === 'notification'" class="msg-notification" :style="{ color: msg.notificationColor || '#8e8e93' }">
+                    {{ msg.text }}
+                </div>
+                <div v-else :class="['msg-bubble-row', msg.type === 'sent' ? 'msg-row-sent' : 'msg-row-received']">
                     <img v-if="msg.type === 'received' && (data.contactAvatar || data.contactAvatarUrl) && isAvatarVisible(idx)" class="msg-contact-avatar" :src="data.contactAvatar || data.contactAvatarUrl" alt="">
                     <div v-else-if="msg.type === 'received' && isAvatarVisible(idx)" class="msg-contact-avatar msg-avatar-placeholder">{{ (data.contactName || '联')[0] }}</div>
                     <div v-if="msg.type === 'received' && !isAvatarVisible(idx) && isAvatarSpacerNeeded(idx)" class="msg-avatar-spacer"></div>
@@ -436,8 +467,15 @@ const iMessagePreview = {
         getMessageStyle(idx) {
             const msgs = this.data.messages;
             const current = msgs[idx];
-            const prev = idx > 0 ? msgs[idx - 1] : null;
-            const next = idx < msgs.length - 1 ? msgs[idx + 1] : null;
+            if (current.type === 'notification' || current.isCall) return 'msg-single';
+            // Find prev/next that are regular messages (not notification/call)
+            let prev = null, next = null;
+            for (let i = idx - 1; i >= 0; i--) {
+                if (!msgs[i].isCall && msgs[i].type !== 'notification') { prev = msgs[i]; break; }
+            }
+            for (let i = idx + 1; i < msgs.length; i++) {
+                if (!msgs[i].isCall && msgs[i].type !== 'notification') { next = msgs[i]; break; }
+            }
 
             const sameAsPrev = prev && prev.type === current.type;
             const sameAsNext = next && next.type === current.type;

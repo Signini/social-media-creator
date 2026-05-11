@@ -180,6 +180,7 @@
 
 .xhs-comment-item {
     display: flex;
+    align-items: flex-start;
     gap: 8px;
     margin-bottom: 12px;
 }
@@ -269,6 +270,7 @@
 
 .xhs-reply-item {
     display: flex;
+    align-items: flex-start;
     gap: 6px;
     margin-bottom: 6px;
 }

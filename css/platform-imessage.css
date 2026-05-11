@@ -432,6 +432,17 @@
     color: #8e8e93;
 }
 
+/* Notification Message */
+.msg-notification {
+    text-align: center;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #8e8e93;
+    line-height: 1.4;
+    align-self: center;
+}
+
 @media (max-width: 540px) {
     .msg-conversation { max-width: 100%; }
 }
