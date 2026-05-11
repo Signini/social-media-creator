@@ -43,7 +43,7 @@ const ExporterUtil = {
         '-webkit-mask', '-webkit-clip-path', 'clip-path', 'image-rendering',
         'scroll-behavior', 'overscroll-behavior', 'touch-action',
         'cursor', 'fill', 'stroke-width', 'pointer-events', 'user-select',
-        'resize', 'content', 'flex-shrink',
+        'resize', 'content',
         'object-fit', 'object-position', 'aspect-ratio',
         'animation', 'animation-delay', 'animation-direction', 'animation-duration',
         'animation-fill-mode', 'animation-iteration-count', 'animation-name',
@@ -110,8 +110,6 @@ img { max-width: 100%; }
             const escaped = prop.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             css = css.replace(new RegExp('^\\s*' + escaped + '\\s*:[^;]*;', 'gim'), '\n');
         }
-
-        css = css.replace(/^\s*gap\s*:[^;]+;/gim, '\n');
 
         // Replace calc(X% - Ypx) with just X% for AO3 compatibility
         css = css.replace(/calc\(\s*([\d.]+%)\s*[-+]\s*[\d.]+(?:px|em|rem)\s*\)/gi, '$1');
