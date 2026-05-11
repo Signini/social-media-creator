@@ -9,7 +9,7 @@ const UniversalEditor = {
     <div class="universal-layout">
         <aside class="universal-sidebar">
             <div class="section-title">📋 已添加模块 ({{ universalData.items.length }})</div>
-            
+
             <div class="universal-item-list" v-if="universalData.items.length > 0">
                 <div class="universal-item"
                     v-for="(item, idx) in universalData.items" :key="item.id"
@@ -20,6 +20,10 @@ const UniversalEditor = {
                     @drop="onDrop(idx, $event)"
                     @click="selectItem(idx)"
                     :class="{ 'drag-over': dragOverIndex === idx, 'selected': selectedIndex === idx }">
+                    <input type="checkbox" class="universal-item-check"
+                        :checked="checkedIds.has(item.id)"
+                        @click.stop
+                        @change="toggleCheck(item.id)">
                     <div class="universal-item-handle">⋮⋮</div>
                     <div class="universal-item-info">
                         <span class="universal-item-icon">{{ getPlatformIcon(item.platform) }}</span>
@@ -40,6 +44,11 @@ const UniversalEditor = {
             </div>
 
             <div class="universal-sidebar-actions" v-if="universalData.items.length > 0">
+                <div class="universal-check-actions">
+                    <button class="btn btn-small btn-outline" @click="checkAll">全选</button>
+                    <button class="btn btn-small btn-outline" @click="uncheckAll">取消全选</button>
+                    <span class="universal-check-count" v-if="checkedIds.size < universalData.items.length">已选 {{ checkedIds.size }}/{{ universalData.items.length }}</span>
+                </div>
                 <button class="btn btn-danger" style="width:100%;" @click="clearAll">🗑️ 清空所有模块</button>
             </div>
         </aside>
@@ -49,7 +58,7 @@ const UniversalEditor = {
                 <span class="section-title" style="margin:0;">综合页面预览</span>
                 <div class="preview-actions">
                     <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
-                    <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
+                    <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML<span v-if="checkedIds.size < universalData.items.length" style="opacity:0.7;font-size:11px;"> ({{ checkedIds.size }}/{{ universalData.items.length }})</span></button>
                     <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
                     <button class="btn btn-secondary" @click="exportImages">🖼️ 批量导出图片</button>
                 </div>
@@ -89,8 +98,26 @@ const UniversalEditor = {
             dragIndex: null,
             dragOverIndex: null,
             selectedIndex: -1,
-            sectionRefs: {}
+            sectionRefs: {},
+            checkedIds: new Set()
         };
+    },
+    mounted() {
+        this.syncAllChecked();
+    },
+    watch: {
+        'universalData.items': {
+            handler(items) {
+                const currentIds = new Set(items.map(i => i.id));
+                for (const id of this.checkedIds) {
+                    if (!currentIds.has(id)) this.checkedIds.delete(id);
+                }
+                items.forEach(item => {
+                    if (!this.checkedIds.has(item.id)) this.checkedIds.add(item.id);
+                });
+            },
+            deep: true
+        }
     },
     methods: {
         getPlatformIcon(platformId) {
@@ -128,6 +155,23 @@ const UniversalEditor = {
                     }
                 });
             }
+        },
+        toggleCheck(id) {
+            if (this.checkedIds.has(id)) {
+                this.checkedIds.delete(id);
+            } else {
+                this.checkedIds.add(id);
+            }
+            this.checkedIds = new Set(this.checkedIds);
+        },
+        syncAllChecked() {
+            this.checkedIds = new Set((this.universalData.items || []).map(i => i.id));
+        },
+        checkAll() {
+            this.syncAllChecked();
+        },
+        uncheckAll() {
+            this.checkedIds = new Set();
         },
         clearAll() {
             if (confirm('确定清空所有模块吗？')) {
@@ -182,7 +226,11 @@ const UniversalEditor = {
                 return;
             }
             try {
-                const html = ExporterUtil.exportCompatibleHTML(previewEl, 'universal');
+                const excludeIndices = [];
+                this.universalData.items.forEach((item, idx) => {
+                    if (!this.checkedIds.has(item.id)) excludeIndices.push(idx);
+                });
+                const html = ExporterUtil.exportCompatibleHTML(previewEl, 'universal', { excludeIndices });
                 ExporterUtil.downloadText(html, 'social-media-universal-compatible.html');
                 this.$emit('export-complete', '📥 兼容 HTML 已下载！');
             } catch (e) {

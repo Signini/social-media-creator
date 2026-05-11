@@ -1013,6 +1013,27 @@ textarea.form-input {
     border-top: 1px solid var(--border-color);
 }
 
+.universal-check-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.universal-check-count {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+}
+
+.universal-item-check {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: var(--accent-blue);
+}
+
 /* 模块列表项 */
 .universal-item-list {
     display: flex;

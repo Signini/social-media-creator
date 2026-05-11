@@ -43,7 +43,7 @@ const ExporterUtil = {
         '-webkit-mask', '-webkit-clip-path', 'clip-path', 'image-rendering',
         'scroll-behavior', 'overscroll-behavior', 'touch-action',
         'cursor', 'fill', 'stroke-width', 'pointer-events', 'user-select',
-        'resize', 'content', 'flex-shrink',
+        'resize', 'content',
         'object-fit', 'object-position', 'aspect-ratio',
         'animation', 'animation-delay', 'animation-direction', 'animation-duration',
         'animation-fill-mode', 'animation-iteration-count', 'animation-name',
@@ -110,6 +110,16 @@ img { max-width: 100%; }
             const escaped = prop.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             css = css.replace(new RegExp('^\\s*' + escaped + '\\s*:[^;]*;', 'gim'), '\n');
         }
+
+        // Convert gap to margin fallback before removing it
+        css = css.replace(/([^\n{}]+)\s*\{([^}]*)\}/g, (match, selector, body) => {
+            const gapMatch = body.match(/gap:\s*([\d.]+)(px|em|rem)/i);
+            if (!gapMatch) return match;
+            const val = gapMatch[1] + gapMatch[2];
+            const sel = selector.trim();
+            // Use adjacent sibling selector as margin fallback
+            return match + '\n' + sel + ' > * + * { margin-left: ' + val + '; }';
+        });
 
         css = css.replace(/^\s*gap\s*:[^;]+;/gim, '\n');
 
@@ -233,9 +243,16 @@ img { max-width: 100%; }
         return css;
     },
 
+    _hashStr(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+            h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h);
+    },
+
     _extractInlineStyles(rootEl) {
         const styleMap = {};
-        let idx = 0;
         const elements = rootEl.querySelectorAll('[style]');
         for (const el of elements) {
             const style = el.getAttribute('style') || '';
@@ -254,8 +271,7 @@ img { max-width: 100%; }
             if (Object.keys(props).length === 0) continue;
             const key = JSON.stringify(props);
             if (!styleMap[key]) {
-                styleMap[key] = 'xc' + idx;
-                idx++;
+                styleMap[key] = 'xs' + (this._hashStr(key) % 90000 + 10000);
             }
             const cls = styleMap[key];
             el.removeAttribute('style');
@@ -371,7 +387,7 @@ ${content.innerHTML}
 </html>`;
     },
 
-    exportCompatibleHTML(previewElement, platform) {
+    exportCompatibleHTML(previewElement, platform, options) {
         if (!previewElement) {
             throw new Error('没有可导出的内容');
         }
@@ -382,6 +398,13 @@ ${content.innerHTML}
         });
 
         const extractedCSS = this._cleanCSS(this._extractInlineStyles(content));
+
+        if (options && options.excludeIndices && options.excludeIndices.length > 0) {
+            const sections = content.querySelectorAll('.universal-preview-section');
+            [...options.excludeIndices].sort((a, b) => b - a).forEach(idx => {
+                if (sections[idx]) sections[idx].remove();
+            });
+        }
 
         let previewStyleCSS = '';
         content.querySelectorAll('style').forEach(styleEl => {
