@@ -397,6 +397,10 @@ ${content.innerHTML}
                 span.textContent = '[图片]';
                 span.setAttribute('class', '_img-placeholder');
                 img.parentNode.replaceChild(span, img);
+            } else {
+                // Remove browser-injected fixed width/height to let CSS control sizing
+                img.removeAttribute('width');
+                img.removeAttribute('height');
             }
         });
 
