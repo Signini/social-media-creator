@@ -1300,6 +1300,19 @@ textarea.form-input {
         padding: 4px 8px;
     }
 
+    .preview-actions {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+        padding-bottom: 4px;
+    }
+
+    .preview-actions .btn {
+        flex-shrink: 0;
+        white-space: nowrap;
+    }
+
     .preview-device {
         flex-shrink: 0;
     }
