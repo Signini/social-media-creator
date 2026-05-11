@@ -261,18 +261,26 @@ if (typeof Vue === 'undefined') {
             currentView: 'single',
             universalData: { items: [] },
             editingUniversalIndex: -1,
-            savedProjects: []
+            savedProjects: [],
+            mobileTab: 'editor',
+            windowWidth: window.innerWidth
         };
     },
 
     computed: {
         filteredPlatforms() {
             return this.platforms.filter(p => p.region === this.platformRegion);
+        },
+        isMobile() {
+            return this.windowWidth <= 768;
         }
     },
 
     mounted() {
         console.log('🔧 Vue 应用已挂载，开始初始化...');
+
+        this._resizeHandler = () => { this.windowWidth = window.innerWidth; };
+        window.addEventListener('resize', this._resizeHandler);
 
         this.showLoadModal = false;
         this.showSaveModal = false;

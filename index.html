@@ -47,7 +47,7 @@
         <!-- ====== 单平台编辑视图 ====== -->
         <main class="app-main" v-if="currentView === 'single'">
             <!-- 左侧：平台选择 + 编辑器 -->
-            <aside class="editor-panel">
+            <aside class="editor-panel" :class="{ 'mobile-hide': isMobile && mobileTab !== 'editor' }">
                 <!-- 平台选择 -->
                 <div class="platform-selector">
                     <div class="platform-tab-switch">
@@ -132,7 +132,7 @@
             </aside>
 
             <!-- 右侧：实时预览 -->
-            <section class="preview-panel">
+            <section class="preview-panel" :class="{ 'mobile-hide': isMobile && mobileTab !== 'preview' }">
                 <div class="preview-toolbar">
                     <div class="preview-device">
                         <button :class="['device-btn', { active: deviceMode === 'phone' }]" @click="deviceMode = 'phone'">📱 手机</button>
@@ -267,6 +267,12 @@
 
         <!-- Toast 提示 -->
         <div class="toast" :class="{ show: toast.visible }">{{ toast.message }}</div>
+
+        <!-- 移动端底部 Tab 栏 -->
+        <div class="mobile-tab-bar" v-if="isMobile && currentView === 'single'">
+            <button :class="{ active: mobileTab === 'editor' }" @click="mobileTab = 'editor'">✏️ 编辑</button>
+            <button :class="{ active: mobileTab === 'preview' }" @click="mobileTab = 'preview'">👁️ 预览</button>
+        </div>
     </div>
 
     <!-- Vue 3 (本地) -->
