@@ -243,9 +243,16 @@ img { max-width: 100%; }
         return css;
     },
 
+    _hashStr(str) {
+        let h = 0;
+        for (let i = 0; i < str.length; i++) {
+            h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+        }
+        return Math.abs(h);
+    },
+
     _extractInlineStyles(rootEl) {
         const styleMap = {};
-        let idx = 0;
         const elements = rootEl.querySelectorAll('[style]');
         for (const el of elements) {
             const style = el.getAttribute('style') || '';
@@ -264,8 +271,7 @@ img { max-width: 100%; }
             if (Object.keys(props).length === 0) continue;
             const key = JSON.stringify(props);
             if (!styleMap[key]) {
-                styleMap[key] = 'xc' + idx;
-                idx++;
+                styleMap[key] = 'xs' + (this._hashStr(key) % 90000 + 10000);
             }
             const cls = styleMap[key];
             el.removeAttribute('style');
