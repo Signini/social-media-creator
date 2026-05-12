@@ -217,6 +217,7 @@ zh: {
     'common.receiptText': '回执文字',
     'common.phReceipt': '已读',
     'common.showTypingLabel': '显示正在输入...',
+    'common.reaction': '表情回应',
 
     // ===== WhatsApp =====
     'wa.contactStatus': '在线状态',
@@ -702,6 +703,7 @@ en: {
     'common.receiptText': 'Receipt text',
     'common.phReceipt': 'Read',
     'common.showTypingLabel': 'Show typing...',
+    'common.reaction': 'Reaction',
 
     // ===== WhatsApp =====
     'wa.contactStatus': 'Online Status',
