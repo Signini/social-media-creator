@@ -26,44 +26,44 @@ const XiaohongshuEditor = {
     emits: ['update'],
     template: `
     <div class="xiaohongshu-editor">
-        <div class="sub-title">👤 用户信息</div>
+        <div class="sub-title">{{ $t('common.userInfo') }}</div>
         <div class="form-group">
-            <label>头像</label>
+            <label>{{ $t('common.avatar') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.avatar }" @click="$refs.avatarInput.click()">
                 <template v-if="data.avatar">
                     <img :src="data.avatar" alt="avatar">
                     <button class="remove-image" @click.stop="updateField('avatar', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传头像</small>
+                    <span>📷</span><small>{{ $t('common.uploadAvatar') }}</small>
                 </div>
             </div>
             <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'avatar')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group" style="flex:2;">
-                <label>用户名</label>
-                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" placeholder="用户名">
+                <label>{{ $t('common.username') }}</label>
+                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" :placeholder="$t('common.username')">
             </div>
             <div class="form-group" style="flex:0;">
-                <label>关注按钮</label>
+                <label>{{ $t('xhs.followBtn') }}</label>
                 <div class="toggle-group" style="margin-top:6px;">
                     <label class="toggle">
                         <input type="checkbox" :checked="data.showFollowBtn" @change="updateField('showFollowBtn', $event.target.checked)">
                         <span class="toggle-slider"></span>
                     </label>
-                    <span style="font-size:13px;">显示</span>
+                    <span style="font-size:13px;">{{ $t('xhs.show') }}</span>
                 </div>
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">🖼️ 笔记图片</div>
+        <div class="sub-title">{{ $t('xhs.noteImage') }}</div>
         <div class="form-group">
             <div class="image-upload" :class="{ 'has-image': data.imageUrl }" @click="$refs.imageInput.click()">
                 <template v-if="data.imageUrl">
@@ -71,42 +71,42 @@ const XiaohongshuEditor = {
                     <button class="remove-image" @click.stop="updateField('imageUrl', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传图片（建议 3:4 竖图）</small>
+                    <span>📷</span><small>{{ $t('xhs.uploadNoteImage') }}</small>
                 </div>
             </div>
             <input type="file" ref="imageInput" accept="image/*" @change="handleUpload($event, 'imageUrl')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📝 笔记内容</div>
+        <div class="sub-title">{{ $t('xhs.noteContent') }}</div>
         <div class="form-group">
-            <label>标题 <span class="hint">({{ (data.title || '').length }}/20)</span></label>
-            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" placeholder="笔记标题" maxlength="20">
+            <label>{{ $t('xhs.title') }} <span class="hint">({{ (data.title || '').length }}/20)</span></label>
+            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" :placeholder="$t('xhs.phTitle')" maxlength="20">
         </div>
         <div class="form-group">
-            <label>正文 <span class="hint">({{ (data.content || '').length }}/1000)</span></label>
-            <textarea class="form-input" :value="data.content" @input="updateField('content', $event.target.value)" rows="6" placeholder="分享你的生活..." maxlength="1000"></textarea>
+            <label>{{ $t('xhs.body') }} <span class="hint">({{ (data.content || '').length }}/1000)</span></label>
+            <textarea class="form-input" :value="data.content" @input="updateField('content', $event.target.value)" rows="6" :placeholder="$t('xhs.phBody')" maxlength="1000"></textarea>
         </div>
         <div class="form-group">
-            <label>📍 位置</label>
-            <input class="form-input" :value="data.location" @input="updateField('location', $event.target.value)" placeholder="添加位置（可选）">
+            <label>{{ $t('xhs.location') }}</label>
+            <input class="form-input" :value="data.location" @input="updateField('location', $event.target.value)" :placeholder="$t('xhs.phLocation')">
         </div>
         <div class="form-group">
-            <label>🕐 发布时间</label>
-            <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" placeholder="如: 2小时前、03-15 18:30">
+            <label>{{ $t('xhs.postTime') }}</label>
+            <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" :placeholder="$t('xhs.phPostTime')">
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📊 互动数据</div>
+        <div class="sub-title">{{ $t('xhs.engagement') }}</div>
         <div class="form-row">
             <div class="form-group">
-                <label>❤️ 点赞</label>
+                <label>{{ $t('xhs.likes') }}</label>
                 <div class="number-input-group">
                     <button @click="adjustNumber('likes', -1)">−</button>
                     <input :value="data.likes" @input="updateField('likes', parseInt($event.target.value)||0)">
@@ -114,7 +114,7 @@ const XiaohongshuEditor = {
                 </div>
             </div>
             <div class="form-group">
-                <label>⭐ 收藏</label>
+                <label>{{ $t('xhs.favorites') }}</label>
                 <div class="number-input-group">
                     <button @click="adjustNumber('favorites', -1)">−</button>
                     <input :value="data.favorites" @input="updateField('favorites', parseInt($event.target.value)||0)">
@@ -125,10 +125,10 @@ const XiaohongshuEditor = {
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">💬 评论区 <span class="hint">({{ (data.comments || []).length }}条)</span></div>
+        <div class="sub-title">{{ $t('common.comments') }} <span class="hint">({{ (data.comments || []).length }}{{ $t('common.count') }})</span></div>
         <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:12px;">显示评论数</label>
+                <label style="font-size:12px;">{{ $t('common.showCommentCount') }}</label>
                 <input class="form-input" type="number" min="0" :value="data.commentCount || (data.comments || []).length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
             </div>
         </div>
@@ -139,7 +139,7 @@ const XiaohongshuEditor = {
                     <button class="remove-comment" @click="removeComment(idx)">✕</button>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">头像</label>
+                    <label style="font-size:12px;">{{ $t('common.avatar') }}</label>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <div v-if="comment.avatar" style="position:relative;width:28px;height:28px;">
                             <img :src="comment.avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
@@ -153,21 +153,21 @@ const XiaohongshuEditor = {
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">🔗 头像链接</label>
-                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" placeholder="外部链接（AO3用）" style="font-size:11px;">
+                    <label style="font-size:12px;">🔗 {{ $t('common.avatar') }}</label>
+                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLinkAO3')" style="font-size:11px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" placeholder="用户名" style="font-size:13px;">
+                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" :placeholder="$t('common.username')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" style="font-size:13px;">
+                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" :placeholder="$t('common.comments')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">🕐 时间</label>
-                    <input class="form-input" :value="comment.time" @input="updateComment(idx, 'time', $event.target.value)" placeholder="如: 1小时前" style="font-size:12px;">
+                    <label style="font-size:12px;">{{ $t('xhs.postTime') }}</label>
+                    <input class="form-input" :value="comment.time" @input="updateComment(idx, 'time', $event.target.value)" :placeholder="$t('xhs.phTime')" style="font-size:12px;">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:12px;">喜欢</label>
+                    <label style="font-size:12px;">{{ $t('common.like') }}</label>
                     <div class="number-input-group">
                         <button @click="adjustCommentLikes(idx, -1)">−</button>
                         <input :value="comment.likes" @input="updateComment(idx, 'likes', parseInt($event.target.value)||0)">
@@ -175,17 +175,17 @@ const XiaohongshuEditor = {
                     </div>
                     <div style="margin-top:10px;padding-left:14px;border-left:2px solid #eee;">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:12px;font-weight:600;color:#8e8e93;">↳ 回复 ({{ (comment.replies || []).length }})</span>
-                            <button style="font-size:11px;color:#ff2442;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">+ 添加回复</button>
+                            <span style="font-size:12px;font-weight:600;color:#8e8e93;">{{ $t('common.replies') }} ({{ (comment.replies || []).length }})</span>
+                            <button style="font-size:11px;color:#ff2442;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">{{ $t('common.addReply') }}</button>
                         </div>
                         <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx"
                             style="background:#fff5f5;border-radius:6px;padding:8px 10px;margin-bottom:6px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:11px;color:#8e8e93;">回复 #{{ rIdx + 1 }}</span>
+                                <span style="font-size:11px;color:#8e8e93;">{{ $t('common.replyHash') }}{{ rIdx + 1 }}</span>
                                 <button style="font-size:11px;color:#ff3b30;background:none;border:none;cursor:pointer;" @click="removeReply(idx, rIdx)">✕</button>
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <label style="font-size:11px;">头像</label>
+                                <label style="font-size:11px;">{{ $t('common.avatar') }}</label>
                                 <div style="display:flex;align-items:center;gap:6px;">
                                     <div v-if="reply.avatar" style="position:relative;width:22px;height:22px;">
                                         <img :src="reply.avatar" style="width:22px;height:22px;border-radius:50%;object-fit:cover;">
@@ -199,22 +199,22 @@ const XiaohongshuEditor = {
                                 </div>
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.avatarUrl" @input="updateReply(idx, rIdx, 'avatarUrl', $event.target.value)" placeholder="🔗 头像外链（AO3用）" style="font-size:11px;padding:3px 6px;">
+                                <input class="form-input" :value="reply.avatarUrl" @input="updateReply(idx, rIdx, 'avatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLinkAO3')" style="font-size:11px;padding:3px 6px;">
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" placeholder="用户名" style="font-size:12px;padding:4px 8px;">
+                                <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" :placeholder="$t('common.replyer')" style="font-size:12px;padding:4px 8px;">
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                                <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" :placeholder="$t('common.replyContent')" style="font-size:12px;padding:4px 8px;">
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.time" @input="updateReply(idx, rIdx, 'time', $event.target.value)" placeholder="🕐 时间" style="font-size:11px;padding:3px 6px;">
+                                <input class="form-input" :value="reply.time" @input="updateReply(idx, rIdx, 'time', $event.target.value)" :placeholder="$t('xhs.phTime')" style="font-size:11px;padding:3px 6px;">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addComment">➕ 添加评论</button>
+            <button class="add-comment-btn" @click="addComment">{{ $t('common.addComment') }}</button>
         </div>
     </div>
     `,
@@ -311,7 +311,7 @@ const XiaohongshuPreview = {
             <template v-else>
                 <div class="xhs-image-placeholder">
                     <span>📷</span>
-                    <small>图片区域</small>
+                    <small>{{ $t('common.imageArea') }}</small>
                 </div>
             </template>
         </div>
@@ -324,9 +324,9 @@ const XiaohongshuPreview = {
                     <template v-else>
                         <div class="xhs-avatar-placeholder">{{ (data.username || '用')[0] }}</div>
                     </template>
-                    <span class="xhs-author-name">{{ data.username || '用户名' }}</span>
+                    <span class="xhs-author-name">{{ data.username || $t('common.username') }}</span>
                 </div>
-                <button v-if="data.showFollowBtn" class="xhs-follow-btn">关注</button>
+                <button v-if="data.showFollowBtn" class="xhs-follow-btn">{{ $t('xhs.follow') }}</button>
             </div>
             <div class="xhs-title" v-if="data.title">{{ data.title }}</div>
             <div class="xhs-desc" v-html="renderContent(data.content)"></div>
@@ -350,7 +350,7 @@ const XiaohongshuPreview = {
             </div>
         </div>
         <div class="xhs-comment-section" v-if="(data.comments || []).length > 0">
-            <div class="xhs-comment-header">共 {{ data.commentCount || (data.comments || []).length }} 条评论</div>
+            <div class="xhs-comment-header">{{ $t('xhs.total') }} {{ data.commentCount || (data.comments || []).length }} {{ $t('xhs.commentsCount') }}</div>
             <div v-for="(comment, idx) in (data.comments || [])" :key="idx" class="xhs-comment-item">
                 <template v-if="comment.avatar || comment.avatarUrl">
                     <img class="xhs-comment-avatar" :src="comment.avatar || comment.avatarUrl" :alt="comment.username">

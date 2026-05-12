@@ -29,43 +29,43 @@ const iMessageEditor = {
     emits: ['update'],
     template: `
     <div class="imessage-editor">
-        <div class="sub-title">👤 对话信息</div>
+        <div class="sub-title">👤 {{ $t('common.chatInfo') }}</div>
         <div class="form-group">
-            <label>联系人头像</label>
+            <label>{{ $t('common.contactAvatar') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.contactAvatar }" @click="$refs.avatarInput.click()" style="width:80px;height:80px;border-radius:50%;">
                 <template v-if="data.contactAvatar">
                     <img :src="data.contactAvatar" alt="avatar" style="border-radius:50%;">
                     <button class="remove-image" @click.stop="updateField('contactAvatar', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>头像</small>
+                    <span>📷</span><small>{{ $t('common.avatar') }}</small>
                 </div>
             </div>
             <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'contactAvatar')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>联系人名称</label>
-                <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" placeholder="联系人名称">
+                <label>{{ $t('common.contactName') }}</label>
+                <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" :placeholder="$t('common.contactName')">
             </div>
             <div class="form-group">
-                <label>副标题</label>
-                <input class="form-input" :value="data.navSubtitle" @input="updateField('navSubtitle', $event.target.value)" placeholder="如: 简介或电话">
+                <label>{{ $t('im.subtitle') }}</label>
+                <input class="form-input" :value="data.navSubtitle" @input="updateField('navSubtitle', $event.target.value)" :placeholder="$t('im.phSubtitle')">
             </div>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label>时间标签</label>
-                <input class="form-input" :value="data.timeSeparator" @input="updateField('timeSeparator', $event.target.value)" placeholder="如: 下午 3:24">
+                <label>{{ $t('im.timeTag') }}</label>
+                <input class="form-input" :value="data.timeSeparator" @input="updateField('timeSeparator', $event.target.value)" :placeholder="$t('im.phTimeTag')">
             </div>
             <div class="form-group">
-                <label>日期标签</label>
-                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" placeholder="如: 今天">
+                <label>{{ $t('im.dateTag') }}</label>
+                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" :placeholder="$t('im.phDateTag')">
             </div>
         </div>
 
@@ -75,12 +75,12 @@ const iMessageEditor = {
                     <input type="checkbox" :checked="data.showReadReceipt" @change="updateField('showReadReceipt', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">显示已读回执</span>
+                <span style="font-size:13px;">{{ $t('common.readReceipt') }}</span>
             </div>
         </div>
         <div class="form-group" v-if="data.showReadReceipt">
-            <label>回执文字</label>
-            <input class="form-input" :value="data.readReceiptText" @input="updateField('readReceiptText', $event.target.value)" placeholder="如: 已读">
+            <label>{{ $t('common.receiptText') }}</label>
+            <input class="form-input" :value="data.readReceiptText" @input="updateField('readReceiptText', $event.target.value)" :placeholder="$t('common.read')">
         </div>
 
         <div class="form-group">
@@ -89,14 +89,14 @@ const iMessageEditor = {
                     <input type="checkbox" :checked="data.showTyping" @change="updateField('showTyping', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">显示正在输入...</span>
+                <span style="font-size:13px;">{{ $t('common.showTypingLabel') }}</span>
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 消息列表 -->
-        <div class="sub-title">💬 消息 <span class="hint">({{ data.messages.length }}条)</span></div>
+        <div class="sub-title">💬 {{ $t('common.messages') }} <span class="hint">({{ data.messages.length }}{{ $t('common.count') }})</span></div>
         <div class="comment-list">
             <div class="comment-item" v-for="(msg, idx) in data.messages" :key="idx" 
                 draggable="true"
@@ -109,26 +109,26 @@ const iMessageEditor = {
                 <div class="comment-header">
                     <span>
                         <strong :style="{ color: msg.type === 'sent' ? '#007aff' : msg.type === 'notification' ? '#ff9500' : '#333' }">
-                            {{ msg.type === 'sent' ? '→ 发送' : msg.type === 'notification' ? '🔔 通知' : '← 收到' }}
+                            {{ msg.type === 'sent' ? $t('common.msgSent') : msg.type === 'notification' ? $t('common.msgNotification') : $t('common.msgReceived') }}
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
-                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
+                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" :title="$t('common.insertBelow')"
                             @click="insertMessage(idx, 'sent')">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
-                            @click="toggleType(idx)" :title="'切换类型（当前: ' + msg.type + ')'">⇄</button>
+                            @click="toggleType(idx)" :title="$t('im.switchType') + msg.type + ')'" >⇄</button>
                         <button class="remove-comment" @click="removeMessage(idx)">✕</button>
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
                     <textarea class="form-input" :value="msg.text"
                         @input="updateMessage(idx, 'text', $event.target.value)"
-                        :placeholder="msg.type === 'notification' ? '通知内容（如：该发件人不在你的联系人列表中）' : '消息内容（留空则为纯图片消息）'" rows="2"
+                        :placeholder="msg.type === 'notification' ? $t('im.phNotification') : $t('im.phMsgContent')" rows="2"
                         style="font-size:13px;min-height:36px;"></textarea>
                 </div>
                 <template v-if="msg.type === 'notification'">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">🎨 文字颜色</label>
+                        <label style="font-size:12px;">{{ $t('im.textColor') }}</label>
                         <div style="display:flex;gap:6px;align-items:center;">
                             <input type="color" :value="msg.notificationColor || '#8e8e93'" @input="updateMessage(idx, 'notificationColor', $event.target.value)" style="width:32px;height:28px;border:1px solid #ddd;border-radius:4px;padding:1px;cursor:pointer;">
                             <input class="form-input" :value="msg.notificationColor || '#8e8e93'" @input="updateMessage(idx, 'notificationColor', $event.target.value)" placeholder="#8e8e93" style="font-size:12px;width:100px;">
@@ -137,26 +137,26 @@ const iMessageEditor = {
                 </template>
                 <template v-if="msg.type !== 'notification'">
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">📎 图片</label>
+                    <label style="font-size:12px;">{{ $t('im.attachImage') }}</label>
                     <div style="display:flex;gap:8px;align-items:center;">
-                        <button class="btn btn-small btn-outline" @click="triggerMsgImage(idx)" style="font-size:11px;">上传图片</button>
-                        <button v-if="msg.image" class="btn btn-small btn-danger" @click="updateMessage(idx, 'image', '')" style="font-size:11px;">删除图片</button>
-                        <span v-if="msg.image" style="font-size:11px;color:#34c759;">✅ 已设置</span>
+                        <button class="btn btn-small btn-outline" @click="triggerMsgImage(idx)" style="font-size:11px;">{{ $t('im.uploadImage') }}</button>
+                        <button v-if="msg.image" class="btn btn-small btn-danger" @click="updateMessage(idx, 'image', '')" style="font-size:11px;">{{ $t('im.deleteImage') }}</button>
+                        <span v-if="msg.image" style="font-size:11px;color:#34c759;">{{ $t('im.imageSet') }}</span>
                     </div>
                     <input type="file" :ref="'msgImage_' + idx" accept="image/*" @change="handleMsgImage($event, idx)" hidden>
                     <div class="ext-url-row" style="margin-top:4px;">
                         <span class="ext-url-label">🔗</span>
-                        <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）" style="font-size:11px;">
+                        <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" :placeholder="$t('common.externalLink')" style="font-size:11px;">
                     </div>
                 </div>
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">⏰ 时间</label>
-                        <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" placeholder="时间" style="font-size:13px;">
+                        <label style="font-size:12px;">{{ $t('im.timeField') }}</label>
+                        <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" :placeholder="$t('im.phTime')" style="font-size:13px;">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">😀 回应</label>
-                        <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" placeholder="❤️👍😂" style="font-size:13px;">
+                        <label style="font-size:12px;">{{ $t('im.reaction') }}</label>
+                        <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" :placeholder="$t('im.phReaction')" style="font-size:13px;">
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
@@ -165,36 +165,36 @@ const iMessageEditor = {
                             <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
                             <span class="toggle-slider"></span>
                         </label>
-                        <span style="font-size:12px;">通话记录</span>
+                        <span style="font-size:12px;">{{ $t('common.call') }}</span>
                     </div>
                 </div>
                 <template v-if="msg.isCall">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">通话类型</label>
+                        <label style="font-size:12px;">{{ $t('common.callType') }}</label>
                         <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
-                            <option value="voice">📞 语音通话</option>
-                            <option value="video">📹 FaceTime</option>
+                            <option value="voice">{{ $t('common.voiceCall') }}</option>
+                            <option value="video">{{ $t('im.faceTime') }}</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">通话状态</label>
+                        <label style="font-size:12px;">{{ $t('common.callStatus') }}</label>
                         <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
-                            <option value="answered">✅ 已接听</option>
-                            <option value="missed">❌ 未接听</option>
-                            <option value="declined">🚫 已拒绝</option>
+                            <option value="answered">{{ $t('common.answered') }}</option>
+                            <option value="missed">{{ $t('common.missed') }}</option>
+                            <option value="declined">{{ $t('common.declined') }}</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">⏱ 通话时长</label>
+                        <label style="font-size:12px;">{{ $t('common.callDuration') }}</label>
                         <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
                     </div>
                 </template>
                 </template>
             </div>
             <div style="display:flex;gap:6px;">
-                <button class="add-comment-btn" @click="addMessage('sent')" style="flex:1;">➕ 发送消息</button>
-                <button class="add-comment-btn" @click="addMessage('received')" style="flex:1;">➕ 收到消息</button>
-                <button class="add-comment-btn" @click="addMessage('notification')" style="flex:1;">➕ 通知消息</button>
+                <button class="add-comment-btn" @click="addMessage('sent')" style="flex:1;">{{ $t('im.sendMsg') }}</button>
+                <button class="add-comment-btn" @click="addMessage('received')" style="flex:1;">{{ $t('im.receiveMsg') }}</button>
+                <button class="add-comment-btn" @click="addMessage('notification')" style="flex:1;">{{ $t('im.notificationMsg') }}</button>
             </div>
         </div>
     </div>
@@ -371,12 +371,12 @@ const iMessagePreview = {
         <div class="msg-navbar">
             <div class="msg-navbar-left">
                 <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
-                <span style="font-size:17px;">返回</span>
+                <span style="font-size:17px;">{{ $t('im.back') }}</span>
             </div>
             <div class="msg-navbar-center">
                 <img v-if="data.contactAvatar || data.contactAvatarUrl" class="msg-nav-avatar" :src="data.contactAvatar || data.contactAvatarUrl" :alt="data.contactName">
-                <div v-else class="msg-nav-avatar-placeholder">{{ (data.contactName || '联')[0] }}</div>
-                <div class="msg-navbar-title">{{ data.contactName || '联系人' }}</div>
+                <div v-else class="msg-nav-avatar-placeholder">{{ (data.contactName || $t('common.contactName'))[0] }}</div>
+                <div class="msg-navbar-title">{{ data.contactName || $t('common.contactName') }}</div>
                 <div v-if="data.navSubtitle" class="msg-navbar-subtitle">{{ data.navSubtitle }}</div>
             </div>
             <div class="msg-navbar-right">
@@ -397,9 +397,9 @@ const iMessagePreview = {
                 <div v-if="msg.isCall" :class="['msg-call-record', 'msg-call-' + (msg.callStatus || 'answered')]">
                     <span class="msg-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
                     <span class="msg-call-text">
-                        <template v-if="msg.callStatus === 'missed'">未接听</template>
-                        <template v-else-if="msg.callStatus === 'declined'">已拒绝</template>
-                        <template v-else>已接听</template>
+                        <template v-if="msg.callStatus === 'missed'">{{ $t('common.missedCall') }}</template>
+                        <template v-else-if="msg.callStatus === 'declined'">{{ $t('common.declinedCall') }}</template>
+                        <template v-else>{{ $t('common.answeredCall') }}</template>
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="msg-call-duration">{{ msg.callDuration }}</span>
                 </div>
@@ -408,7 +408,7 @@ const iMessagePreview = {
                 </div>
                 <div v-else :class="['msg-bubble-row', msg.type === 'sent' ? 'msg-row-sent' : 'msg-row-received']">
                     <img v-if="msg.type === 'received' && (data.contactAvatar || data.contactAvatarUrl) && isAvatarVisible(idx)" class="msg-contact-avatar" :src="data.contactAvatar || data.contactAvatarUrl" alt="">
-                    <div v-else-if="msg.type === 'received' && isAvatarVisible(idx)" class="msg-contact-avatar msg-avatar-placeholder">{{ (data.contactName || '联')[0] }}</div>
+                    <div v-else-if="msg.type === 'received' && isAvatarVisible(idx)" class="msg-contact-avatar msg-avatar-placeholder">{{ (data.contactName || $t('common.contactName'))[0] }}</div>
                     <div v-if="msg.type === 'received' && !isAvatarVisible(idx) && isAvatarSpacerNeeded(idx)" class="msg-avatar-spacer"></div>
                     <div :class="['msg-bubble',
                         msg.type === 'sent' ? 'msg-bubble-sent' : 'msg-bubble-received',
@@ -430,7 +430,7 @@ const iMessagePreview = {
 
                     <!-- Empty placeholder -->
                     <div v-if="!msg.text && !msg.image && !msg.imageUrl" class="msg-bubble-text" style="color:#c7c7cc; font-style:italic;">
-                        {{ msg.type === 'sent' ? '（空消息）' : '（空消息）' }}
+                        {{ $t('common.emptyMsg') }}
                     </div>
                 </div>
                 </div>
@@ -449,14 +449,14 @@ const iMessagePreview = {
         </div>
 
         <!-- Read Receipt -->
-        <div v-if="data.showReadReceipt" class="msg-read-receipt">{{ data.readReceiptText || '已读' }}</div>
+        <div v-if="data.showReadReceipt" class="msg-read-receipt">{{ data.readReceiptText || $t('common.read') }}</div>
 
         <!-- Input Bar -->
         <div class="msg-input-bar">
             <table width="100%" cellpadding="0" cellspacing="0" border="0">
                 <tr>
                     <td width="30" align="center" valign="middle"><span class="msg-input-plus">+</span></td>
-                    <td valign="middle"><div class="msg-input-field"><span class="msg-input-placeholder">iMessage</span></div></td>
+                    <td valign="middle"><div class="msg-input-field"><span class="msg-input-placeholder">{{ $t('im.imessage') }}</span></div></td>
                     <td width="40" align="center" valign="middle"><span class="msg-send-btn">➤</span></td>
                 </tr>
             </table>

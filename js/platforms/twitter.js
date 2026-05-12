@@ -35,56 +35,56 @@ const TwitterEditor = {
     template: `
     <div class="twitter-editor">
         <!-- 用户信息 -->
-        <div class="sub-title">👤 用户信息</div>
+        <div class="sub-title">{{ $t('common.userInfo') }}</div>
         <div class="form-group">
-            <label>头像</label>
+            <label>{{ $t('common.avatar') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.avatar }" @click="$refs.avatarInput.click()">
                 <template v-if="data.avatar">
                     <img :src="data.avatar" alt="avatar">
                     <button class="remove-image" @click.stop="updateField('avatar', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传头像</small>
+                    <span>📷</span><small>{{ $t('common.uploadAvatar') }}</small>
                 </div>
             </div>
             <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'avatar')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>显示名</label>
-                <input class="form-input" :value="data.displayName" @input="updateField('displayName', $event.target.value)" placeholder="显示名称">
+                <label>{{ $t('common.username') }}</label>
+                <input class="form-input" :value="data.displayName" @input="updateField('displayName', $event.target.value)" :placeholder="$t('tw.phDisplayName')">
             </div>
             <div class="form-group">
-                <label>@用户名</label>
-                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" placeholder="username">
+                <label>{{ $t('tw.atUsername') }}</label>
+                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" :placeholder="$t('tw.atUsername')">
             </div>
         </div>
         <div class="form-group">
-            <label>认证标记</label>
+            <label>{{ $t('common.verified') }}</label>
             <div class="toggle-group" style="margin-top:4px;">
                 <label class="toggle">
                     <input type="checkbox" :checked="data.verified" @change="updateField('verified', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">蓝标认证</span>
+                <span style="font-size:13px;">{{ $t('tw.blueCheck') }}</span>
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 推文内容 -->
-        <div class="sub-title">📝 推文内容</div>
+        <div class="sub-title">{{ $t('tw.postContent') }}</div>
         <div class="form-group">
-            <label>正文 <span class="hint">({{ (data.content || '').length }}/280)</span></label>
-            <textarea class="form-input" :value="data.content" @input="updateField('content', $event.target.value)" rows="5" placeholder="有什么新鲜事？" maxlength="280"></textarea>
+            <label>{{ $t('tw.postContent') }} <span class="hint">({{ (data.content || '').length }}/280)</span></label>
+            <textarea class="form-input" :value="data.content" @input="updateField('content', $event.target.value)" rows="5" :placeholder="$t('tw.phWhatsNew')" maxlength="280"></textarea>
         </div>
 
         <!-- 图片 -->
-        <div class="sub-title">🖼️ 配图</div>
+        <div class="sub-title">🖼️ {{ $t('common.image') }}</div>
         <div class="form-group">
             <div class="image-upload" :class="{ 'has-image': data.imageUrl }" @click="$refs.imageInput.click()">
                 <template v-if="data.imageUrl">
@@ -92,102 +92,102 @@ const TwitterEditor = {
                     <button class="remove-image" @click.stop="updateField('imageUrl', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传图片</small>
+                    <span>📷</span><small>{{ $t('common.uploadImage') }}</small>
                 </div>
             </div>
             <input type="file" ref="imageInput" accept="image/*" @change="handleUpload($event, 'imageUrl')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">🔄 引用转发</div>
+        <div class="sub-title">{{ $t('tw.quoteTweet') }}</div>
         <div class="form-group">
             <div class="toggle-group">
                 <label class="toggle">
                     <input type="checkbox" :checked="!!data.quoteTweet" @change="toggleQuote">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">引用转发</span>
+                <span style="font-size:13px;">{{ $t('tw.quoteTweet') }}</span>
             </div>
         </div>
         <template v-if="data.quoteTweet">
             <div class="form-group">
-                <label>原推作者</label>
-                <input class="form-input" :value="data.quoteTweet.displayName" @input="updateQuote('displayName', $event.target.value)" placeholder="显示名称">
+                <label>{{ $t('tw.originalAuthor') }}</label>
+                <input class="form-input" :value="data.quoteTweet.displayName" @input="updateQuote('displayName', $event.target.value)" :placeholder="$t('tw.phDisplayName')">
             </div>
             <div class="form-group">
-                <label>@用户名</label>
-                <input class="form-input" :value="data.quoteTweet.username" @input="updateQuote('username', $event.target.value)" placeholder="username">
+                <label>{{ $t('tw.atUsername') }}</label>
+                <input class="form-input" :value="data.quoteTweet.username" @input="updateQuote('username', $event.target.value)" :placeholder="$t('tw.atUsername')">
             </div>
             <div class="form-group">
-                <label>认证</label>
+                <label>{{ $t('common.verified') }}</label>
                 <div class="toggle-group" style="margin-top:4px;">
                     <label class="toggle">
                         <input type="checkbox" :checked="data.quoteTweet.verified" @change="updateQuote('verified', $event.target.checked)">
                         <span class="toggle-slider"></span>
                     </label>
-                    <span style="font-size:13px;">蓝标</span>
+                    <span style="font-size:13px;">{{ $t('common.blueV') }}</span>
                 </div>
             </div>
             <div class="form-group">
-                <label>原推内容</label>
-                <textarea class="form-input" :value="data.quoteTweet.content" @input="updateQuote('content', $event.target.value)" rows="3" placeholder="原推文内容"></textarea>
+                <label>{{ $t('tw.originalContent') }}</label>
+                <textarea class="form-input" :value="data.quoteTweet.content" @input="updateQuote('content', $event.target.value)" rows="3" :placeholder="$t('tw.phOriginalContent')"></textarea>
             </div>
             <div class="form-group">
-                <label>原推图片链接</label>
-                <input class="form-input ext-url-input" :value="data.quoteTweet.imageUrlExt" @input="updateQuote('imageUrlExt', $event.target.value)" placeholder="外部图片链接">
+                <label>{{ $t('tw.originalImageLink') }}</label>
+                <input class="form-input ext-url-input" :value="data.quoteTweet.imageUrlExt" @input="updateQuote('imageUrlExt', $event.target.value)" :placeholder="$t('tw.phExternalLink')">
             </div>
         </template>
 
         <div class="section-divider"></div>
 
         <!-- 时间 -->
-        <div class="sub-title">🕐 时间</div>
+        <div class="sub-title">{{ $t('tw.sectionTime') }}</div>
         <div class="form-group">
-            <label>时间戳</label>
-            <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" placeholder="如: 下午3:24 · 2024年3月15日">
+            <label>{{ $t('tw.timestamp') }}</label>
+            <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" :placeholder="$t('tw.timestamp')">
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 互动数据 -->
-        <div class="sub-title">📊 互动数据</div>
+        <div class="sub-title">{{ $t('tw.interactionData') }}</div>
         <div class="form-row">
             <div class="form-group">
-                <label>回复</label>
+                <label>{{ $t('tw.replies') }}</label>
                 <input class="form-input" type="number" :value="data.replies" @input="updateField('replies', parseInt($event.target.value)||0)" min="0">
             </div>
             <div class="form-group">
-                <label>转推</label>
+                <label>{{ $t('tw.retweets') }}</label>
                 <input class="form-input" type="number" :value="data.retweets" @input="updateField('retweets', parseInt($event.target.value)||0)" min="0">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>喜欢</label>
+                <label>{{ $t('tw.likes') }}</label>
                 <input class="form-input" type="number" :value="data.likes" @input="updateField('likes', parseInt($event.target.value)||0)" min="0">
             </div>
             <div class="form-group">
-                <label>浏览量</label>
+                <label>{{ $t('tw.views') }}</label>
                 <input class="form-input" type="number" :value="data.views" @input="updateField('views', parseInt($event.target.value)||0)" min="0">
             </div>
         </div>
         <div class="form-group">
-            <label>书签</label>
+            <label>{{ $t('tw.bookmarks') }}</label>
             <input class="form-input" type="number" :value="data.bookmarks" @input="updateField('bookmarks', parseInt($event.target.value)||0)" min="0">
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 评论 -->
-        <div class="sub-title">💬 评论区 <span class="hint">({{ (data.comments || []).length }}条)</span></div>
+        <div class="sub-title">{{ $t('common.comments') }} <span class="hint">({{ (data.comments || []).length }}{{ $t('common.count') }})</span></div>
         <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:12px;">显示评论数</label>
+                <label style="font-size:12px;">{{ $t('common.showCommentCount') }}</label>
                 <input class="form-input" type="number" min="0" :value="data.commentCount || (data.comments || []).length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
             </div>
         </div>
@@ -204,7 +204,7 @@ const TwitterEditor = {
                     <button class="remove-comment" @click="removeComment(idx)">✕</button>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">头像</label>
+                    <label style="font-size:12px;">{{ $t('common.avatar') }}</label>
                     <div style="display:flex;align-items:center;gap:8px;">
                         <div v-if="comment.avatar" style="position:relative;width:28px;height:28px;">
                             <img :src="comment.avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
@@ -218,17 +218,17 @@ const TwitterEditor = {
                     </div>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <label style="font-size:12px;">🔗 头像链接</label>
-                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" placeholder="外部链接（AO3用）" style="font-size:11px;">
+                    <label style="font-size:12px;">{{ $t('tw.avatarLink') }}</label>
+                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" :placeholder="$t('tw.phExternalAvatarLink')" style="font-size:11px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" placeholder="用户名" style="font-size:13px;">
+                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" :placeholder="$t('common.username')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" style="font-size:13px;">
+                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" :placeholder="$t('tw.phCommentContent')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:12px;">喜欢</label>
+                    <label style="font-size:12px;">{{ $t('common.like') }}</label>
                     <div class="number-input-group">
                         <button @click="adjustCommentLikes(idx, -1)">−</button>
                         <input :value="comment.likes" @input="updateComment(idx, 'likes', parseInt($event.target.value)||0)">
@@ -238,25 +238,25 @@ const TwitterEditor = {
                 <!-- 嵌套回复 -->
                 <div style="margin-top:10px;padding-left:14px;border-left:2px solid #e9ecef;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">↳ 回复 ({{ (comment.replies || []).length }})</span>
-                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">+ 添加回复</button>
+                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">{{ $t('common.replies') }} ({{ (comment.replies || []).length }})</span>
+                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">{{ $t('common.addReply') }}</button>
                     </div>
                     <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" 
                         style="background:#f8f9fa;border-radius:6px;padding:8px 10px;margin-bottom:6px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                            <span style="font-size:11px;color:#8e8e93;">回复 #{{ rIdx + 1 }}</span>
+                            <span style="font-size:11px;color:#8e8e93;">{{ $t('common.replyHash') }}{{ rIdx + 1 }}</span>
                             <button style="font-size:11px;color:#ff3b30;background:none;border:none;cursor:pointer;" @click="removeReply(idx, rIdx)">✕</button>
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" placeholder="用户名" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" :placeholder="$t('common.replyer')" style="font-size:12px;padding:4px 8px;">
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" :placeholder="$t('common.replyContent')" style="font-size:12px;padding:4px 8px;">
                         </div>
                     </div>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addComment">➕ 添加评论</button>
+            <button class="add-comment-btn" @click="addComment">{{ $t('common.addComment') }}</button>
         </div>
     </div>
     `,
@@ -427,7 +427,7 @@ const TwitterPreview = {
                 </template>
                 <div class="tw-header-info">
                     <div class="tw-header-names">
-                        <span class="tw-display-name">{{ data.displayName || '用户名' }}</span>
+                        <span class="tw-display-name">{{ data.displayName || $t('common.username') }}</span>
                         <span v-if="data.verified" class="tw-verified-badge">
                             <svg viewBox="0 0 22 22"><path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.855-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.69-.13.635-.08 1.293.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.604-.274 1.26-.144 1.896.13.636.433 1.221.878 1.69.47.446 1.055.752 1.69.883.635.13 1.294.083 1.902-.143.271.586.702 1.084 1.24 1.438.54.354 1.167.551 1.813.568.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.225 1.261.276 1.894.146.634-.13 1.22-.435 1.69-.88.445-.47.75-1.055.88-1.69.131-.634.084-1.292-.139-1.896.584-.273 1.084-.704 1.438-1.244.355-.54.553-1.17.57-1.817zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"/></svg>
                         </span>
@@ -468,28 +468,28 @@ const TwitterPreview = {
             <div class="tw-views" v-if="data.timestamp">
                 {{ data.timestamp }}
                 <span v-if="data.views"> · </span>
-                <span v-if="data.views" style="font-weight:600;">{{ formatCount(data.views) }}</span> 次查看
+                <span v-if="data.views" style="font-weight:600;">{{ formatCount(data.views) }}</span> {{ $t('tw.viewsCount') }}
             </div>
 
             <!-- Actions -->
             <div class="tw-action-row">
-                <div class="tw-action-row-item" title="回复">
+                <div class="tw-action-row-item" :title="$t('tw.replies')">
                     <span class="tw-emoji-icon">💬</span>
                     <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                 </div>
-                <div class="tw-action-row-item" title="转推">
+                <div class="tw-action-row-item" :title="$t('tw.retweets')">
                     <span class="tw-emoji-icon">🔁</span>
                     <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"/></svg>
                 </div>
-                <div class="tw-action-row-item" title="喜欢">
+                <div class="tw-action-row-item" :title="$t('tw.likes')">
                     <span class="tw-emoji-icon">❤️</span>
                     <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                 </div>
-                <div class="tw-action-row-item" title="浏览量">
+                <div class="tw-action-row-item" :title="$t('tw.views')">
                     <span class="tw-emoji-icon">👁️</span>
                     <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"/></svg>
                 </div>
-                <div class="tw-action-row-item" title="分享">
+                <div class="tw-action-row-item" :title="$t('rd.share')">
                     <span class="tw-emoji-icon">↗️</span>
                     <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 2.59l5.7 5.7-1.41 1.42L13 6.41V16h-2V6.41l-3.3 3.3-1.41-1.42L12 2.59zM21 14l-.02 3.51c0 1.38-1.12 2.49-2.5 2.49H5.5C4.11 20 3 18.88 3 17.5V14h2v3.5c0 .28.22.5.5.5h12.98c.28 0 .5-.22.5-.5L19 14h2z"/></svg>
                 </div>
@@ -498,7 +498,7 @@ const TwitterPreview = {
             <!-- Comments -->
             <template v-if="data.comments && data.comments.length > 0">
                 <div style="border-top:1px solid #e6ecf0; margin-top:12px; padding-top:12px;">
-                    <div style="font-size:13px; color:#536471; margin-bottom:8px;">查看全部 {{ data.commentCount || data.comments.length }} 条评论</div>
+                    <div style="font-size:13px; color:#536471; margin-bottom:8px;">{{ $t('tw.viewAll') }} {{ data.commentCount || data.comments.length }} {{ $t('tw.commentsCount') }}</div>
                     <div class="tw-comments">
                         <div class="tw-comment" v-for="(comment, idx) in data.comments" :key="idx">
                             <img v-if="comment.avatar || comment.avatarUrl" class="tw-comment-avatar" :src="comment.avatar || comment.avatarUrl" :alt="comment.username">
@@ -509,11 +509,11 @@ const TwitterPreview = {
                                     <span class="tw-comment-text">{{ comment.text }}</span>
                                 </div>
                                 <div class="tw-comment-actions">
-                                    <span class="tw-comment-action" title="回复">
+                                    <span class="tw-comment-action" :title="$t('tw.replies')">
                                         <span class="tw-emoji-icon">💬</span>
                                         <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                                     </span>
-                                    <span class="tw-comment-action" title="喜欢">
+                                    <span class="tw-comment-action" :title="$t('tw.likes')">
                                         <span class="tw-emoji-icon">❤️</span>
                                         <svg class="tw-hd-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                                         <span class="tw-comment-like-count" v-if="comment.likes > 0">{{ comment.likes }}</span>
@@ -533,9 +533,9 @@ const TwitterPreview = {
 
             <!-- Stats -->
             <div style="display:flex; justify-content:space-between; padding:4px 16px 12px; font-size:13px; color:#536471;">
-                <span><strong style="color:#0f1419;">{{ formatCount(data.retweets) }}</strong> 转推</span>
-                <span><strong style="color:#0f1419;">{{ formatCount(data.likes) }}</strong> 喜欢</span>
-                <span v-if="data.bookmarks"><strong style="color:#0f1419;">{{ formatCount(data.bookmarks) }}</strong> 书签</span>
+                <span><strong style="color:#0f1419;">{{ formatCount(data.retweets) }}</strong> {{ $t('tw.retweetsAbbr') }}</span>
+                <span><strong style="color:#0f1419;">{{ formatCount(data.likes) }}</strong> {{ $t('tw.likesAbbr') }}</span>
+                <span v-if="data.bookmarks"><strong style="color:#0f1419;">{{ formatCount(data.bookmarks) }}</strong> {{ $t('tw.bookmarksAbbr') }}</span>
             </div>
         </div>
     </div>

@@ -33,24 +33,24 @@ const WeChatEditor = {
     template: `
     <div class="wechat-editor">
         <!-- 对话信息 -->
-        <div class="sub-title">👤 对话信息</div>
+        <div class="sub-title">👤 {{ $t('common.chatInfo') }}</div>
         <div class="form-group">
             <div class="toggle-group">
                 <label class="toggle">
                     <input type="checkbox" :checked="data.isGroup" @change="updateField('isGroup', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">群聊模式</span>
+                <span style="font-size:13px;">{{ $t('common.groupMode') }}</span>
             </div>
         </div>
 
         <!-- 群聊设置 -->
         <template v-if="data.isGroup">
             <div class="form-group">
-                <label>群名称</label>
-                <input class="form-input" :value="data.groupName" @input="updateField('groupName', $event.target.value)" placeholder="群名称">
+                <label>{{ $t('common.groupName') }}</label>
+                <input class="form-input" :value="data.groupName" @input="updateField('groupName', $event.target.value)" :placeholder="$t('wx.phGroupName')">
             </div>
-            <div class="sub-title" style="margin-top:12px;">👥 群成员 <span class="hint">({{ (data.groupMembers || []).length }}人)</span></div>
+            <div class="sub-title" style="margin-top:12px;">👥 {{ $t('common.groupMembers') }} <span class="hint">({{ (data.groupMembers || []).length }}{{ $t('common.memberCount') }})</span></div>
             <div class="comment-list">
                 <div class="comment-item" v-for="(m, idx) in (data.groupMembers || [])" :key="idx"
                     :style="{ borderLeft: '3px solid ' + (m.color || '#07c160') }">
@@ -60,14 +60,14 @@ const WeChatEditor = {
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group" style="margin-bottom:0;">
-                            <input class="form-input" :value="m.name" @input="updateMember(idx, 'name', $event.target.value)" placeholder="名称" style="font-size:12px;">
+                            <input class="form-input" :value="m.name" @input="updateMember(idx, 'name', $event.target.value)" :placeholder="$t('common.memberName')" style="font-size:12px;">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:11px;">头像色</label>
+                            <label style="font-size:11px;">{{ $t('common.memberAvatarColor') }}</label>
                             <input type="color" :value="m.color || '#07c160'" @input="updateMember(idx, 'color', $event.target.value)" style="width:30px;height:24px;padding:0;border:none;">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:11px;">头像</label>
+                            <label style="font-size:11px;">{{ $t('common.avatar') }}</label>
                             <label class="btn btn-small btn-outline" style="cursor:pointer;font-size:10px;padding:1px 6px;">
                                 📷
                                 <input type="file" accept="image/*" @change="handleMemberAvatar(idx, $event)" hidden>
@@ -76,35 +76,35 @@ const WeChatEditor = {
                     </div>
                     <div class="ext-url-row" style="margin-top:4px;">
                         <span class="ext-url-label">🔗</span>
-                        <input class="form-input ext-url-input" :value="m.avatarUrl" @input="updateMember(idx, 'avatarUrl', $event.target.value)" placeholder="外部头像链接" style="font-size:11px;">
+                        <input class="form-input ext-url-input" :value="m.avatarUrl" @input="updateMember(idx, 'avatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLink')" style="font-size:11px;">
                     </div>
                 </div>
-                <button class="add-comment-btn" @click="addMember">➕ 添加成员</button>
+                <button class="add-comment-btn" @click="addMember">{{ $t('common.addMember') }}</button>
             </div>
         </template>
 
         <!-- 单聊设置 -->
         <template v-else>
             <div class="form-group">
-                <label>联系人头像</label>
+                <label>{{ $t('common.contactAvatar') }}</label>
                 <div class="image-upload" :class="{ 'has-image': data.contactAvatar }" @click="$refs.avatarInput.click()" style="width:80px;height:80px;border-radius:6px;">
                     <template v-if="data.contactAvatar">
                         <img :src="data.contactAvatar" alt="avatar" style="border-radius:6px;">
                         <button class="remove-image" @click.stop="updateField('contactAvatar', '')">✕</button>
                     </template>
                     <div v-else class="upload-placeholder">
-                        <span>📷</span><small>头像</small>
+                        <span>📷</span><small>{{ $t('common.avatar') }}</small>
                     </div>
                 </div>
                 <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'contactAvatar')" hidden>
                 <div class="ext-url-row">
                     <span class="ext-url-label">🔗</span>
-                    <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" placeholder="外部图片链接">
+                    <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLink')">
                 </div>
             </div>
             <div class="form-group">
-                <label>联系人名称</label>
-                <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" placeholder="联系人名称">
+                <label>{{ $t('common.contactName') }}</label>
+                <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" :placeholder="$t('common.contactName')">
             </div>
         </template>
 
@@ -113,8 +113,8 @@ const WeChatEditor = {
         <!-- 其他设置 -->
         <div class="form-row">
             <div class="form-group">
-                <label>日期标签</label>
-                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" placeholder="如: 昨天">
+                <label>{{ $t('common.dateLabel') }}</label>
+                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" :placeholder="$t('wx.phDateExample')">
             </div>
         </div>
         <div class="form-group">
@@ -123,14 +123,14 @@ const WeChatEditor = {
                     <input type="checkbox" :checked="data.showTyping" @change="updateField('showTyping', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">显示对方正在输入...</span>
+                <span style="font-size:13px;">{{ $t('common.showTyping') }}</span>
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 消息列表 -->
-        <div class="sub-title">💬 消息 <span class="hint">({{ data.messages.length }}条)</span></div>
+        <div class="sub-title">💬 {{ $t('common.messages') }} <span class="hint">({{ data.messages.length }}{{ $t('common.count') }})</span></div>
         <div class="comment-list">
             <div class="comment-item" v-for="(msg, idx) in data.messages" :key="idx"
                 draggable="true"
@@ -143,11 +143,11 @@ const WeChatEditor = {
                 <div class="comment-header">
                     <span>
                         <strong :style="{ color: msg.type === 'sent' ? '#07c160' : msg.type === 'system' ? '#fa9d3b' : msg.type === 'timeSeparator' ? '#576b95' : '#333' }">
-                            {{ msg.type === 'sent' ? '→ 发送' : msg.type === 'received' ? '← 收到' : msg.type === 'system' ? '🔔 系统' : '🕐 时间' }}
+                            {{ msg.type === 'sent' ? $t('common.msgSent') : msg.type === 'received' ? $t('common.msgReceived') : msg.type === 'system' ? $t('common.msgSystem') : $t('common.msgTime') }}
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
-                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
+                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" :title="$t('common.insertBelow')"
                             @click="insertMessage(idx)">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
                             @click="toggleType(idx)">⇄</button>
@@ -158,10 +158,10 @@ const WeChatEditor = {
                 <!-- System Message Editor -->
                 <template v-if="msg.type === 'system'">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">内容</label>
+                        <label style="font-size:12px;">{{ $t('common.content') }}</label>
                         <textarea class="form-input" :value="msg.systemText || ''"
                             @input="updateMessage(idx, 'systemText', $event.target.value)"
-                            placeholder="如: 你 邀请 赵六 加入群聊" rows="2"
+                            :placeholder="$t('wx.phSystemContent')" rows="2"
                             style="font-size:13px;min-height:36px;"></textarea>
                     </div>
                 </template>
@@ -169,17 +169,17 @@ const WeChatEditor = {
                 <!-- Time Separator Editor -->
                 <template v-else-if="msg.type === 'timeSeparator'">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">时间文字</label>
+                        <label style="font-size:12px;">{{ $t('common.timeLabel') }}</label>
                         <input class="form-input" :value="msg.text || ''"
                             @input="updateMessage(idx, 'text', $event.target.value)"
-                            placeholder="如：下午 5:20" style="font-size:13px;">
+                            :placeholder="$t('wx.phTime')" style="font-size:13px;">
                     </div>
                 </template>
 
                 <!-- Normal Message Editor -->
                 <template v-else>
                     <div v-if="data.isGroup && msg.type === 'received'" class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">发送者</label>
+                        <label style="font-size:12px;">{{ $t('common.sender') }}</label>
                         <select class="form-input" :value="msg.sender || 0" @change="updateMessage(idx, 'sender', parseInt($event.target.value))" style="font-size:12px;">
                             <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
                         </select>
@@ -187,11 +187,11 @@ const WeChatEditor = {
                     <div class="form-group" style="margin-bottom:8px;">
                         <textarea class="form-input" :value="msg.text"
                             @input="updateMessage(idx, 'text', $event.target.value)"
-                            placeholder="消息内容" rows="2"
+                            :placeholder="$t('common.msgContent')" rows="2"
                             style="font-size:13px;min-height:36px;"></textarea>
                     </div>
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">图片</label>
+                        <label style="font-size:12px;">{{ $t('common.image') }}</label>
                         <div style="display:flex;align-items:center;gap:8px;">
                             <div v-if="msg.image" style="position:relative;">
                                 <img :src="msg.image" style="width:60px;height:40px;border-radius:4px;object-fit:cover;">
@@ -204,7 +204,7 @@ const WeChatEditor = {
                         </div>
                         <div class="ext-url-row" style="margin-top:4px;">
                             <span class="ext-url-label">🔗</span>
-                            <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接" style="font-size:11px;">
+                            <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" :placeholder="$t('common.externalLinkShort')" style="font-size:11px;">
                         </div>
                     </div>
                     <div class="form-group" style="margin-bottom:8px;">
@@ -213,12 +213,12 @@ const WeChatEditor = {
                                 <input type="checkbox" :checked="msg.isVoice" @change="updateMessage(idx, 'isVoice', $event.target.checked)">
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span style="font-size:12px;">语音消息</span>
+                            <span style="font-size:12px;">{{ $t('common.voiceMsg') }}</span>
                         </div>
                     </div>
                     <template v-if="msg.isVoice">
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">⏱ 时长</label>
+                            <label style="font-size:12px;">{{ $t('common.duration') }}</label>
                             <input class="form-input" :value="msg.voiceDuration" @input="updateMessage(idx, 'voiceDuration', $event.target.value)" placeholder="0:05" style="font-size:12px;">
                         </div>
                     </template>
@@ -228,41 +228,41 @@ const WeChatEditor = {
                                 <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span style="font-size:12px;">通话记录</span>
+                            <span style="font-size:12px;">{{ $t('common.call') }}</span>
                         </div>
                     </div>
                     <template v-if="msg.isCall">
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">通话类型</label>
+                            <label style="font-size:12px;">{{ $t('common.callType') }}</label>
                             <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
-                                <option value="voice">📞 语音通话</option>
-                                <option value="video">📹 视频通话</option>
+                                <option value="voice">{{ $t('common.voiceCall') }}</option>
+                                <option value="video">{{ $t('common.videoCall') }}</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">通话状态</label>
+                            <label style="font-size:12px;">{{ $t('common.callStatus') }}</label>
                             <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
-                                <option value="answered">✅ 已接听</option>
-                                <option value="missed">❌ 未接听</option>
+                                <option value="answered">{{ $t('common.answered') }}</option>
+                                <option value="missed">{{ $t('common.missed') }}</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">⏱ 通话时长</label>
+                            <label style="font-size:12px;">{{ $t('common.callDuration') }}</label>
                             <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
                         </div>
                     </template>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px;">时间</label>
-                            <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" placeholder="时间" style="font-size:12px;">
+                            <label style="font-size:12px;">{{ $t('common.timeLabel') }}</label>
+                            <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" :placeholder="$t('common.timeLabel')" style="font-size:12px;">
                         </div>
                     </div>
                 </template>
             </div>
-            <button class="add-comment-btn" @click="addMessage">➕ 添加消息</button>
+            <button class="add-comment-btn" @click="addMessage">{{ $t('common.addMessage') }}</button>
             <div style="display:flex;gap:6px;margin-top:4px;">
-                <button class="add-comment-btn" style="background:#fa9d3b;" @click="addSystemMessage">🔔 系统消息</button>
-                <button class="add-comment-btn" style="background:#576b95;" @click="addTimeSeparator">🕐 时间标签</button>
+                <button class="add-comment-btn" style="background:#fa9d3b;" @click="addSystemMessage">{{ $t('common.addSystemMsg') }}</button>
+                <button class="add-comment-btn" style="background:#576b95;" @click="addTimeSeparator">{{ $t('common.addTimeLabel') }}</button>
             </div>
         </div>
     </div>
@@ -410,8 +410,8 @@ const WeChatPreview = {
                 <div v-else class="wx-header-avatar">{{ (data.contactName || 'U')[0] }}</div>
             </template>
             <div class="wx-header-info">
-                <div class="wx-header-name">{{ data.isGroup ? (data.groupName || '群聊') : (data.contactName || '联系人') }}</div>
-                <div v-if="data.isGroup" class="wx-header-status">{{ (data.groupMembers || []).length }}位联系人</div>
+                <div class="wx-header-name">{{ data.isGroup ? (data.groupName || $t('common.groupChat')) : (data.contactName || $t('common.contact')) }}</div>
+                <div v-if="data.isGroup" class="wx-header-status">{{ (data.groupMembers || []).length }}{{ $t('wx.contactsCount') }}</div>
             </div>
             <div class="wx-header-actions">
                 <span class="wx-header-action">⋯</span>
@@ -443,8 +443,8 @@ const WeChatPreview = {
                 <div v-else-if="msg.isCall" :class="['wx-call-record', 'wx-call-' + (msg.callStatus || 'answered')]">
                     <span class="wx-call-icon">{{ msg.callType === 'video' ? '📹' : '📞' }}</span>
                     <span class="wx-call-text">
-                        <template v-if="msg.callStatus === 'missed'">未接听</template>
-                        <template v-else>已接听</template>
+                        <template v-if="msg.callStatus === 'missed'">{{ $t('common.missedCall') }}</template>
+                        <template v-else>{{ $t('common.answeredCall') }}</template>
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed'" class="wx-call-duration">{{ msg.callDuration }}</span>
                 </div>
@@ -470,7 +470,7 @@ const WeChatPreview = {
                                 <img :src="msg.image || msg.imageUrl" alt="">
                             </div>
                             <div v-if="!msg.isVoice && msg.text" class="wx-bubble-text">{{ msg.text }}</div>
-                            <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wx-bubble-empty">（空消息）</div>
+                            <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wx-bubble-empty">{{ $t('common.emptyMsg') }}</div>
                         </div>
                     </div>
                 </div>
@@ -488,7 +488,7 @@ const WeChatPreview = {
         <div class="wx-input-bar">
             <span class="wx-input-voice">🎙️</span>
             <div class="wx-input-field">
-                <span class="wx-input-placeholder">输入消息...</span>
+                <span class="wx-input-placeholder">{{ $t('common.typeMessageDot') }}</span>
             </div>
             <div class="wx-input-actions">
                 <span class="wx-input-action">😊</span>

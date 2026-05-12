@@ -21,27 +21,31 @@
         <!-- 顶部导航 -->
         <header class="app-header">
             <div class="header-left">
-                <h1 class="app-title">🎨 社交媒体内容创作器</h1>
+                <h1 class="app-title">🎨 {{ $t('app.title') }}</h1>
                 <span class="app-badge">v2.0</span>
-                <span v-if="universalData.items.length > 0" class="app-badge" style="background:#34c759;cursor:pointer;" @click="switchView('universal')" title="查看综合页面">
-                    📋 {{ universalData.items.length }}个模块
+                <span v-if="universalData.items.length > 0" class="app-badge" style="background:#34c759;cursor:pointer;" @click="switchView('universal')" :title="$t('view.universal')">
+                    📋 {{ $t('app.modules', {n: universalData.items.length}) }}
                 </span>
             </div>
             <div class="header-actions">
+                <!-- 语言切换 -->
+                <button class="btn btn-outline lang-toggle" @click="locale = locale === 'zh' ? 'en' : 'zh'" :title="locale === 'zh' ? 'Switch to English' : '切换到中文'">
+                    {{ locale === 'zh' ? 'EN' : '中文' }}
+                </button>
                 <!-- 视图切换 -->
                 <div class="view-toggle">
-                    <button :class="['view-toggle-btn', { active: currentView === 'single' }]" @click="switchView('single')">📱 编辑</button>
-                    <button :class="['view-toggle-btn', { active: currentView === 'universal' }]" @click="switchView('universal')">📋 综合</button>
+                    <button :class="['view-toggle-btn', { active: currentView === 'single' }]" @click="switchView('single')">{{ $t('view.edit') }}</button>
+                    <button :class="['view-toggle-btn', { active: currentView === 'universal' }]" @click="switchView('universal')">{{ $t('view.universal') }}</button>
                 </div>
-                <button class="btn btn-outline" @click="saveProject" title="保存到浏览器">💾 保存项目</button>
-                <button class="btn btn-outline" @click="showLoadModal = true" title="加载已保存的项目">📂 加载项目</button>
-                <a class="btn btn-outline" href="help.html" title="使用指南">📖 帮助</a>
-                <button class="btn btn-outline" @click="exportJSON" title="导出配置文件">📤 导出配置</button>
-                <label class="btn btn-outline" title="导入配置文件">
-                    📥 导入配置
+                <button class="btn btn-outline" @click="saveProject">{{ $t('btn.save') }}</button>
+                <button class="btn btn-outline" @click="showLoadModal = true">{{ $t('btn.load') }}</button>
+                <a class="btn btn-outline" href="help.html">{{ $t('btn.help') }}</a>
+                <button class="btn btn-outline" @click="exportJSON">{{ $t('btn.exportConfig') }}</button>
+                <label class="btn btn-outline">
+                    {{ $t('btn.importConfig') }}
                     <input type="file" accept=".json" @change="importJSON" hidden>
                 </label>
-                <button class="btn btn-danger" @click="clearAllData" title="清除所有保存的数据">🗑️ 清除数据</button>
+                <button class="btn btn-danger" @click="clearAllData">{{ $t('btn.clearData') }}</button>
             </div>
         </header>
 
@@ -52,8 +56,8 @@
                 <!-- 平台选择 -->
                 <div class="platform-selector">
                     <div class="platform-tab-switch">
-                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'domestic' }]" @click="platformRegion = 'domestic'">🇨🇳 国内平台</button>
-                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'international' }]" @click="platformRegion = 'international'">🌍 国际平台</button>
+                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'domestic' }]" @click="platformRegion = 'domestic'">{{ $t('region.domestic') }}</button>
+                        <button :class="['platform-tab-switch-btn', { active: platformRegion === 'international' }]" @click="platformRegion = 'international'">{{ $t('region.international') }}</button>
                     </div>
                     <div class="platform-tabs">
                         <button 
@@ -62,8 +66,8 @@
                             :class="['platform-tab', { active: currentPlatform === p.id }]"
                             @click="switchPlatform(p.id)">
                             <span class="platform-icon">{{ p.icon }}</span>
-                            <span class="platform-name">{{ p.name }}</span>
-                            <span v-if="p.status === 'coming'" class="platform-badge">即将上线</span>
+                            <span class="platform-name">{{ $t('platform.' + p.id) }}</span>
+                            <span v-if="p.status === 'coming'" class="platform-badge">{{ $t('status.comingSoon') }}</span>
                         </button>
                     </div>
                 </div>
@@ -136,19 +140,19 @@
             <section class="preview-panel" :class="{ 'mobile-hide': isMobile && mobileTab !== 'preview' }">
                 <div class="preview-toolbar">
                     <div class="preview-device">
-                        <button :class="['device-btn', { active: deviceMode === 'phone' }]" @click="deviceMode = 'phone'">📱 手机</button>
-                        <button :class="['device-btn', { active: deviceMode === 'desktop' }]" @click="deviceMode = 'desktop'">🖥️ 桌面</button>
-                        <button :class="['device-btn', { active: previewMode === 'hd' }]" @click="previewMode = previewMode === 'hd' ? 'standard' : 'hd'">✨ 高清</button>
+                        <button :class="['device-btn', { active: deviceMode === 'phone' }]" @click="deviceMode = 'phone'">{{ $t('device.phone') }}</button>
+                        <button :class="['device-btn', { active: deviceMode === 'desktop' }]" @click="deviceMode = 'desktop'">{{ $t('device.desktop') }}</button>
+                        <button :class="['device-btn', { active: previewMode === 'hd' }]" @click="previewMode = previewMode === 'hd' ? 'standard' : 'hd'">{{ $t('device.hd') }}</button>
                     </div>
                     <div class="preview-actions">
-                        <button class="btn btn-primary" @click="addToUniversal">➕ 添加到综合页面</button>
-                        <button v-if="editingUniversalIndex >= 0" class="btn btn-primary" style="background:#34c759;" @click="updateUniversalItem">✅ 更新综合页面</button>
-                        <button v-if="editingUniversalIndex >= 0" class="btn btn-outline" @click="editingUniversalIndex = -1">❌ 取消编辑</button>
-                        <button class="btn btn-outline" @click="resetCurrentPlatform">🔄 新建空白</button>
-                        <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
-                        <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML</button>
-                        <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
-                        <button class="btn btn-secondary" @click="exportImage">🖼️ 导出图片</button>
+                        <button class="btn btn-primary" @click="addToUniversal">{{ $t('action.addToUniversal') }}</button>
+                        <button v-if="editingUniversalIndex >= 0" class="btn btn-primary" style="background:#34c759;" @click="updateUniversalItem">{{ $t('action.updateUniversal') }}</button>
+                        <button v-if="editingUniversalIndex >= 0" class="btn btn-outline" @click="editingUniversalIndex = -1">{{ $t('action.cancelEdit') }}</button>
+                        <button class="btn btn-outline" @click="resetCurrentPlatform">{{ $t('action.newBlank') }}</button>
+                        <button class="btn btn-primary" @click="exportHTML">{{ $t('action.exportHTML') }}</button>
+                        <button class="btn btn-secondary" @click="exportCompatible">{{ $t('action.exportCompatible') }}</button>
+                        <button class="btn btn-secondary" @click="copyHTML">{{ $t('action.copyHTML') }}</button>
+                        <button class="btn btn-secondary" @click="exportImage">{{ $t('action.exportImage') }}</button>
                     </div>
                 </div>
                 <div class="preview-container" :class="['device-' + deviceMode, previewMode === 'hd' ? 'preview-hd' : '']">
@@ -223,22 +227,22 @@
         <div class="modal-overlay" v-if="showLoadModal" @click.self="showLoadModal = false">
             <div class="modal">
                 <div class="modal-header">
-                    <h3>📂 加载已保存的项目</h3>
+                    <h3>{{ $t('modal.loadTitle') }}</h3>
                     <button class="modal-close" @click="showLoadModal = false">✕</button>
                 </div>
                 <div class="modal-body">
                     <div v-if="savedProjects.length === 0" class="empty-state">
-                        <p>暂无已保存的项目</p>
+                        <p>{{ $t('modal.noProjects') }}</p>
                     </div>
                     <div v-for="(proj, idx) in savedProjects" :key="idx" class="saved-project-item">
                         <div class="project-info">
                             <span class="project-name">{{ proj.name || ('项目 ' + (idx + 1)) }}</span>
-                            <span class="project-platform">{{ platforms.find(p => p.id === proj.platform)?.name || '未知平台' }}</span>
+                            <span class="project-platform">{{ $t('platform.' + proj.platform) || '未知' }}</span>
                             <span class="project-time">{{ proj.savedAt }}</span>
                         </div>
                         <div class="project-actions">
-                            <button class="btn btn-small btn-primary" @click="loadProject(proj)">加载</button>
-                            <button class="btn btn-small btn-danger" @click="deleteProject(idx)">删除</button>
+                            <button class="btn btn-small btn-primary" @click="loadProject(proj)">{{ $t('modal.load') }}</button>
+                            <button class="btn btn-small btn-danger" @click="deleteProject(idx)">{{ $t('modal.delete') }}</button>
                         </div>
                     </div>
                 </div>
@@ -249,18 +253,18 @@
         <div class="modal-overlay" v-if="showSaveModal" @click.self="showSaveModal = false">
             <div class="modal">
                 <div class="modal-header">
-                    <h3>💾 保存项目</h3>
+                    <h3>{{ $t('modal.saveTitle') }}</h3>
                     <button class="modal-close" @click="showSaveModal = false">✕</button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>项目名称</label>
-                        <input type="text" v-model="saveProjectName" placeholder="输入项目名称..." 
+                        <label>{{ $t('label.projectName') }}</label>
+                        <input type="text" v-model="saveProjectName" :placeholder="$t('ph.projectName')"
                             @keyup.enter="confirmSaveProject">
                     </div>
                     <div class="form-actions">
-                        <button class="btn btn-primary" @click="confirmSaveProject">确认保存</button>
-                        <button class="btn btn-outline" @click="showSaveModal = false">取消</button>
+                        <button class="btn btn-primary" @click="confirmSaveProject">{{ $t('btn.confirmSave') }}</button>
+                        <button class="btn btn-outline" @click="showSaveModal = false">{{ $t('btn.cancel') }}</button>
                     </div>
                 </div>
             </div>
@@ -271,8 +275,8 @@
 
         <!-- 移动端底部 Tab 栏 -->
         <div class="mobile-tab-bar" v-if="isMobile && currentView === 'single'">
-            <button :class="{ active: mobileTab === 'editor' }" @click="mobileTab = 'editor'">✏️ 编辑</button>
-            <button :class="{ active: mobileTab === 'preview' }" @click="mobileTab = 'preview'">👁️ 预览</button>
+            <button :class="{ active: mobileTab === 'editor' }" @click="mobileTab = 'editor'">{{ $t('tab.editor') }}</button>
+            <button :class="{ active: mobileTab === 'preview' }" @click="mobileTab = 'preview'">{{ $t('tab.preview') }}</button>
         </div>
 
         <!-- 页脚 -->
@@ -288,6 +292,7 @@
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
     <!-- 工具模块 -->
+    <script src="js/i18n.js?v=4.0"></script>
     <script src="js/utils/storage.js?v=3.7"></script>
     <script src="js/utils/image.js?v=3.7"></script>
     <script src="js/utils/platform-css.js?v=3.7"></script>

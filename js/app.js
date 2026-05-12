@@ -7,7 +7,9 @@ if (typeof Vue === 'undefined') {
 } else {
     console.log('✅ Vue 3 已加载');
     const { createApp, ref, reactive, computed, watch, onMounted, nextTick } = Vue;
-    
+
+    const _locale = ref(localStorage.getItem('smc-locale') || 'zh');
+
     const app = createApp({
     data() {
         return {
@@ -268,6 +270,10 @@ if (typeof Vue === 'undefined') {
     },
 
     computed: {
+        locale: {
+            get() { return _locale.value; },
+            set(v) { _locale.value = v; localStorage.setItem('smc-locale', v); }
+        },
         filteredPlatforms() {
             return this.platforms.filter(p => p.region === this.platformRegion);
         },
@@ -317,7 +323,7 @@ if (typeof Vue === 'undefined') {
                     if (p) this.platformRegion = p.region;
                 }
                 console.log('🔄 已自动恢复上次编辑内容');
-                this.showToast('🔄 已自动恢复上次编辑内容');
+                this.showToast(this.$t('toast.autoRestore'));
             } catch (e) {
                 console.error('自动恢复失败:', e);
             }
@@ -358,7 +364,7 @@ if (typeof Vue === 'undefined') {
         });
 
         console.log('📊 当前平台:', this.currentPlatform);
-        this.showToast('🎉 社交媒体创作器已就绪！');
+        this.showToast(this.$t('toast.ready'));
     },
 
     methods: {
@@ -401,8 +407,8 @@ if (typeof Vue === 'undefined') {
             const methodName = 'getDefault' + platform.charAt(0).toUpperCase() + platform.slice(1) + 'Data';
             if (this[methodName]) {
                 this.projectData[platform] = this[methodName]();
-                const name = this.platforms.find(p => p.id === platform)?.name || platform;
-                this.showToast('🔄 ' + name + ' 已重置为空白内容');
+                const name = this.$t('platform.' + platform);
+                this.showToast(this.$t('toast.reset', {name}));
             }
         },
 
@@ -423,8 +429,8 @@ if (typeof Vue === 'undefined') {
                 addedAt: new Date().toLocaleString('zh-CN')
             });
             this.editingUniversalIndex = -1;
-            const platformName = this.platforms.find(p => p.id === platform)?.name || platform;
-            this.showToast('✅ ' + platformName + ' 已添加到综合页面（共 ' + this.universalData.items.length + ' 个模块）');
+            const platformName = this.$t('platform.' + platform);
+            this.showToast(this.$t('toast.addedUniversal', {name: platformName, count: this.universalData.items.length}));
         },
 
         updateUniversalItem() {
@@ -439,8 +445,8 @@ if (typeof Vue === 'undefined') {
             };
             this.universalData = { ...this.universalData };
             this.editingUniversalIndex = -1;
-            const platformName = this.platforms.find(p => p.id === platform)?.name || platform;
-            this.showToast('✅ ' + platformName + ' 已更新到综合页面');
+            const platformName = this.$t('platform.' + platform);
+            this.showToast(this.$t('toast.updatedUniversal', {name: platformName}));
         },
 
         updateUniversalData(newData) {
@@ -454,7 +460,7 @@ if (typeof Vue === 'undefined') {
             this.currentPlatform = item.platform;
             this.editingUniversalIndex = idx;
             this.currentView = 'single';
-            this.showToast('✏️ 已加载模块到编辑器，编辑完点击「更新综合页面」');
+            this.showToast(this.$t('toast.editHint'));
         },
 
         /**
@@ -487,7 +493,7 @@ if (typeof Vue === 'undefined') {
         confirmSaveProject() {
             const project = {
                 id: this.projectId || StorageUtil.generateId(),
-                name: this.saveProjectName || '未命名项目',
+                name: this.saveProjectName || this.$t('default.projectName'),
                 platform: this.currentPlatform,
                 data: this.projectData,
                 universalData: this.universalData,
@@ -499,9 +505,9 @@ if (typeof Vue === 'undefined') {
                 this.showSaveModal = false;
                 this.loadSavedProjectsList();
                 localStorage.removeItem('social-media-creator-autosave');
-                this.showToast('✅ 项目保存成功！');
+                this.showToast(this.$t('toast.saveSuccess'));
             } else {
-                this.showToast('❌ 保存失败，请重试');
+                this.showToast(this.$t('toast.saveFail'));
             }
         },
 
@@ -523,9 +529,9 @@ if (typeof Vue === 'undefined') {
                 this.universalData = project.universalData || { items: [] };
                 this._migrateData();
                 this.showLoadModal = false;
-                this.showToast('✅ 项目加载成功！');
+                this.showToast(this.$t('toast.loadSuccess'));
             } catch (e) {
-                this.showToast('❌ 加载失败：数据格式错误');
+                this.showToast(this.$t('toast.loadFail'));
             }
         },
 
@@ -533,10 +539,10 @@ if (typeof Vue === 'undefined') {
          * 删除项目
          */
         deleteProject(index) {
-            if (confirm('确定删除这个项目吗？')) {
+            if (confirm(this.$t('confirm.deleteProject'))) {
                 StorageUtil.delete(index);
                 this.loadSavedProjectsList();
-                this.showToast('🗑️ 项目已删除');
+                this.showToast(this.$t('toast.deleted'));
             }
         },
 
@@ -544,13 +550,13 @@ if (typeof Vue === 'undefined') {
          * 清除所有数据
          */
         clearAllData() {
-            if (confirm('⚠️ 确定清除所有保存的数据吗？此操作不可恢复！')) {
+            if (confirm(this.$t('confirm.clearAll'))) {
                 localStorage.removeItem(StorageUtil.STORAGE_KEY);
                 this.savedProjects = [];
                 this.projectId = null;
                 this.projectData = this.getDefaultData();
                 this.universalData = { items: [] };
-                this.showToast('✅ 所有数据已清除');
+                this.showToast(this.$t('toast.cleared'));
                 console.log('🗑️ 已清除所有数据');
             }
         },
@@ -841,7 +847,7 @@ if (typeof Vue === 'undefined') {
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            this.showToast('📤 配置文件已导出');
+            this.showToast(this.$t('toast.configExported'));
         },
 
         /**
@@ -859,12 +865,12 @@ if (typeof Vue === 'undefined') {
                         this.projectData = { ...this.getDefaultData(), ...config.data };
                         this.currentPlatform = config.platform || 'instagram';
                         this.universalData = config.universalData || { items: [] };
-                        this.showToast('📥 配置导入成功！');
+                        this.showToast(this.$t('toast.configImported'));
                     } else {
-                        this.showToast('❌ 配置文件格式错误');
+                        this.showToast(this.$t('toast.configFormatError'));
                     }
                 } catch (err) {
-                    this.showToast('❌ 文件解析失败');
+                    this.showToast(this.$t('toast.configParseError'));
                 }
             };
             reader.readAsText(file);
@@ -880,18 +886,18 @@ if (typeof Vue === 'undefined') {
         exportHTML() {
             const previewEl = this.$refs.previewContent;
             if (!previewEl) {
-                this.showToast('❌ 没有可导出的内容');
+                this.showToast(this.$t('toast.noContent'));
                 return;
             }
 
             try {
                 const html = ExporterUtil.exportHTML(previewEl, this.currentPlatform);
-                const platformName = this.platforms.find(p => p.id === this.currentPlatform)?.name || 'social';
+                const platformName = this.$t('platform.' + this.currentPlatform);
                 ExporterUtil.downloadHTML(html, `${platformName}-content.html`);
-                this.showToast('📥 HTML 文件已下载！');
+                this.showToast(this.$t('toast.htmlDownloaded'));
             } catch (e) {
-                console.error('导出失败:', e);
-                this.showToast('❌ 导出失败：' + e.message);
+                console.error('Export failed:', e);
+                this.showToast(this.$t('toast.exportFailed') + e.message);
             }
         },
 
@@ -901,14 +907,14 @@ if (typeof Vue === 'undefined') {
         async copyHTML() {
             const previewEl = this.$refs.previewContent;
             if (!previewEl) {
-                this.showToast('❌ 没有可复制的内容');
+                this.showToast(this.$t('toast.noContentCopy'));
                 return;
             }
 
             try {
                 const html = ExporterUtil.copyHTMLFragment(previewEl, this.currentPlatform);
                 await navigator.clipboard.writeText(html);
-                this.showToast('📋 HTML 已复制到剪贴板！');
+                this.showToast(this.$t('toast.htmlCopied'));
             } catch (e) {
                 try {
                     const html = ExporterUtil.copyHTMLFragment(previewEl, this.currentPlatform);
@@ -920,9 +926,9 @@ if (typeof Vue === 'undefined') {
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    this.showToast('📋 HTML 已复制到剪贴板！');
+                    this.showToast(this.$t('toast.htmlCopied'));
                 } catch (e2) {
-                    this.showToast('❌ 复制失败，请手动导出 HTML');
+                    this.showToast(this.$t('toast.copyFailed'));
                 }
             }
         },
@@ -930,33 +936,33 @@ if (typeof Vue === 'undefined') {
         exportCompatible() {
             const previewEl = this.$refs.previewContent;
             if (!previewEl) {
-                this.showToast('❌ 没有可导出的内容');
+                this.showToast(this.$t('toast.noContent'));
                 return;
             }
 
             try {
-                const platformName = this.platforms.find(p => p.id === this.currentPlatform)?.name || 'social';
+                const platformName = this.$t('platform.' + this.currentPlatform);
                 const html = ExporterUtil.exportCompatibleHTML(previewEl, this.currentPlatform);
                 ExporterUtil.downloadText(html, `${platformName}-compatible.html`);
-                this.showToast('📥 兼容 HTML 已下载！');
+                this.showToast(this.$t('toast.compatDownloaded'));
             } catch (e) {
-                console.error('导出失败:', e);
-                this.showToast('❌ 导出失败：' + e.message);
+                console.error('Export failed:', e);
+                this.showToast(this.$t('toast.exportFailed') + e.message);
             }
         },
 
         async exportImage() {
             const previewEl = this.$refs.previewContent;
             if (!previewEl) {
-                this.showToast('❌ 没有可导出的内容');
+                this.showToast(this.$t('toast.noContent'));
                 return;
             }
             if (typeof html2canvas === 'undefined') {
-                this.showToast('❌ html2canvas 库未加载，请检查网络');
+                this.showToast(this.$t('toast.noHtml2canvas'));
                 return;
             }
             try {
-                this.showToast('⏳ 正在生成图片...');
+                this.showToast(this.$t('toast.generatingImage'));
                 const hdTarget = previewEl.closest('.preview-container') || previewEl;
                 const wasHd = hdTarget.classList.contains('preview-hd');
                 if (!wasHd) hdTarget.classList.add('preview-hd');
@@ -990,14 +996,14 @@ if (typeof Vue === 'undefined') {
                 if (!wasHd) hdTarget.classList.remove('preview-hd');
 
                 const link = document.createElement('a');
-                const platformName = this.platforms.find(p => p.id === this.currentPlatform)?.name || 'social';
+                const platformName = this.$t('platform.' + this.currentPlatform);
                 link.download = `${platformName}-content.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                this.showToast('🖼️ 图片已下载！');
+                this.showToast(this.$t('toast.imageDownloaded'));
             } catch (e) {
-                console.error('导出图片失败:', e);
-                this.showToast('❌ 导出图片失败：' + e.message);
+                console.error('Image export failed:', e);
+                this.showToast(this.$t('toast.imageExportFailed') + e.message);
             }
         }
     }
@@ -1174,6 +1180,18 @@ if (UniversalEditor) {
 } else {
     console.error('❌ UniversalEditor 未加载，无法注册');
 }
+
+// 国际化全局方法
+app.config.globalProperties.$t = function(key, params) {
+    const locale = _locale.value;
+    let text = (I18n[locale] && I18n[locale][key]) || (I18n['zh'] && I18n['zh'][key]) || key;
+    if (params) {
+        for (const k of Object.keys(params)) {
+            text = text.split('{' + k + '}').join(params[k]);
+        }
+    }
+    return text;
+};
 
 // 挂载
 try {

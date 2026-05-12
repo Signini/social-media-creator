@@ -8,7 +8,7 @@ const UniversalEditor = {
     template: `
     <div class="universal-layout">
         <aside class="universal-sidebar">
-            <div class="section-title">📋 已添加模块 ({{ universalData.items.length }})</div>
+            <div class="section-title">📋 {{ $t('uni.addedModules') }} ({{ universalData.items.length }})</div>
 
             <div class="universal-item-list" v-if="universalData.items.length > 0">
                 <div class="universal-item"
@@ -31,36 +31,36 @@ const UniversalEditor = {
                         <span class="universal-item-time">{{ item.addedAt }}</span>
                     </div>
                     <div class="universal-item-actions">
-                        <button class="btn btn-small btn-outline" @click.stop="editItem(idx)" title="回到编辑器编辑此模块">✏️</button>
-                        <button class="btn btn-small btn-danger" @click.stop="removeItem(idx)" title="删除此模块">✕</button>
+                        <button class="btn btn-small btn-outline" @click.stop="editItem(idx)" :title="$t('uni.editModule')">✏️</button>
+                        <button class="btn btn-small btn-danger" @click.stop="removeItem(idx)" :title="$t('uni.deleteModule')">✕</button>
                     </div>
                 </div>
             </div>
 
             <div class="empty-state" v-else>
                 <div style="font-size:48px;opacity:0.2;margin-bottom:12px;">📋</div>
-                <p style="font-size:14px;color:#8e8e93;">暂无模块</p>
-                <p style="font-size:12px;color:#aeaeb2;margin-top:4px;">在单平台编辑器中点击<br>"➕ 添加到综合页面"</p>
+                <p style="font-size:14px;color:#8e8e93;">{{ $t('uni.noModules') }}</p>
+                <p style="font-size:12px;color:#aeaeb2;margin-top:4px;">{{ $t('uni.hintPrefix') }}<br>"{{ $t('uni.hintButton') }}"</p>
             </div>
 
             <div class="universal-sidebar-actions" v-if="universalData.items.length > 0">
                 <div class="universal-check-actions">
-                    <button class="btn btn-small btn-outline" @click="checkAll">全选</button>
-                    <button class="btn btn-small btn-outline" @click="uncheckAll">取消全选</button>
-                    <span class="universal-check-count" v-if="checkedIds.size < universalData.items.length">已选 {{ checkedIds.size }}/{{ universalData.items.length }}</span>
+                    <button class="btn btn-small btn-outline" @click="checkAll">{{ $t('uni.selectAll') }}</button>
+                    <button class="btn btn-small btn-outline" @click="uncheckAll">{{ $t('uni.deselectAll') }}</button>
+                    <span class="universal-check-count" v-if="universalData.items.length > 0">{{ $t('uni.selected') }} {{ checkedCount }}/{{ universalData.items.length }}</span>
                 </div>
-                <button class="btn btn-danger" style="width:100%;" @click="clearAll">🗑️ 清空所有模块</button>
+                <button class="btn btn-danger" style="width:100%;" @click="clearAll">{{ $t('uni.clearAll') }}</button>
             </div>
         </aside>
 
         <section class="universal-preview-panel">
             <div class="universal-preview-toolbar">
-                <span class="section-title" style="margin:0;">综合页面预览</span>
+                <span class="section-title" style="margin:0;">{{ $t('uni.preview') }}</span>
                 <div class="preview-actions">
-                    <button class="btn btn-primary" @click="exportHTML">📥 导出 HTML</button>
-                    <button class="btn btn-secondary" @click="exportCompatible">📤 导出兼容 HTML<span v-if="checkedIds.size < universalData.items.length" style="opacity:0.7;font-size:11px;"> ({{ checkedIds.size }}/{{ universalData.items.length }})</span></button>
-                    <button class="btn btn-secondary" @click="copyHTML">📋 复制 HTML</button>
-                    <button class="btn btn-secondary" @click="exportImages">🖼️ 批量导出图片</button>
+                    <button class="btn btn-primary" @click="exportHTML">{{ $t('uni.exportHTML') }}</button>
+                    <button class="btn btn-secondary" @click="exportCompatible">{{ $t('uni.exportCompat') }}<span v-if="checkedCount < universalData.items.length" style="opacity:0.7;font-size:11px;"> ({{ checkedCount }}/{{ universalData.items.length }})</span></button>
+                    <button class="btn btn-secondary" @click="copyHTML">{{ $t('uni.copyHTML') }}</button>
+                    <button class="btn btn-secondary" @click="exportImages">{{ $t('uni.batchExport') }}</button>
                 </div>
             </div>
             <div class="universal-preview-scroll" ref="universalPreview">
@@ -87,7 +87,7 @@ const UniversalEditor = {
                 </div>
                 <div class="empty-state" v-else style="padding:80px 20px;">
                     <div style="font-size:64px;opacity:0.15;margin-bottom:16px;">📄</div>
-                    <p style="font-size:16px;color:#8e8e93;">添加模块后，这里会显示综合预览</p>
+                    <p style="font-size:16px;color:#8e8e93;">{{ $t('uni.emptyPreview') }}</p>
                 </div>
             </div>
         </section>
@@ -105,16 +105,21 @@ const UniversalEditor = {
     mounted() {
         this.syncAllChecked();
     },
+    computed: {
+        checkedCount() {
+            return this.universalData.items.filter(item => this.checkedIds.has(item.id)).length;
+        }
+    },
     watch: {
         'universalData.items': {
             handler(items) {
                 const currentIds = new Set(items.map(i => i.id));
+                const updated = new Set();
                 for (const id of this.checkedIds) {
-                    if (!currentIds.has(id)) this.checkedIds.delete(id);
+                    if (currentIds.has(id)) updated.add(id);
                 }
-                items.forEach(item => {
-                    if (!this.checkedIds.has(item.id)) this.checkedIds.add(item.id);
-                });
+                items.forEach(item => updated.add(item.id));
+                this.checkedIds = updated;
             },
             deep: true
         }
@@ -129,13 +134,7 @@ const UniversalEditor = {
             return map[platformId] || '📱';
         },
         getPlatformName(platformId) {
-            const map = {
-                xiaohongshu: '小红书', instagram: 'Instagram',                 twitter: 'X', reddit: 'Reddit',
-                youtube: 'YouTube', imessage: 'iMessage',
-                whatsapp: 'WhatsApp', wechat: '微信', qq: 'QQ',
-                wechatMoments: '朋友圈'
-            };
-            return map[platformId] || platformId;
+            return this.$t('platform.' + platformId);
         },
         removeItem(idx) {
             const items = [...this.universalData.items];
@@ -174,7 +173,7 @@ const UniversalEditor = {
             this.checkedIds = new Set();
         },
         clearAll() {
-            if (confirm('确定清空所有模块吗？')) {
+            if (confirm(this.$t('uni.confirmClear'))) {
                 this.$emit('update', { items: [] });
             }
         },
@@ -207,22 +206,22 @@ const UniversalEditor = {
         exportHTML() {
             const previewEl = this.$refs.universalPreview;
             if (!previewEl) {
-                this.$emit('export-complete', '❌ 没有可导出的内容');
+                this.$emit('export-complete', this.$t('uni.noExportContent'));
                 return;
             }
             try {
                 const html = ExporterUtil.exportHTML(previewEl, 'universal');
                 ExporterUtil.downloadHTML(html, 'social-media-universal.html');
-                this.$emit('export-complete', '📥 综合页面已导出！');
+                this.$emit('export-complete', this.$t('uni.exportSuccess'));
             } catch (e) {
                 console.error('导出失败:', e);
-                this.$emit('export-complete', '❌ 导出失败：' + e.message);
+                this.$emit('export-complete', this.$t('uni.exportFailed') + e.message);
             }
         },
         exportCompatible() {
             const previewEl = this.$refs.universalPreview;
             if (!previewEl) {
-                this.$emit('export-complete', '❌ 没有可导出的内容');
+                this.$emit('export-complete', this.$t('uni.noExportContent'));
                 return;
             }
             try {
@@ -232,22 +231,22 @@ const UniversalEditor = {
                 });
                 const html = ExporterUtil.exportCompatibleHTML(previewEl, 'universal', { excludeIndices });
                 ExporterUtil.downloadText(html, 'social-media-universal-compatible.html');
-                this.$emit('export-complete', '📥 兼容 HTML 已下载！');
+                this.$emit('export-complete', this.$t('uni.exportSuccess'));
             } catch (e) {
                 console.error('导出失败:', e);
-                this.$emit('export-complete', '❌ 导出失败：' + e.message);
+                this.$emit('export-complete', this.$t('uni.exportFailed') + e.message);
             }
         },
         async copyHTML() {
             const previewEl = this.$refs.universalPreview;
             if (!previewEl) {
-                this.$emit('export-complete', '❌ 没有可复制的内容');
+                this.$emit('export-complete', this.$t('uni.noCopyContent'));
                 return;
             }
             try {
                 const html = ExporterUtil.copyHTMLFragment(previewEl, 'universal');
                 await navigator.clipboard.writeText(html);
-                this.$emit('export-complete', '📋 HTML 已复制到剪贴板！');
+                this.$emit('export-complete', this.$t('uni.copySuccess'));
             } catch (e) {
                 try {
                     const html = ExporterUtil.copyHTMLFragment(previewEl, 'universal');
@@ -259,28 +258,28 @@ const UniversalEditor = {
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    this.$emit('export-complete', '📋 HTML 已复制到剪贴板！');
+                    this.$emit('export-complete', this.$t('uni.copySuccess'));
                 } catch (e2) {
-                    this.$emit('export-complete', '❌ 复制失败');
+                    this.$emit('export-complete', this.$t('uni.copyFailed'));
                 }
             }
         },
         async exportImages() {
             if (typeof html2canvas === 'undefined') {
-                this.$emit('export-complete', '❌ html2canvas 库未加载，请检查网络');
+                this.$emit('export-complete', this.$t('uni.noHtml2canvas'));
                 return;
             }
             const items = this.universalData.items;
             if (!items || items.length === 0) {
-                this.$emit('export-complete', '❌ 没有可导出的内容');
+                this.$emit('export-complete', this.$t('uni.noExportContent'));
                 return;
             }
-            this.$emit('export-complete', '⏳ 正在生成图片 (0/' + items.length + ')...');
+            this.$emit('export-complete', this.$t('uni.generating') + ' (0/' + items.length + ')...');
             const pad = String(items.length).length;
             for (let i = 0; i < items.length; i++) {
                 const sectionEl = this.sectionRefs[i];
                 if (!sectionEl) continue;
-                this.$emit('export-complete', '⏳ 正在生成图片 (' + (i + 1) + '/' + items.length + ')...');
+                this.$emit('export-complete', this.$t('uni.generating') + ' (' + (i + 1) + '/' + items.length + ')...');
                 try {
                     const wasHd = sectionEl.classList.contains('preview-hd');
                     if (!wasHd) sectionEl.classList.add('preview-hd');
@@ -326,7 +325,7 @@ const UniversalEditor = {
                     }
                 }
             }
-            this.$emit('export-complete', '🖼️ 已导出 ' + items.length + ' 张图片！');
+            this.$emit('export-complete', this.$t('uni.exported') + ' ' + items.length + ' ' + this.$t('uni.images') + '!');
         }
     }
 };
