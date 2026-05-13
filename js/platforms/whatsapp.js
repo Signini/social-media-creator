@@ -51,24 +51,24 @@ const WhatsAppEditor = {
     template: `
     <div class="whatsapp-editor">
         <!-- 对话信息 -->
-        <div class="sub-title">👤 对话信息</div>
+        <div class="sub-title">👤 {{ $t('common.chatInfo') }}</div>
         <div class="form-group">
             <div class="toggle-group">
                 <label class="toggle">
                     <input type="checkbox" :checked="data.isGroup" @change="updateField('isGroup', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">群聊模式</span>
+                <span style="font-size:13px;">{{ $t('common.groupMode') }}</span>
             </div>
         </div>
 
         <!-- 群聊设置 -->
         <template v-if="data.isGroup">
             <div class="form-group">
-                <label>群名称</label>
-                <input class="form-input" :value="data.groupName" @input="updateField('groupName', $event.target.value)" placeholder="群名称">
+                <label>{{ $t('common.groupName') }}</label>
+                <input class="form-input" :value="data.groupName" @input="updateField('groupName', $event.target.value)" :placeholder="$t('common.groupName')">
             </div>
-            <div class="sub-title" style="margin-top:12px;">👥 群成员 <span class="hint">({{ (data.groupMembers || []).length }}人)</span></div>
+            <div class="sub-title" style="margin-top:12px;">👥 {{ $t('common.groupMembers') }} <span class="hint">({{ (data.groupMembers || []).length }}{{ $t('common.memberCount') }})</span></div>
             <div class="comment-list">
                 <div class="comment-item" v-for="(m, idx) in (data.groupMembers || [])" :key="idx"
                     :style="{ borderLeft: '3px solid ' + (m.color || '#25d366') }">
@@ -78,14 +78,14 @@ const WhatsAppEditor = {
                     </div>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group" style="margin-bottom:0;">
-                            <input class="form-input" :value="m.name" @input="updateMember(idx, 'name', $event.target.value)" placeholder="名称" style="font-size:12px;">
+                            <input class="form-input" :value="m.name" @input="updateMember(idx, 'name', $event.target.value)" :placeholder="$t('common.memberName')" style="font-size:12px;">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:11px;">头像色</label>
+                            <label style="font-size:11px;">{{ $t('common.memberAvatarColor') }}</label>
                             <input type="color" :value="m.color || '#25d366'" @input="updateMember(idx, 'color', $event.target.value)" style="width:30px;height:24px;padding:0;border:none;">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:11px;">头像</label>
+                            <label style="font-size:11px;">{{ $t('common.avatar') }}</label>
                             <label class="btn btn-small btn-outline" style="cursor:pointer;font-size:10px;padding:1px 6px;">
                                 📷
                                 <input type="file" accept="image/*" @change="handleMemberAvatar(idx, $event)" hidden>
@@ -94,40 +94,40 @@ const WhatsAppEditor = {
                     </div>
                     <div class="ext-url-row" style="margin-top:4px;">
                         <span class="ext-url-label">🔗</span>
-                        <input class="form-input ext-url-input" :value="m.avatarUrl" @input="updateMember(idx, 'avatarUrl', $event.target.value)" placeholder="外部头像链接（AO3用）" style="font-size:11px;">
+                        <input class="form-input ext-url-input" :value="m.avatarUrl" @input="updateMember(idx, 'avatarUrl', $event.target.value)" :placeholder="$t('common.externalLinkShort')" style="font-size:11px;">
                     </div>
                 </div>
-                <button class="add-comment-btn" @click="addMember">➕ 添加成员</button>
+                <button class="add-comment-btn" @click="addMember">{{ $t('common.addMember') }}</button>
             </div>
         </template>
 
         <!-- 单聊设置 -->
         <template v-else>
             <div class="form-group">
-                <label>联系人头像</label>
+                <label>{{ $t('common.contactAvatar') }}</label>
                 <div class="image-upload" :class="{ 'has-image': data.contactAvatar }" @click="$refs.avatarInput.click()" style="width:80px;height:80px;border-radius:50%;">
                     <template v-if="data.contactAvatar">
                         <img :src="data.contactAvatar" alt="avatar" style="border-radius:50%;">
                         <button class="remove-image" @click.stop="updateField('contactAvatar', '')">✕</button>
                     </template>
                     <div v-else class="upload-placeholder">
-                        <span>📷</span><small>头像</small>
+                        <span>📷</span><small>{{ $t('common.avatar') }}</small>
                     </div>
                 </div>
                 <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'contactAvatar')" hidden>
                 <div class="ext-url-row">
                     <span class="ext-url-label">🔗</span>
-                    <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                    <input class="form-input ext-url-input" :value="data.contactAvatarUrl" @input="updateField('contactAvatarUrl', $event.target.value)" :placeholder="$t('common.externalLinkShort')">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>联系人名称</label>
-                    <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" placeholder="联系人名称">
+                    <label>{{ $t('common.contactName') }}</label>
+                    <input class="form-input" :value="data.contactName" @input="updateField('contactName', $event.target.value)" :placeholder="$t('common.contactName')">
                 </div>
                 <div class="form-group">
-                    <label>在线状态</label>
-                    <input class="form-input" :value="data.contactStatus" @input="updateField('contactStatus', $event.target.value)" placeholder="如: 在线">
+                    <label>{{ $t('wa.contactStatus') }}</label>
+                    <input class="form-input" :value="data.contactStatus" @input="updateField('contactStatus', $event.target.value)" :placeholder="$t('wa.phOnline')">
                 </div>
             </div>
         </template>
@@ -135,22 +135,22 @@ const WhatsAppEditor = {
         <div class="section-divider"></div>
 
         <!-- 皮肤选择 -->
-        <div class="sub-title">🎨 聊天皮肤</div>
+        <div class="sub-title">🎨 {{ $t('common.chatSkin') }}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
             <div v-for="t in themes" :key="t.id"
                 @click="selectTheme(t.id)"
                 :style="{ background: t.bg, border: data.theme === t.id ? '3px solid #007aff' : '3px solid #e0e0e0', borderRadius: '8px', padding: '8px 12px', width: '70px', textAlign: 'center', fontSize: '11px', lineHeight: 1.3 }">
                 <div :style="{ width: '100%', height: '6px', borderRadius: '3px', background: t.header, marginBottom: '4px' }"></div>
-                {{ t.name }}
+                {{ $t('wa.theme.' + t.id) }}
             </div>
         </div>
         <div v-if="data.theme === 'custom'" class="form-row">
             <div class="form-group">
-                <label>背景色</label>
+                <label>{{ $t('wa.bgColor') }}</label>
                 <input type="color" :value="data.customBgColor || '#efeae2'" @input="updateField('customBgColor', $event.target.value)" style="width:100%;height:32px;">
             </div>
             <div class="form-group">
-                <label>头部色</label>
+                <label>{{ $t('wa.headerColor') }}</label>
                 <input type="color" :value="data.customHeaderColor || '#075e54'" @input="updateField('customHeaderColor', $event.target.value)" style="width:100%;height:32px;">
             </div>
         </div>
@@ -160,8 +160,8 @@ const WhatsAppEditor = {
         <!-- 其他设置 -->
         <div class="form-row">
             <div class="form-group">
-                <label>日期标签</label>
-                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" placeholder="如: 今天">
+                <label>{{ $t('common.dateLabel') }}</label>
+                <input class="form-input" :value="data.dateSeparator" @input="updateField('dateSeparator', $event.target.value)" :placeholder="$t('common.dateLabel')">
             </div>
         </div>
         <div class="form-group">
@@ -170,12 +170,12 @@ const WhatsAppEditor = {
                     <input type="checkbox" :checked="data.showReadReceipt" @change="updateField('showReadReceipt', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">显示已读回执</span>
+                <span style="font-size:13px;">{{ $t('common.readReceipt') }}</span>
             </div>
         </div>
         <div class="form-group" v-if="data.showReadReceipt">
-            <label>回执文字</label>
-            <input class="form-input" :value="data.readReceiptText" @input="updateField('readReceiptText', $event.target.value)" placeholder="如: 已读">
+            <label>{{ $t('common.receiptText') }}</label>
+            <input class="form-input" :value="data.readReceiptText" @input="updateField('readReceiptText', $event.target.value)" :placeholder="$t('common.receiptText')">
         </div>
         <div class="form-group">
             <div class="toggle-group">
@@ -183,14 +183,14 @@ const WhatsAppEditor = {
                     <input type="checkbox" :checked="data.showTyping" @change="updateField('showTyping', $event.target.checked)">
                     <span class="toggle-slider"></span>
                 </label>
-                <span style="font-size:13px;">显示正在输入...</span>
+                <span style="font-size:13px;">{{ $t('common.showTypingLabel') }}</span>
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 消息列表 -->
-        <div class="sub-title">💬 消息 <span class="hint">({{ data.messages.length }}条)</span></div>
+        <div class="sub-title">💬 {{ $t('common.messages') }} <span class="hint">({{ data.messages.length }}{{ $t('common.count') }})</span></div>
         <div class="comment-list">
             <div class="comment-item" v-for="(msg, idx) in data.messages" :key="idx"
                 draggable="true"
@@ -203,11 +203,11 @@ const WhatsAppEditor = {
                 <div class="comment-header">
                     <span>
                         <strong :style="{ color: msg.type === 'sent' ? '#075e54' : msg.type === 'system' ? '#ff9500' : msg.type === 'timeSeparator' ? '#007aff' : '#333' }">
-                            {{ msg.type === 'sent' ? '→ 发送' : msg.type === 'received' ? '← 收到' : msg.type === 'system' ? '🔔 系统' : '🕐 时间' }}
+                            {{ msg.type === 'sent' ? $t('common.msgSent') : msg.type === 'received' ? $t('common.msgReceived') : msg.type === 'system' ? $t('common.msgSystem') : $t('common.msgTime') }}
                         </strong>
                     </span>
                     <div style="display:flex;gap:4px;align-items:center;">
-                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" title="在下方插入消息"
+                        <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" :title="$t('common.insertBelow')"
                             @click="insertMessage(idx)">⬇</button>
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;"
                             @click="toggleType(idx)">⇄</button>
@@ -218,66 +218,66 @@ const WhatsAppEditor = {
                 <!-- System Message Editor -->
                 <template v-if="msg.type === 'system'">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">模板类型</label>
+                        <label style="font-size:12px;">{{ $t('wa.templateType') }}</label>
                         <select class="form-input" :value="msg.systemType || 'custom'" @change="updateMessage(idx, 'systemType', $event.target.value)" style="font-size:12px;">
-                            <option value="addMember">➕ 添加成员</option>
-                            <option value="join">🔗 通过链接加入</option>
-                            <option value="leave">🚪 退出群聊</option>
-                            <option value="remove">❌ 移出群聊</option>
-                            <option value="changeName">✏️ 修改群名</option>
-                            <option value="changeDesc">📝 修改群描述</option>
-                            <option value="setAdmin">👑 设为管理员</option>
-                            <option value="revokeAdmin">👤 撤销管理员</option>
-                            <option value="custom">💬 自定义</option>
+                            <option value="addMember">{{ $t('wa.tmpl.addMember') }}</option>
+                            <option value="join">{{ $t('wa.tmpl.joinLink') }}</option>
+                            <option value="leave">{{ $t('wa.tmpl.leaveGroup') }}</option>
+                            <option value="remove">{{ $t('wa.tmpl.removeMember') }}</option>
+                            <option value="changeName">{{ $t('wa.tmpl.renameGroup') }}</option>
+                            <option value="changeDesc">{{ $t('wa.tmpl.editDesc') }}</option>
+                            <option value="setAdmin">{{ $t('wa.tmpl.setAdmin') }}</option>
+                            <option value="revokeAdmin">{{ $t('wa.tmpl.removeAdmin') }}</option>
+                            <option value="custom">{{ $t('wa.tmpl.custom') }}</option>
                         </select>
                     </div>
                     <template v-if="msg.systemType === 'custom'">
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">自定义内容</label>
+                            <label style="font-size:12px;">{{ $t('wa.customContent') }}</label>
                             <textarea class="form-input" :value="msg.systemText || ''"
                                 @input="updateMessage(idx, 'systemText', $event.target.value)"
-                                placeholder="输入自定义系统消息" rows="2"
+                                :placeholder="$t('wa.phCustomMsg')" rows="2"
                                 style="font-size:13px;min-height:36px;"></textarea>
                         </div>
                     </template>
                     <template v-else>
                         <div v-if="needsActor(msg.systemType)" class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">操作者</label>
+                            <label style="font-size:12px;">{{ $t('wa.actor') }}</label>
                             <select class="form-input" :value="msg.systemActor !== undefined ? msg.systemActor : -1" @change="updateMessage(idx, 'systemActor', parseInt($event.target.value))" style="font-size:12px;">
-                                <option value="-1">我</option>
+                                <option value="-1">{{ $t('wa.me') }}</option>
                                 <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
                             </select>
                         </div>
                         <div v-if="needsTarget(msg.systemType)" class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">目标成员</label>
+                            <label style="font-size:12px;">{{ $t('wa.targetMember') }}</label>
                             <select class="form-input" :value="msg.systemTarget || 0" @change="updateMessage(idx, 'systemTarget', parseInt($event.target.value))" style="font-size:12px;">
                                 <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
                             </select>
                         </div>
                         <div v-if="needsText(msg.systemType)" class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">{{ msg.systemType === 'changeName' ? '新群名' : '内容' }}</label>
-                            <input class="form-input" :value="msg.systemText || ''" @input="updateMessage(idx, 'systemText', $event.target.value)" :placeholder="msg.systemType === 'changeName' ? '输入新群名' : '输入内容'" style="font-size:12px;">
+                            <label style="font-size:12px;">{{ msg.systemType === 'changeName' ? $t('wa.newGroupName') : $t('wa.customContent') }}</label>
+                            <input class="form-input" :value="msg.systemText || ''" @input="updateMessage(idx, 'systemText', $event.target.value)" :placeholder="msg.systemType === 'changeName' ? $t('wa.phNewGroupName') : $t('wa.phContent')" style="font-size:12px;">
                         </div>
                     </template>
                     <div style="font-size:11px;color:#888;margin-top:4px;padding:4px 8px;background:#f5f5f5;border-radius:4px;">
-                        预览：{{ getSystemPreview(msg) }}
+                        {{ $t('wa.preview') }}{{ getSystemPreview(msg) }}
                     </div>
                 </template>
 
                 <!-- Time Separator Editor -->
                 <template v-else-if="msg.type === 'timeSeparator'">
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">时间文字</label>
+                        <label style="font-size:12px;">{{ $t('common.msgTime') }}</label>
                         <input class="form-input" :value="msg.text || ''"
                             @input="updateMessage(idx, 'text', $event.target.value)"
-                            placeholder="如：上午 11:00" style="font-size:13px;">
+                            :placeholder="$t('wa.phTime')" style="font-size:13px;">
                     </div>
                 </template>
 
                 <!-- Normal Message Editor (sent/received) -->
                 <template v-else>
                     <div v-if="data.isGroup && msg.type === 'received'" class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">发送者</label>
+                        <label style="font-size:12px;">{{ $t('common.sender') }}</label>
                         <select class="form-input" :value="msg.sender || 0" @change="updateMessage(idx, 'sender', parseInt($event.target.value))" style="font-size:12px;">
                             <option v-for="(m, mi) in (data.groupMembers || [])" :key="mi" :value="mi">{{ m.name }}</option>
                         </select>
@@ -285,11 +285,11 @@ const WhatsAppEditor = {
                     <div class="form-group" style="margin-bottom:8px;">
                         <textarea class="form-input" :value="msg.text"
                             @input="updateMessage(idx, 'text', $event.target.value)"
-                            placeholder="消息内容" rows="2"
+                            :placeholder="$t('common.msgContent')" rows="2"
                             style="font-size:13px;min-height:36px;"></textarea>
                     </div>
                     <div class="form-group" style="margin-bottom:8px;">
-                        <label style="font-size:12px;">图片</label>
+                        <label style="font-size:12px;">{{ $t('common.image') }}</label>
                         <div style="display:flex;align-items:center;gap:8px;">
                             <div v-if="msg.image" style="position:relative;">
                                 <img :src="msg.image" style="width:60px;height:40px;border-radius:4px;object-fit:cover;">
@@ -302,7 +302,7 @@ const WhatsAppEditor = {
                         </div>
                         <div class="ext-url-row" style="margin-top:4px;">
                             <span class="ext-url-label">🔗</span>
-                            <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）" style="font-size:11px;">
+                            <input class="form-input ext-url-input" :value="msg.imageUrl" @input="updateMessage(idx, 'imageUrl', $event.target.value)" :placeholder="$t('common.externalLinkShort')" style="font-size:11px;">
                         </div>
                     </div>
                             <div class="form-group" style="margin-bottom:8px;">
@@ -311,17 +311,17 @@ const WhatsAppEditor = {
                                         <input type="checkbox" :checked="msg.isVoice" @change="updateMessage(idx, 'isVoice', $event.target.checked)">
                                         <span class="toggle-slider"></span>
                                     </label>
-                                    <span style="font-size:12px;">语音消息</span>
+                                    <span style="font-size:12px;">{{ $t('common.voiceMsg') }}</span>
                                 </div>
                             </div>
                             <template v-if="msg.isVoice">
                                 <div class="form-group" style="margin-bottom:8px;">
-                                    <label style="font-size:12px;">⏱ 时长</label>
+                                    <label style="font-size:12px;">{{ $t('common.duration') }}</label>
                                     <input class="form-input" :value="msg.voiceDuration" @input="updateMessage(idx, 'voiceDuration', $event.target.value)" placeholder="0:05" style="font-size:12px;">
                                 </div>
                                 <div class="form-group" style="margin-bottom:8px;">
-                                    <label style="font-size:12px;">📝 转文字内容</label>
-                                    <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" placeholder="语音转文字内容（可选）" style="font-size:12px;">
+                                    <label style="font-size:12px;">{{ $t('common.transcription') }}</label>
+                                    <input class="form-input" :value="msg.voiceTranscription" @input="updateMessage(idx, 'voiceTranscription', $event.target.value)" :placeholder="$t('common.phTranscription')" style="font-size:12px;">
                                 </div>
                             </template>
                     <div class="form-group" style="margin-bottom:8px;">
@@ -330,54 +330,54 @@ const WhatsAppEditor = {
                                 <input type="checkbox" :checked="msg.isCall" @change="updateMessage(idx, 'isCall', $event.target.checked)">
                                 <span class="toggle-slider"></span>
                             </label>
-                            <span style="font-size:12px;">通话记录</span>
+                            <span style="font-size:12px;">{{ $t('common.call') }}</span>
                         </div>
                     </div>
                     <template v-if="msg.isCall">
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">通话类型</label>
+                            <label style="font-size:12px;">{{ $t('common.callType') }}</label>
                             <select class="form-input" :value="msg.callType || 'voice'" @change="updateMessage(idx, 'callType', $event.target.value)" style="font-size:12px;">
-                                <option value="voice">📞 语音通话</option>
-                                <option value="video">📹 视频通话</option>
+                                <option value="voice">{{ $t('common.voiceCall') }}</option>
+                                <option value="video">{{ $t('common.videoCall') }}</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">通话状态</label>
+                            <label style="font-size:12px;">{{ $t('common.callStatus') }}</label>
                             <select class="form-input" :value="msg.callStatus || 'answered'" @change="updateMessage(idx, 'callStatus', $event.target.value)" style="font-size:12px;">
-                                <option value="answered">✅ 已接听</option>
-                                <option value="missed">❌ 未接听</option>
-                                <option value="declined">🚫 已拒绝</option>
+                                <option value="answered">{{ $t('common.answered') }}</option>
+                                <option value="missed">{{ $t('common.missed') }}</option>
+                                <option value="declined">{{ $t('common.declined') }}</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin-bottom:8px;">
-                            <label style="font-size:12px;">⏱ 通话时长</label>
+                            <label style="font-size:12px;">{{ $t('common.callDuration') }}</label>
                             <input class="form-input" :value="msg.callDuration" @input="updateMessage(idx, 'callDuration', $event.target.value)" placeholder="5:23" style="font-size:12px;">
                         </div>
                     </template>
                     <div class="form-row" style="margin-bottom:0;">
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px;">时间</label>
-                            <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" placeholder="时间" style="font-size:12px;">
+                            <label style="font-size:12px;">{{ $t('common.msgTime') }}</label>
+                            <input class="form-input" :value="msg.time" @input="updateMessage(idx, 'time', $event.target.value)" :placeholder="$t('common.msgTime')" style="font-size:12px;">
                         </div>
                         <div class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px;">表情回应</label>
-                            <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" placeholder="如: ❤️" style="font-size:12px;">
+                            <label style="font-size:12px;">{{ $t('common.reaction') }}</label>
+                            <input class="form-input" :value="msg.reaction" @input="updateMessage(idx, 'reaction', $event.target.value)" :placeholder="$t('wa.phReaction')" style="font-size:12px;">
                         </div>
                         <div v-if="msg.type === 'sent'" class="form-group" style="margin-bottom:0;">
-                            <label style="font-size:12px;">已读状态</label>
+                            <label style="font-size:12px;">{{ $t('wa.readStatus') }}</label>
                             <select class="form-input" :value="msg.ticks || 'sent'" @change="updateMessage(idx, 'ticks', $event.target.value)" style="font-size:12px;">
-                                <option value="sent">已发送 ✓</option>
-                                <option value="delivered">已送达 ✓✓</option>
-                                <option value="read">已读 ✓✓</option>
+                                <option value="sent">{{ $t('wa.ticksSent') }}</option>
+                                <option value="delivered">{{ $t('wa.ticksDelivered') }}</option>
+                                <option value="read">{{ $t('wa.ticksRead') }}</option>
                             </select>
                         </div>
                     </div>
                 </template>
             </div>
-            <button class="add-comment-btn" @click="addMessage">➕ 添加消息</button>
+            <button class="add-comment-btn" @click="addMessage">{{ $t('common.addMessage') }}</button>
             <div style="display:flex;gap:6px;margin-top:4px;">
-                <button class="add-comment-btn" style="background:#ff9500;" @click="addSystemMessage">🔔 系统消息</button>
-                <button class="add-comment-btn" style="background:#007aff;" @click="addTimeSeparator">🕐 时间标签</button>
+                <button class="add-comment-btn" style="background:#ff9500;" @click="addSystemMessage">{{ $t('common.addSystemMsg') }}</button>
+                <button class="add-comment-btn" style="background:#007aff;" @click="addTimeSeparator">{{ $t('common.addTimeLabel') }}</button>
             </div>
         </div>
     </div>
@@ -566,8 +566,8 @@ const WhatsAppPreview = {
                 <div v-else class="wa-header-avatar">{{ (data.contactName || 'U')[0].toUpperCase() }}</div>
             </template>
             <div class="wa-header-info">
-                <div class="wa-header-name">{{ data.isGroup ? (data.groupName || '群聊') : (data.contactName || '联系人') }}</div>
-                <div class="wa-header-status">{{ data.isGroup ? groupMembersText : (data.contactStatus || '在线') }}</div>
+                <div class="wa-header-name">{{ data.isGroup ? (data.groupName || $t('common.groupChat')) : (data.contactName || $t('common.contact')) }}</div>
+                <div class="wa-header-status">{{ data.isGroup ? groupMembersText : (data.contactStatus || $t('common.online')) }}</div>
             </div>
             <div class="wa-header-actions">
                 <span class="wa-header-action"><span class="wa-emoji-icon">📹</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></span>
@@ -601,9 +601,9 @@ const WhatsAppPreview = {
                 <div v-else-if="msg.isCall" :class="['wa-call-record', 'wa-call-' + (msg.callStatus || 'answered')]">
                     <span class="wa-call-icon"><template v-if="msg.callType === 'video'"><span class="wa-emoji-icon">📹</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></template><template v-else><span class="wa-emoji-icon">📞</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></template></span>
                     <span class="wa-call-text">
-                        <template v-if="msg.callStatus === 'missed'">未接听</template>
-                        <template v-else-if="msg.callStatus === 'declined'">已拒绝</template>
-                        <template v-else>已接听</template>
+                        <template v-if="msg.callStatus === 'missed'">{{ $t('common.missedCall') }}</template>
+                        <template v-else-if="msg.callStatus === 'declined'">{{ $t('common.declinedCall') }}</template>
+                        <template v-else>{{ $t('common.answeredCall') }}</template>
                     </span>
                     <span v-if="msg.callDuration && msg.callStatus !== 'missed' && msg.callStatus !== 'declined'" class="wa-call-duration">{{ msg.callDuration }}</span>
                 </div>
@@ -637,7 +637,7 @@ const WhatsAppPreview = {
                         <img :src="msg.image || msg.imageUrl" alt="">
                     </div>
                     <div v-if="!msg.isVoice && msg.text" class="wa-bubble-text">{{ msg.text }}</div>
-                    <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wa-bubble-empty">（空消息）</div>
+                    <div v-if="!msg.isVoice && !msg.text && !msg.image && !msg.imageUrl" class="wa-bubble-empty">{{ $t('common.emptyMsg') }}</div>
                     <div class="wa-bubble-meta">
                         <span class="wa-bubble-time">{{ msg.time }}</span>
                         <span v-if="msg.type === 'sent' && msg.ticks" :class="['wa-bubble-ticks', msg.ticks === 'read' ? 'wa-ticks-read' : 'wa-ticks-sent']">
@@ -662,13 +662,13 @@ const WhatsAppPreview = {
         </div>
 
         <!-- Read Receipt -->
-        <div v-if="data.showReadReceipt" class="wa-read-receipt">{{ data.readReceiptText || '已读' }}</div>
+        <div v-if="data.showReadReceipt" class="wa-read-receipt">{{ data.readReceiptText || $t('common.read') }}</div>
 
         <!-- Input Bar -->
         <div class="wa-input-bar">
             <span class="wa-input-emoji"><span class="wa-emoji-icon">😀</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg></span>
             <div class="wa-input-field">
-                <span class="wa-input-placeholder">输入消息</span>
+                <span class="wa-input-placeholder">{{ $t('common.typeMessage') }}</span>
             </div>
             <span class="wa-input-attach"><span class="wa-emoji-icon">📎</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z"/></svg></span>
             <span class="wa-send-btn"><span class="wa-emoji-icon">➤</span><svg class="wa-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></span>

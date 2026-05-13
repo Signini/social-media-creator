@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用指南 - 社交媒体内容创作器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.7;
+            padding: 0;
+        }
+        .help-header {
+            background: #fff;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .help-header h1 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .help-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: 1px solid #d1d1d6;
+            background: #fff;
+            color: #007aff;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .help-back:hover {
+            background: #f5f5f7;
+        }
+        .help-body {
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 32px 24px 64px;
+        }
+        .help-body h1 { font-size: 24px; margin-bottom: 16px; }
+        .help-body h2 { font-size: 20px; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid #e5e5e5; }
+        .help-body h3 { font-size: 16px; margin: 20px 0 8px; }
+        .help-body p { margin-bottom: 12px; }
+        .help-body ul, .help-body ol { margin: 8px 0 12px 20px; }
+        .help-body li { margin-bottom: 6px; }
+        .help-body hr { border: none; border-top: 1px solid #e5e5e5; margin: 24px 0; }
+        .help-body strong { font-weight: 600; }
+        .help-body em { font-style: italic; }
+        .help-body code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: 'SF Mono', Menlo, monospace;
+        }
+        .help-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        .help-body th, .help-body td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+            font-size: 14px;
+        }
+        .help-body th {
+            background: #f5f5f7;
+            font-weight: 600;
+        }
+        @media (max-width: 768px) {
+            .help-body { padding: 20px 16px 48px; }
+            .help-body h1 { font-size: 20px; }
+            .help-body h2 { font-size: 17px; }
+            .help-header { padding: 12px 16px; }
+            .help-body th, .help-body td { padding: 6px 8px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="help-header">
+    <h1>📖 使用指南</h1>
+    <a class="help-back" href="index.html">← 返回</a>
+</div>
+
+<div class="help-body">
+
+<h1>社交媒体内容创作器 - 使用指南</h1>
+
+<h2>简介</h2>
+
+<p>社交媒体内容创作器是一款浏览器端工具，用于模拟生成各大社交平台的帖子、聊天记录等界面内容。适用于小说创作、AO3 同人文排版、UI 原型设计等场景。</p>
+
+<p>无需安装，直接打开 <code>index.html</code> 即可使用。</p>
+
+<hr>
+
+<h2>支持的平台</h2>
+
+<h3>国内平台</h3>
+
+<table>
+<thead><tr><th>平台</th><th>功能</th></tr></thead>
+<tbody>
+<tr><td>小红书</td><td>图文帖子、标题、标签、评论（含嵌套回复）、收藏、定位</td></tr>
+<tr><td>微信</td><td>单聊/群聊、文本/图片消息、语音消息、语音/视频通话</td></tr>
+<tr><td>朋友圈</td><td>多条动态、多图（最多9张）、点赞列表、评论回复</td></tr>
+<tr><td>QQ</td><td>单聊/群聊、在线状态、文本/图片消息、语音/视频通话</td></tr>
+</tbody>
+</table>
+
+<h3>国际平台</h3>
+
+<table>
+<thead><tr><th>平台</th><th>功能</th></tr></thead>
+<tbody>
+<tr><td>Instagram</td><td>图片帖子、评论、点赞、定位、认证标识</td></tr>
+<tr><td>X (Twitter)</td><td>推文、图片、转推、引用推文、书签、话题标签</td></tr>
+<tr><td>Reddit</td><td>帖子、投票、评论嵌套、Flair、奖项</td></tr>
+<tr><td>YouTube</td><td>视频缩略图、评论、置顶评论、订阅数</td></tr>
+<tr><td>iMessage</td><td>聊天气泡、已读回执、正在输入、表情回应、通话记录、通知消息</td></tr>
+<tr><td>WhatsApp</td><td>单聊/群聊、消息状态（已发送/已送达/已读）、语音消息、主题配色</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>快速开始</h2>
+
+<h3>1. 选择平台</h3>
+<p>打开页面后，在左侧平台网格中点击目标平台。国内平台和国际平台分为两个标签页。</p>
+
+<h3>2. 编辑内容</h3>
+<p>选择平台后进入编辑器，不同平台提供的编辑选项不同。通用操作包括：</p>
+<ul>
+<li><strong>添加消息/评论</strong>：点击底部按钮添加新条目</li>
+<li><strong>拖拽排序</strong>：长按条目左侧的 <code>⋮⋮</code> 拖动调整顺序</li>
+<li><strong>插入消息</strong>：点击条目右上角的 <code>⬇</code> 按钮，在其下方插入新消息</li>
+<li><strong>切换类型</strong>：点击 <code>⇄</code> 按钮切换消息方向（发送/收到/通知）</li>
+<li><strong>删除条目</strong>：点击 <code>✕</code> 按钮</li>
+</ul>
+
+<h3>3. 预览与导出</h3>
+<p>编辑时右侧实时预览，完成后使用底部工具栏导出：</p>
+<ul>
+<li><strong>导出图片</strong>：生成 PNG 图片，自动启用高清模式</li>
+<li><strong>导出 HTML</strong>：下载完整 HTML 文件</li>
+<li><strong>导出兼容 HTML</strong>：生成适配 AO3 等平台的精简 HTML（去除动画、SVG 等）</li>
+<li><strong>复制 HTML</strong>：复制 HTML 片段到剪贴板</li>
+</ul>
+
+<hr>
+
+<h2>各平台详细说明</h2>
+
+<h3>小红书</h3>
+<ol>
+<li>填写作者昵称和头像</li>
+<li>上传帖子图片（支持本地上传和外部链接）</li>
+<li>填写标题和正文，正文中的 <code>#标签</code> 自动高亮</li>
+<li>添加评论：每条评论可设置用户名、头像、内容、时间、点赞数</li>
+<li>评论支持嵌套回复，回复同样支持自定义头像</li>
+<li>底部可设置互动数据（点赞、收藏、评论数）</li>
+</ol>
+
+<h3>微信 / QQ 聊天</h3>
+<ol>
+<li>设置联系人信息和头像</li>
+<li>发送方消息显示在右侧（蓝色气泡），接收方消息显示在左侧</li>
+<li>支持文本消息、图片消息、文本+图片组合</li>
+<li>支持语音消息（可设置时长和转写文字）</li>
+<li>支持通话记录（语音/视频，可设置通话状态和时长）</li>
+<li>QQ 支持在线状态显示和顶部颜色自定义</li>
+<li>微信支持群聊，可设置不同成员的名称和颜色</li>
+</ol>
+
+<h3>朋友圈</h3>
+<ol>
+<li>添加多条动态，每条动态独立编辑</li>
+<li>每条动态支持最多 9 张图片</li>
+<li>设置点赞列表（逗号分隔昵称）</li>
+<li>添加评论，评论可指定回复对象</li>
+<li>支持定位标签</li>
+</ol>
+
+<h3>iMessage</h3>
+<ol>
+<li>设置联系人名称、头像、副标题</li>
+<li>发送/收到消息，支持文本和图片</li>
+<li>消息回应（emoji 表情回应）</li>
+<li>通话记录（语音通话 / FaceTime，支持已接听/未接听/已拒绝）</li>
+<li><strong>通知消息</strong>：插入系统提示信息（如"该发件人不在你的联系人列表中"），颜色可自定义</li>
+<li>已读回执和正在输入状态</li>
+</ol>
+
+<h3>WhatsApp</h3>
+<ol>
+<li>单聊或群聊模式</li>
+<li>消息状态标记（单勾/双勾/蓝色双勾）</li>
+<li>语音消息（带播放时长和转写文字）</li>
+<li>主题配色（自定义顶部栏颜色和聊天背景颜色）</li>
+<li>群聊成员颜色自动分配</li>
+</ol>
+
+<h3>Instagram / Twitter / Reddit / YouTube</h3>
+<p>这些社交媒体平台的操作流程相似：</p>
+<ol>
+<li>设置用户信息（头像、昵称/用户名、认证标识）</li>
+<li>编辑帖子/推文内容</li>
+<li>上传图片</li>
+<li>添加评论和回复</li>
+<li>调整互动数据（点赞、转发、收藏等）</li>
+</ol>
+<p><strong>平台特色功能：</strong></p>
+<ul>
+<li>Twitter：话题标签高亮、引用推文、话题串</li>
+<li>Reddit：Subreddit 显示、Flair 标签（自定义文字和颜色）、投票数、奖项</li>
+<li>YouTube：视频缩略图、频道信息、置顶评论</li>
+</ul>
+
+<hr>
+
+<h2>综合页面（多平台拼接）</h2>
+<p>将多个平台的模块组合到一个页面中：</p>
+<ol>
+<li>在单个平台编辑完成后，点击底部<strong>「添加到综合页面」</strong>按钮</li>
+<li>切换到<strong>「综合页面」</strong>视图查看所有已添加的模块</li>
+<li>支持拖拽调整模块顺序</li>
+<li>点击模块可返回编辑器修改内容</li>
+<li>支持批量导出：每个模块生成独立的 PNG 图片</li>
+<li><strong>勾选导出</strong>：在侧边栏勾选模块后导出兼容 HTML，CSS 包含全部模块样式，HTML 只包含勾选模块，适合 AO3 章节拆分</li>
+</ol>
+
+<hr>
+
+<h2>图片处理</h2>
+
+<h3>图片上传方式</h3>
+<ul>
+<li><strong>本地上传</strong>：点击上传按钮选择本地图片文件，自动压缩并转为 Base64</li>
+<li><strong>外部链接</strong>：在 <code>🔗</code> 输入框中填写图片 URL（适用于 AO3 导出，导出时保留链接地址）</li>
+</ul>
+<p>两种方式可以同时设置，预览时优先显示本地上传的图片，导出兼容 HTML 时使用外部链接。</p>
+
+<h3>头像设置</h3>
+<p>大多数平台支持自定义头像。未设置头像时会自动生成首字母占位头像。</p>
+
+<hr>
+
+<h2>导出说明</h2>
+
+<h3>导出图片 (PNG)</h3>
+<ul>
+<li>使用 html2canvas 渲染，2 倍分辨率输出</li>
+<li>自动临时切换到高清模式（SVG 图标），导出完成后恢复</li>
+<li>聊天类平台会自动展开所有消息再截图</li>
+<li>综合页面导出时，每个模块生成单独的 PNG</li>
+</ul>
+
+<h3>导出 HTML</h3>
+<p>完整的独立 HTML 文件，包含所有 CSS 样式。可直接在浏览器中打开。</p>
+
+<h3>导出兼容 HTML</h3>
+<p>专为 AO3 等受限平台设计：</p>
+<ul>
+<li>仅保留白名单内的 HTML 标签和属性</li>
+<li>移除 CSS 动画、SVG 样式、交互属性</li>
+<li>Base64 图片替换为 <code>[图片]</code> 占位符</li>
+<li>输出分为 HTML 部分和 CSS 部分，分别粘贴到平台编辑器</li>
+</ul>
+
+<h3>复制 HTML</h3>
+<p>将预览区域的 HTML 和 CSS 复制到剪贴板，方便粘贴到其他工具。</p>
+
+<hr>
+
+<h2>项目管理</h2>
+
+<h3>保存与加载</h3>
+<ul>
+<li>点击顶部<strong>「保存」</strong>按钮保存当前项目到浏览器本地存储</li>
+<li>支持保存多个项目，每个项目记录平台、内容和时间戳</li>
+<li>通过<strong>「加载」</strong>按钮选择已保存的项目恢复</li>
+</ul>
+
+<h3>配置导入/导出</h3>
+<ul>
+<li><strong>导出配置</strong>：将当前内容导出为 JSON 文件</li>
+<li><strong>导入配置</strong>：从 JSON 文件恢复内容</li>
+<li>适合跨设备迁移或备份</li>
+</ul>
+
+<h3>自动保存</h3>
+<p>页面每 2 秒自动保存当前状态，关闭页面前也会保存。重新打开时自动恢复上次的编辑内容。</p>
+
+<hr>
+
+<h2>预览模式</h2>
+<ul>
+<li><strong>手机模式 / 桌面模式</strong>：切换预览区域的显示宽度</li>
+<li><strong>高清模式</strong>：将界面中的 Emoji 图标替换为 SVG 矢量图标，提升导出图片质量。导出图片时会自动临时启用</li>
+</ul>
+
+<hr>
+
+<h2>常见问题</h2>
+
+<p><strong>Q: 导出的图片中图片/头像显示空白？</strong><br>
+A: 确保使用本地上传的图片（Base64），外部链接的图片可能因跨域限制无法被 html2canvas 渲染。</p>
+
+<p><strong>Q: 兼容 HTML 导出后粘贴到 AO3 样式不对？</strong><br>
+A: 确保将 CSS 部分粘贴到 AO3 的 Work Skin 功能中设置为工作区皮肤，HTML 部分粘贴到章节内容的「HTML 编辑器」中，在作品信息中选中对应的 Work Skin 即可。</p>
+
+<p><strong>Q: 聊天消息太多时预览区域显示不全？</strong><br>
+A: 预览区域可以滚动查看。导出图片时会自动展开显示所有消息。</p>
+
+<p><strong>Q: 数据存在哪里？</strong><br>
+A: 所有数据保存在浏览器的 localStorage 中，不会上传到任何服务器。清除浏览器数据会丢失保存的项目。</p>
+
+<p><strong>Q: 支持手机端使用吗？</strong><br>
+A: 页面支持响应式布局，可以在手机浏览器中使用，但建议在桌面端使用以获得更好的编辑体验。</p>
+
+</div>
+</body>
+</html>

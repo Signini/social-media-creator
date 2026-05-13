@@ -32,9 +32,9 @@ const InstagramEditor = {
     template: `
     <div class="instagram-editor">
         <!-- 用户信息 -->
-        <div class="sub-title">👤 用户信息</div>
+        <div class="sub-title">{{ $t('common.userInfo') }}</div>
         <div class="form-group">
-            <label>头像</label>
+            <label>{{ $t('common.avatar') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.avatar }" @click="triggerUpload('avatar')">
                 <template v-if="data.avatar">
                     <img :src="data.avatar" alt="avatar">
@@ -42,40 +42,40 @@ const InstagramEditor = {
                 </template>
                 <div v-else class="upload-placeholder">
                     <span>📷</span>
-                    <small>点击上传头像</small>
+                    <small>{{ $t('common.uploadAvatar') }}</small>
                 </div>
             </div>
             <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'avatar')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.avatarUrl" @input="updateField('avatarUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>用户名</label>
-                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" placeholder="用户名">
+                <label>{{ $t('common.username') }}</label>
+                <input class="form-input" :value="data.username" @input="updateField('username', $event.target.value)" :placeholder="$t('common.username')">
             </div>
             <div class="form-group" style="flex: 0 0 auto;">
-                <label>认证</label>
+                <label>{{ $t('common.verified') }}</label>
                 <div class="toggle-group" style="margin-top:6px;">
                     <label class="toggle">
                         <input type="checkbox" :checked="data.verified" @change="updateField('verified', $event.target.checked)">
                         <span class="toggle-slider"></span>
                     </label>
-                    <span style="font-size:13px;">蓝V</span>
+                    <span style="font-size:13px;">{{ $t('common.blueV') }}</span>
                 </div>
             </div>
         </div>
         <div class="form-group">
-            <label>位置</label>
-            <input class="form-input" :value="data.location" @input="updateField('location', $event.target.value)" placeholder="地理位置（可选）">
+            <label>{{ $t('ig.location') }}</label>
+            <input class="form-input" :value="data.location" @input="updateField('location', $event.target.value)" :placeholder="$t('ig.phLocation')">
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 图片 -->
-        <div class="sub-title">🖼️ 帖子图片</div>
+        <div class="sub-title">{{ $t('ig.postImage') }}</div>
         <div class="form-group">
             <div class="image-upload" :class="{ 'has-image': data.imageUrl }" @click="triggerUpload('image')">
                 <template v-if="data.imageUrl">
@@ -84,27 +84,27 @@ const InstagramEditor = {
                 </template>
                 <div v-else class="upload-placeholder">
                     <span>📷</span>
-                    <small>点击上传图片（建议 1:1 正方形）</small>
+                    <small>{{ $t('ig.uploadPostImage') }}</small>
                 </div>
             </div>
             <input type="file" ref="imageInput" accept="image/*" @change="handleUpload($event, 'imageUrl')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 内容 -->
-        <div class="sub-title">📝 帖子内容</div>
+        <div class="sub-title">{{ $t('ig.postContent') }}</div>
         <div class="form-group">
-            <label>文案</label>
-            <textarea class="form-input" :value="data.caption" @input="updateField('caption', $event.target.value)" rows="4" placeholder="写点什么..."></textarea>
+            <label>{{ $t('ig.caption') }}</label>
+            <textarea class="form-input" :value="data.caption" @input="updateField('caption', $event.target.value)" rows="4" :placeholder="$t('ig.phCaption')"></textarea>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>点赞数</label>
+                <label>{{ $t('ig.likesCount') }}</label>
                 <div class="number-input-group">
                     <button @click="adjustNumber('likes', -1)">−</button>
                     <input :value="formatNumber(data.likes)" @input="updateField('likes', parseNumber($event.target.value))">
@@ -112,18 +112,18 @@ const InstagramEditor = {
                 </div>
             </div>
             <div class="form-group">
-                <label>时间</label>
-                <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" placeholder="如: 2小时前">
+                <label>{{ $t('common.timeLabel') }}</label>
+                <input class="form-input" :value="data.timestamp" @input="updateField('timestamp', $event.target.value)" :placeholder="$t('ig.phTime')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 评论 -->
-        <div class="sub-title">💬 评论区 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="sub-title">{{ $t('common.comments') }} <span class="hint">({{ data.comments.length }}{{ $t('common.count') }})</span></div>
         <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:12px;">显示评论数</label>
+                <label style="font-size:12px;">{{ $t('common.showCommentCount') }}</label>
                 <input class="form-input" type="number" min="0" :value="data.commentCount || data.comments.length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
             </div>
         </div>
@@ -140,13 +140,13 @@ const InstagramEditor = {
                     <button class="remove-comment" @click="removeComment(idx)">✕</button>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" placeholder="用户名" style="font-size:13px;">
+                    <input class="form-input" :value="comment.username" @input="updateComment(idx, 'username', $event.target.value)" :placeholder="$t('common.username')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" style="font-size:13px;">
+                    <input class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" :placeholder="$t('common.phCommentContent')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-size:12px;">点赞</label>
+                    <label style="font-size:12px;">{{ $t('common.like') }}</label>
                     <div class="number-input-group">
                         <button @click="adjustCommentLikes(idx, -1)">−</button>
                         <input :value="comment.likes" @input="updateComment(idx, 'likes', parseInt($event.target.value)||0)">
@@ -155,26 +155,26 @@ const InstagramEditor = {
                     <!-- 嵌套回复 -->
                     <div style="margin-top:10px;padding-left:14px;border-left:2px solid #e9ecef;">
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                            <span style="font-size:12px;font-weight:600;color:#8e8e93;">↳ 回复 ({{ (comment.replies || []).length }})</span>
-                            <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">+ 添加回复</button>
+                            <span style="font-size:12px;font-weight:600;color:#8e8e93;">{{ $t('common.replies') }} ({{ (comment.replies || []).length }})</span>
+                            <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">{{ $t('common.addReply') }}</button>
                         </div>
                         <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" 
                             style="background:#f8f9fa;border-radius:6px;padding:8px 10px;margin-bottom:6px;">
                             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                <span style="font-size:11px;color:#8e8e93;">回复 #{{ rIdx + 1 }}</span>
+                                <span style="font-size:11px;color:#8e8e93;">{{ $t('common.replyHash') }}{{ rIdx + 1 }}</span>
                                 <button style="font-size:11px;color:#ff3b30;background:none;border:none;cursor:pointer;" @click="removeReply(idx, rIdx)">✕</button>
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" placeholder="用户名" style="font-size:12px;padding:4px 8px;">
+                                <input class="form-input" :value="reply.username" @input="updateReply(idx, rIdx, 'username', $event.target.value)" :placeholder="$t('common.username')" style="font-size:12px;padding:4px 8px;">
                             </div>
                             <div class="form-group" style="margin-bottom:4px;">
-                                <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                                <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" :placeholder="$t('common.replyContent')" style="font-size:12px;padding:4px 8px;">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addComment">➕ 添加评论</button>
+            <button class="add-comment-btn" @click="addComment">{{ $t('common.addComment') }}</button>
         </div>
     </div>
     `,
@@ -362,7 +362,7 @@ const InstagramPreview = {
             <template v-else>
                 <div class="ig-image-placeholder">
                     <span>📷</span>
-                    <small>图片区域</small>
+                    <small>{{ $t('common.imageArea') }}</small>
                 </div>
             </template>
         </div>
@@ -392,7 +392,7 @@ const InstagramPreview = {
         </div>
 
         <!-- Likes -->
-        <div class="ig-likes">{{ formatLikes(data.likes) }} 次赞</div>
+        <div class="ig-likes">{{ formatLikes(data.likes) }} {{ $t('ig.likes') }}</div>
 
         <!-- Caption -->
         <div class="ig-caption">
@@ -403,7 +403,7 @@ const InstagramPreview = {
         <!-- Comments -->
         <template v-if="data.comments && data.comments.length > 0">
             <div class="ig-view-comments" v-if="data.comments.length > 2">
-                查看 {{ data.commentCount || data.comments.length }} 条评论
+                {{ $t('ig.view') }} {{ data.commentCount || data.comments.length }} {{ $t('ig.commentsCount') }}
             </div>
             <div class="ig-comments">
                 <div v-for="(comment, idx) in data.comments" :key="idx" class="ig-comment-group">
@@ -431,8 +431,8 @@ const InstagramPreview = {
 
         <!-- Add Comment -->
         <div class="ig-add-comment">
-            <span class="ig-add-comment-placeholder">添加评论...</span>
-            <span class="ig-post-btn">发布</span>
+            <span class="ig-add-comment-placeholder">{{ $t('ig.phAddComment') }}</span>
+            <span class="ig-post-btn">{{ $t('ig.post') }}</span>
         </div>
     </div>
     `,

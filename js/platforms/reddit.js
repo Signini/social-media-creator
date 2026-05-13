@@ -30,41 +30,41 @@ const RedditEditor = {
     emits: ['update'],
     template: `
     <div class="reddit-editor">
-        <div class="sub-title">📌 帖子信息</div>
+        <div class="sub-title">📌 {{ $t('rd.postInfo') }}</div>
         <div class="form-row">
             <div class="form-group">
                 <label>Subreddit</label>
                 <input class="form-input" :value="data.subreddit" @input="updateField('subreddit', $event.target.value)" placeholder="r/...">
             </div>
             <div class="form-group">
-                <label>作者</label>
+                <label>{{ $t('rd.author') }}</label>
                 <input class="form-input" :value="data.author" @input="updateField('author', $event.target.value)" placeholder="u/...">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>FLAIR 标签</label>
-                <input class="form-input" :value="data.flair" @input="updateField('flair', $event.target.value)" placeholder="如: 图片/讨论/新闻">
+                <label>{{ $t('rd.flair') }}</label>
+                <input class="form-input" :value="data.flair" @input="updateField('flair', $event.target.value)" :placeholder="$t('rd.phFlair')">
             </div>
             <div class="form-group">
-                <label>FLAIR 颜色</label>
+                <label>{{ $t('rd.flairColor') }}</label>
                 <input class="form-input" type="color" :value="data.flairColor" @input="updateField('flairColor', $event.target.value)" style="height:36px;padding:2px;">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📝 内容</div>
+        <div class="sub-title">{{ $t('rd.content') }}</div>
         <div class="form-group">
-            <label>标题</label>
-            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" placeholder="帖子标题">
+            <label>{{ $t('rd.title') }}</label>
+            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" :placeholder="$t('rd.phTitle')">
         </div>
         <div class="form-group">
-            <label>正文</label>
-            <textarea class="form-input" :value="data.body" @input="updateField('body', $event.target.value)" rows="5" placeholder="正文内容..."></textarea>
+            <label>{{ $t('rd.body') }}</label>
+            <textarea class="form-input" :value="data.body" @input="updateField('body', $event.target.value)" rows="5" :placeholder="$t('rd.phBody')"></textarea>
         </div>
 
-        <div class="sub-title">🖼️ 图片</div>
+        <div class="sub-title">{{ $t('rd.image') }}</div>
         <div class="form-group">
             <div class="image-upload" :class="{ 'has-image': data.imageUrl }" @click="$refs.imageInput.click()">
                 <template v-if="data.imageUrl">
@@ -72,40 +72,40 @@ const RedditEditor = {
                     <button class="remove-image" @click.stop="updateField('imageUrl', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传图片</small>
+                    <span>📷</span><small>{{ $t('common.uploadImage') }}</small>
                 </div>
             </div>
             <input type="file" ref="imageInput" accept="image/*" @change="handleUpload($event)" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.imageUrlExt" @input="updateField('imageUrlExt', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📊 数据</div>
+        <div class="sub-title">{{ $t('rd.data') }}</div>
         <div class="form-row">
             <div class="form-group">
-                <label>👍 赞</label>
+                <label>{{ $t('rd.upvotes') }}</label>
                 <input class="form-input" type="number" :value="data.upvotes" @input="updateField('upvotes', parseInt($event.target.value)||0)" min="0">
             </div>
             <div class="form-group">
-                <label>👎 踩</label>
+                <label>{{ $t('rd.downvotes') }}</label>
                 <input class="form-input" type="number" :value="data.downvotes" @input="updateField('downvotes', parseInt($event.target.value)||0)" min="0">
             </div>
         </div>
         <div class="form-group">
-            <label>时间</label>
-            <input class="form-input" :value="data.timeAgo" @input="updateField('timeAgo', $event.target.value)" placeholder="如: 3 小时前">
+            <label>{{ $t('common.timeLabel') }}</label>
+            <input class="form-input" :value="data.timeAgo" @input="updateField('timeAgo', $event.target.value)" :placeholder="$t('rd.phTime')">
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">💬 评论 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="sub-title">💬 {{ $t('common.comments') }} <span class="hint">({{ data.comments.length }}{{ $t('common.count') }})</span></div>
         <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:12px;">显示评论数</label>
+                <label style="font-size:12px;">{{ $t('common.showCommentCount') }}</label>
                 <input class="form-input" type="number" min="0" :value="data.commentCount || data.comments.length" @input="updateField('commentCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
             </div>
         </div>
@@ -118,58 +118,58 @@ const RedditEditor = {
                 @drop="onDrop(comment, idx, $event)">
                 <div class="drag-handle">⋮⋮</div>
                 <div class="comment-header">
-                    <span>评论 #{{ idx + 1 }}</span>
+                    <span>{{ $t('rd.commentHash') }}{{ idx + 1 }}</span>
                     <button class="remove-comment" @click="removeComment(idx)">✕</button>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.author" @input="updateComment(idx, 'author', $event.target.value)" placeholder="评论者" style="font-size:13px;">
+                    <input class="form-input" :value="comment.author" @input="updateComment(idx, 'author', $event.target.value)" :placeholder="$t('rd.commenter')" style="font-size:13px;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <textarea class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" rows="2" style="font-size:13px;min-height:40px;"></textarea>
+                    <textarea class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" :placeholder="$t('rd.phComment')" rows="2" style="font-size:13px;min-height:40px;"></textarea>
                 </div>
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">赞</label>
+                        <label style="font-size:12px;">{{ $t('rd.upvotes') }}</label>
                         <input class="form-input" type="number" :value="comment.upvotes" @input="updateComment(idx, 'upvotes', parseInt($event.target.value)||0)" min="0" style="font-size:13px;">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">时间</label>
-                        <input class="form-input" :value="comment.timeAgo" @input="updateComment(idx, 'timeAgo', $event.target.value)" placeholder="时间" style="font-size:13px;">
+                        <label style="font-size:12px;">{{ $t('common.timeLabel') }}</label>
+                        <input class="form-input" :value="comment.timeAgo" @input="updateComment(idx, 'timeAgo', $event.target.value)" :placeholder="$t('common.timeLabel')" style="font-size:13px;">
                     </div>
                 </div>
 
                 <!-- 嵌套回复 -->
                 <div style="margin-top:10px;padding-left:14px;border-left:2px solid #e9ecef;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">↳ 回复 ({{ (comment.replies || []).length }})</span>
-                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">+ 添加回复</button>
+                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">{{ $t('common.replies') }} ({{ (comment.replies || []).length }})</span>
+                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">{{ $t('common.addReply') }}</button>
                     </div>
                     <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" 
                         style="background:#f8f9fa;border-radius:6px;padding:8px 10px;margin-bottom:6px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                            <span style="font-size:11px;color:#8e8e93;">回复 #{{ rIdx + 1 }}</span>
+                            <span style="font-size:11px;color:#8e8e93;">{{ $t('common.replyHash') }}{{ rIdx + 1 }}</span>
                             <button style="font-size:11px;color:#ff3b30;background:none;border:none;cursor:pointer;" @click="removeReply(idx, rIdx)">✕</button>
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.author" @input="updateReply(idx, rIdx, 'author', $event.target.value)" placeholder="回复者" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.author" @input="updateReply(idx, rIdx, 'author', $event.target.value)" :placeholder="$t('common.replyer')" style="font-size:12px;padding:4px 8px;">
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" :placeholder="$t('common.replyContent')" style="font-size:12px;padding:4px 8px;">
                         </div>
                         <div class="form-row" style="margin-bottom:0;">
                             <div class="form-group" style="margin-bottom:0;">
-                                <label style="font-size:11px;">赞</label>
+                                <label style="font-size:11px;">{{ $t('rd.upvotes') }}</label>
                                 <input class="form-input" type="number" :value="reply.upvotes" @input="updateReply(idx, rIdx, 'upvotes', parseInt($event.target.value)||0)" min="0" style="font-size:12px;padding:4px 8px;">
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
-                                <label style="font-size:11px;">时间</label>
-                                <input class="form-input" :value="reply.timeAgo" @input="updateReply(idx, rIdx, 'timeAgo', $event.target.value)" placeholder="时间" style="font-size:12px;padding:4px 8px;">
+                                <label style="font-size:11px;">{{ $t('common.timeLabel') }}</label>
+                                <input class="form-input" :value="reply.timeAgo" @input="updateReply(idx, rIdx, 'timeAgo', $event.target.value)" :placeholder="$t('common.timeLabel')" style="font-size:12px;padding:4px 8px;">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addComment">➕ 添加评论</button>
+            <button class="add-comment-btn" @click="addComment">{{ $t('common.addComment') }}</button>
         </div>
     </div>
     `,
@@ -311,7 +311,7 @@ const RedditPreview = {
                 <div class="rd-post-meta">
                     <span class="rd-subreddit">{{ data.subreddit || 'r/all' }}</span>
                     <span>·</span>
-                    <span>发布者 <span class="rd-post-author">u/{{ data.author || 'username' }}</span></span>
+                    <span>{{ $t('rd.poster') }} <span class="rd-post-author">u/{{ data.author || 'username' }}</span></span>
                     <span>·</span>
                     <span>{{ data.timeAgo || '刚刚' }}</span>
                     <span v-if="data.flair" class="rd-flair" :style="{ background: data.flairColor || '#ff4500' }">{{ data.flair }}</span>
@@ -324,22 +324,22 @@ const RedditPreview = {
                 <div class="rd-post-actions">
                     <div class="rd-action-btn">
                         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-                        {{ data.commentCount || (data.comments ? data.comments.length : 0) }} 评论
+                        {{ data.commentCount || (data.comments ? data.comments.length : 0) }} {{ $t('rd.comment') }}
                     </div>
                     <div class="rd-action-btn">
                         <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-                        分享
+                        {{ $t('rd.share') }}
                     </div>
                     <div class="rd-action-btn">
                         <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-                        保存
+                        {{ $t('rd.save') }}
                     </div>
                 </div>
 
                 <!-- Comments -->
                 <div class="rd-comments" v-if="data.comments && data.comments.length > 0">
                     <div class="rd-comments-header">
-                        <span class="rd-comments-title">{{ data.commentCount || data.comments.length }} 条评论</span>
+                        <span class="rd-comments-title">{{ data.commentCount || data.comments.length }} {{ $t('rd.commentsCount') }}</span>
                     </div>
                     <div v-for="(comment, idx) in data.comments" :key="idx" class="rd-comment">
                         <div class="rd-comment-header">
@@ -351,7 +351,7 @@ const RedditPreview = {
                         <div class="rd-comment-actions">
                             <span class="rd-comment-action rd-vote-up"><span class="rd-emoji-icon">👍</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg> {{ comment.upvotes || 0 }}</span>
                             <span class="rd-comment-action rd-vote-down"><span class="rd-emoji-icon">👎</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></span>
-                            <span class="rd-comment-action">回复</span>
+                            <span class="rd-comment-action">{{ $t('common.replies') }}</span>
                         </div>
                         <!-- Nested Replies -->
                         <template v-if="(comment.replies || []).length > 0">
@@ -364,7 +364,7 @@ const RedditPreview = {
                                 <div class="rd-comment-body">{{ reply.text }}</div>
                                 <div class="rd-comment-actions">
                                     <span class="rd-comment-action rd-vote-up"><span class="rd-emoji-icon">👍</span><svg class="rd-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg> {{ reply.upvotes || 0 }}</span>
-                                    <span class="rd-comment-action">回复</span>
+                                    <span class="rd-comment-action">{{ $t('common.replies') }}</span>
                                 </div>
                             </div>
                         </template>

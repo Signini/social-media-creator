@@ -28,13 +28,13 @@ const YouTubeEditor = {
     emits: ['update'],
     template: `
     <div class="youtube-editor">
-        <div class="sub-title">🎬 视频信息</div>
+        <div class="sub-title">🎬 {{ $t('yt.videoInfo') }}</div>
         <div class="form-group">
-            <label>视频标题</label>
-            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" placeholder="视频标题">
+            <label>{{ $t('yt.videoTitle') }}</label>
+            <input class="form-input" :value="data.title" @input="updateField('title', $event.target.value)" :placeholder="$t('yt.phVideoTitle')">
         </div>
 
-        <div class="sub-title">🖼️ 封面图</div>
+        <div class="sub-title">🖼️ {{ $t('yt.thumbnail') }}</div>
         <div class="form-group">
             <div class="image-upload" :class="{ 'has-image': data.thumbnail }" @click="$refs.thumbInput.click()" style="aspect-ratio:16/9;">
                 <template v-if="data.thumbnail">
@@ -42,84 +42,84 @@ const YouTubeEditor = {
                     <button class="remove-image" @click.stop="updateField('thumbnail', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>🎬</span><small>点击上传封面图（建议 16:9）</small>
+                    <span>🎬</span><small>{{ $t('yt.uploadThumbnail') }}</small>
                 </div>
             </div>
             <input type="file" ref="thumbInput" accept="image/*" @change="handleUpload($event, 'thumbnail')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.thumbnailUrl" @input="updateField('thumbnailUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.thumbnailUrl" @input="updateField('thumbnailUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">👤 频道信息</div>
+        <div class="sub-title">👤 {{ $t('yt.channelInfo') }}</div>
         <div class="form-group">
-            <label>频道头像</label>
+            <label>{{ $t('yt.channelAvatar') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.channelAvatar }" @click="$refs.avatarInput.click()">
                 <template v-if="data.channelAvatar">
                     <img :src="data.channelAvatar" alt="avatar">
                     <button class="remove-image" @click.stop="updateField('channelAvatar', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>点击上传头像</small>
+                    <span>📷</span><small>{{ $t('common.uploadAvatar') }}</small>
                 </div>
             </div>
             <input type="file" ref="avatarInput" accept="image/*" @change="handleUpload($event, 'channelAvatar')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.channelAvatarUrl" @input="updateField('channelAvatarUrl', $event.target.value)" placeholder="外部图片链接（AO3导出用）">
+                <input class="form-input ext-url-input" :value="data.channelAvatarUrl" @input="updateField('channelAvatarUrl', $event.target.value)" :placeholder="$t('common.externalLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>频道名</label>
-                <input class="form-input" :value="data.channelName" @input="updateField('channelName', $event.target.value)" placeholder="频道名称">
+                <label>{{ $t('yt.channelName') }}</label>
+                <input class="form-input" :value="data.channelName" @input="updateField('channelName', $event.target.value)" :placeholder="$t('yt.phChannelName')">
             </div>
             <div class="form-group">
-                <label>订阅数</label>
-                <input class="form-input" :value="data.subscribers" @input="updateField('subscribers', $event.target.value)" placeholder="如: 12.5万">
+                <label>{{ $t('yt.subscribers') }}</label>
+                <input class="form-input" :value="data.subscribers" @input="updateField('subscribers', $event.target.value)" :placeholder="$t('yt.phSubscribers')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📊 数据</div>
+        <div class="sub-title">{{ $t('yt.data') }}</div>
         <div class="form-row">
             <div class="form-group">
-                <label>观看量</label>
+                <label>{{ $t('yt.views') }}</label>
                 <input class="form-input" type="number" :value="data.views" @input="updateField('views', parseInt($event.target.value)||0)" min="0">
             </div>
             <div class="form-group">
-                <label>日期</label>
-                <input class="form-input" :value="data.dateText" @input="updateField('dateText', $event.target.value)" placeholder="如: 2024年3月15日">
+                <label>{{ $t('yt.date') }}</label>
+                <input class="form-input" :value="data.dateText" @input="updateField('dateText', $event.target.value)" :placeholder="$t('yt.phDate')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>👍 喜欢</label>
+                <label>{{ $t('yt.likes') }}</label>
                 <input class="form-input" type="number" :value="data.likes" @input="updateField('likes', parseInt($event.target.value)||0)" min="0">
             </div>
             <div class="form-group">
-                <label>👎 不喜欢</label>
+                <label>{{ $t('yt.dislikes') }}</label>
                 <input class="form-input" type="number" :value="data.dislikes" @input="updateField('dislikes', parseInt($event.target.value)||0)" min="0">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">📝 视频描述</div>
+        <div class="sub-title">📝 {{ $t('yt.videoDesc') }}</div>
         <div class="form-group">
-            <textarea class="form-input" :value="data.description" @input="updateField('description', $event.target.value)" rows="4" placeholder="视频描述..."></textarea>
+            <textarea class="form-input" :value="data.description" @input="updateField('description', $event.target.value)" rows="4" :placeholder="$t('yt.phVideoDesc')"></textarea>
         </div>
 
         <div class="section-divider"></div>
 
-        <div class="sub-title">💬 评论 <span class="hint">({{ data.comments.length }}条)</span></div>
+        <div class="sub-title">💬 {{ $t('common.comments') }} <span class="hint">({{ data.comments.length }}{{ $t('common.count') }})</span></div>
         <div class="form-row" style="margin-bottom:8px;">
             <div class="form-group" style="margin-bottom:0;">
-                <label style="font-size:12px;">显示评论数</label>
+                <label style="font-size:12px;">{{ $t('common.showCommentCount') }}</label>
                 <input class="form-input" type="number" min="0" :value="data.commentsCount || data.comments.length" @input="updateField('commentsCount', parseInt($event.target.value)||0)" style="font-size:12px;width:80px;">
             </div>
         </div>
@@ -133,62 +133,62 @@ const YouTubeEditor = {
                 <div class="drag-handle">⋮⋮</div>
                 <div class="comment-header">
                     <span>
-                        评论 #{{ idx + 1 }}
+                        {{ $t('rd.commentHash') }}{{ idx + 1 }}
                         <label v-if="idx === 0" style="font-size:11px; color:#606060; margin-left:8px;">
-                            <input type="checkbox" :checked="comment.isPinned" @change="updateComment(idx, 'isPinned', $event.target.checked)"> 置顶
+                            <input type="checkbox" :checked="comment.isPinned" @change="updateComment(idx, 'isPinned', $event.target.checked)"> {{ $t('yt.pinned') }}
                         </label>
                     </span>
                     <button class="remove-comment" @click="removeComment(idx)">✕</button>
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <input class="form-input" :value="comment.author" @input="updateComment(idx, 'author', $event.target.value)" placeholder="评论者" style="font-size:13px;">
+                    <input class="form-input" :value="comment.author" @input="updateComment(idx, 'author', $event.target.value)" :placeholder="$t('yt.commenter')" style="font-size:13px;">
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
                     <label class="btn btn-small btn-outline" style="cursor:pointer;font-size:11px;padding:1px 6px;">
-                        📷 头像
+                        {{ $t('yt.cameraAvatar') }}
                         <input type="file" accept="image/*" @change="handleCommentAvatar(idx, $event)" hidden>
                     </label>
                     <div v-if="comment.avatar" style="position:relative;width:28px;height:28px;">
                         <img :src="comment.avatar" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">
                         <button style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:#ff3b30;color:#fff;border:none;font-size:7px;cursor:pointer;line-height:1;" @click.stop="updateComment(idx, 'avatar', '')">✕</button>
                     </div>
-                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" placeholder="外部头像链接" style="font-size:11px;flex:1;">
+                    <input class="form-input" :value="comment.avatarUrl" @input="updateComment(idx, 'avatarUrl', $event.target.value)" :placeholder="$t('yt.phExternalAvatarLink')" style="font-size:11px;flex:1;">
                 </div>
                 <div class="form-group" style="margin-bottom:8px;">
-                    <textarea class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" placeholder="评论内容" rows="2" style="font-size:13px;min-height:40px;"></textarea>
+                    <textarea class="form-input" :value="comment.text" @input="updateComment(idx, 'text', $event.target.value)" :placeholder="$t('common.phCommentContent')" rows="2" style="font-size:13px;min-height:40px;"></textarea>
                 </div>
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">赞</label>
+                        <label style="font-size:12px;">{{ $t('common.like') }}</label>
                         <input class="form-input" type="number" :value="comment.likes" @input="updateComment(idx, 'likes', parseInt($event.target.value)||0)" min="0" style="font-size:13px;">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:12px;">时间</label>
+                        <label style="font-size:12px;">{{ $t('common.timeLabel') }}</label>
                         <input class="form-input" :value="comment.timeAgo" @input="updateComment(idx, 'timeAgo', $event.target.value)" style="font-size:13px;">
                     </div>
                 </div>
                 <!-- 嵌套回复 -->
                 <div style="margin-top:10px;padding-left:14px;border-left:2px solid #e9ecef;">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">↳ 回复 ({{ (comment.replies || []).length }})</span>
-                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">+ 添加回复</button>
+                        <span style="font-size:12px;font-weight:600;color:#8e8e93;">{{ $t('common.replies') }} ({{ (comment.replies || []).length }})</span>
+                        <button style="font-size:11px;color:#007aff;background:none;border:none;cursor:pointer;padding:2px 6px;" @click="addReply(idx)">{{ $t('common.addReply') }}</button>
                     </div>
                     <div v-for="(reply, rIdx) in (comment.replies || [])" :key="rIdx" 
                         style="background:#f8f9fa;border-radius:6px;padding:8px 10px;margin-bottom:6px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                            <span style="font-size:11px;color:#8e8e93;">回复 #{{ rIdx + 1 }}</span>
+                            <span style="font-size:11px;color:#8e8e93;">{{ $t('common.replyHash') }}{{ rIdx + 1 }}</span>
                             <button style="font-size:11px;color:#ff3b30;background:none;border:none;cursor:pointer;" @click="removeReply(idx, rIdx)">✕</button>
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.author" @input="updateReply(idx, rIdx, 'author', $event.target.value)" placeholder="回复者" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.author" @input="updateReply(idx, rIdx, 'author', $event.target.value)" :placeholder="$t('common.replyer')" style="font-size:12px;padding:4px 8px;">
                         </div>
                         <div class="form-group" style="margin-bottom:4px;">
-                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" placeholder="回复内容" style="font-size:12px;padding:4px 8px;">
+                            <input class="form-input" :value="reply.text" @input="updateReply(idx, rIdx, 'text', $event.target.value)" :placeholder="$t('common.replyContent')" style="font-size:12px;padding:4px 8px;">
                         </div>
                     </div>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addComment">➕ 添加评论</button>
+            <button class="add-comment-btn" @click="addComment">{{ $t('common.addComment') }}</button>
         </div>
     </div>
     `,
@@ -332,7 +332,7 @@ const YouTubePreview = {
             <template v-else>
                 <div class="yt-player-placeholder">
                     <span class="yt-emoji-icon">▶</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="48" height="48" fill="rgba(255,255,255,0.8)"><path d="M8 5v14l11-7z"/></svg>
-                    <small>视频封面区域</small>
+                    <small>{{ $t('yt.videoCoverArea') }}</small>
                 </div>
             </template>
         </div>
@@ -340,9 +340,9 @@ const YouTubePreview = {
 
         <!-- Title -->
         <div class="yt-title-area">
-            <div class="yt-title">{{ data.title || '视频标题' }}</div>
+            <div class="yt-title">{{ data.title || $t('yt.videoTitle') }}</div>
             <div class="yt-meta-row">
-                <div class="yt-view-info">{{ formatViews(data.views) }}次观看 · {{ data.dateText || '今天' }}</div>
+                <div class="yt-view-info">{{ formatViews(data.views) }}{{ $t('yt.viewsCount') }} · {{ data.dateText || '今天' }}</div>
                 <div class="yt-actions">
                     <div class="yt-action-btn liked">
                         <span class="yt-emoji-icon">👍</span>
@@ -353,8 +353,8 @@ const YouTubePreview = {
                         <span class="yt-emoji-icon">👎</span>
                         <svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="#0f0f0f"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
                     </div>
-                    <div class="yt-action-btn"><span class="yt-emoji-icon">分享</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span class="yt-hd-icon-text">分享</span></div>
-                    <div class="yt-action-btn"><span class="yt-emoji-icon">下载</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="yt-hd-icon-text">下载</span></div>
+                    <div class="yt-action-btn"><span class="yt-emoji-icon">{{ $t('yt.share') }}</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg><span class="yt-hd-icon-text">{{ $t('yt.share') }}</span></div>
+                    <div class="yt-action-btn"><span class="yt-emoji-icon">{{ $t('yt.download') }}</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="yt-hd-icon-text">{{ $t('yt.download') }}</span></div>
                 </div>
             </div>
         </div>
@@ -369,33 +369,33 @@ const YouTubePreview = {
                     <div class="yt-channel-avatar-placeholder">{{ (data.channelName || 'U')[0] }}</div>
                 </template>
                 <div class="yt-channel-info">
-                    <div class="yt-channel-name">{{ data.channelName || '频道名称' }}</div>
-                    <div class="yt-channel-subs">{{ data.subscribers || '0' }}位订阅者</div>
+                    <div class="yt-channel-name">{{ data.channelName || $t('yt.channelName') }}</div>
+                    <div class="yt-channel-subs">{{ data.subscribers || '0' }}{{ $t('yt.subscribersCount') }}</div>
                 </div>
             </div>
-            <button class="yt-subscribe-btn">订阅</button>
+            <button class="yt-subscribe-btn">{{ $t('yt.subscribe') }}</button>
         </div>
 
         <!-- Description -->
         <div class="yt-description" v-if="data.description">
-            <div class="yt-description-stats">{{ formatViews(data.views) }}次观看 · {{ data.dateText || '今天' }}</div>
+            <div class="yt-description-stats">{{ formatViews(data.views) }}{{ $t('yt.viewsCount') }} · {{ data.dateText || '今天' }}</div>
             <div class="yt-description-text" v-html="renderDescription(data.description)"></div>
-            <span class="yt-description-expand">展开</span>
+            <span class="yt-description-expand">{{ $t('yt.expand') }}</span>
         </div>
 
         <!-- Comments -->
         <div class="yt-comments">
             <div class="yt-comments-header">
-                <span class="yt-comments-count">{{ data.commentsCount || data.comments.length }} 条评论</span>
+                <span class="yt-comments-count">{{ data.commentsCount || data.comments.length }} {{ $t('common.count') }}{{ $t('common.comments') }}</span>
                 <span class="yt-sort-btn">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#0f0f0f" stroke-width="2"><path d="M3 4h18M3 12h12M3 20h6"/></svg>
-                    排序方式
+                    {{ $t('yt.sortBy') }}
                 </span>
             </div>
             <div v-for="(comment, idx) in data.comments" :key="idx">
                 <div class="yt-comment" :class="{ 'yt-comment-pinned': comment.isPinned }">
                     <template v-if="comment.isPinned">
-                        <div class="yt-pinned-label"><span class="yt-emoji-icon">📌</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="#606060"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg> 由作者置顶</div>
+                        <div class="yt-pinned-label"><span class="yt-emoji-icon">📌</span><svg class="yt-hd-icon" viewBox="0 0 24 24" width="14" height="14" fill="#606060"><path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/></svg> {{ $t('yt.pinnedByAuthor') }}</div>
                     </template>
                     <template v-if="comment.avatar || comment.avatarUrl">
                         <img class="yt-comment-avatar" :src="comment.avatar || comment.avatarUrl" alt="">
@@ -419,7 +419,7 @@ const YouTubePreview = {
                                 <span class="yt-emoji-icon">👎</span>
                                 <svg class="yt-hd-icon" viewBox="0 0 24 24" width="16" height="16" fill="#606060"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
                             </div>
-                            <span class="yt-comment-action" style="margin-left:8px;">回复</span>
+                            <span class="yt-comment-action" style="margin-left:8px;">{{ $t('common.reply') }}</span>
                         </div>
                     </div>
                 </div>

@@ -1218,6 +1218,27 @@ textarea.form-input {
     background: rgba(0, 122, 255, 0.06);
 }
 
+/* ===== 页脚 ===== */
+.app-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 11px;
+    color: #aaa;
+    border-top: 1px solid var(--border-light);
+    flex-shrink: 0;
+}
+
+.footer-divider {
+    color: #ddd;
+}
+
+.footer-slogan {
+    font-style: italic;
+}
+
 /* ===== 移动端响应式 ===== */
 @media (max-width: 768px) {
     .mobile-hide {

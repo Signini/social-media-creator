@@ -49,50 +49,50 @@ const WeChatMomentsEditor = {
     template: `
     <div class="wechat-moments-editor">
         <!-- 页面设置 -->
-        <div class="sub-title">🏠 页面设置</div>
+        <div class="sub-title">🏠 {{ $t('wm.pageSettings') }}</div>
         <div class="form-group">
-            <label>封面图</label>
+            <label>{{ $t('wm.coverImage') }}</label>
             <div class="image-upload" :class="{ 'has-image': data.coverImage }" @click="$refs.coverInput.click()" style="width:100%;height:80px;border-radius:6px;">
                 <template v-if="data.coverImage">
                     <img :src="data.coverImage" alt="cover" style="border-radius:6px;">
                     <button class="remove-image" @click.stop="updateField('coverImage', '')">✕</button>
                 </template>
                 <div v-else class="upload-placeholder">
-                    <span>📷</span><small>上传封面图</small>
+                    <span>📷</span><small>{{ $t('wm.uploadCover') }}</small>
                 </div>
             </div>
             <input type="file" ref="coverInput" accept="image/*" @change="handleUpload($event, 'coverImage')" hidden>
             <div class="ext-url-row">
                 <span class="ext-url-label">🔗</span>
-                <input class="form-input ext-url-input" :value="data.coverImageUrl" @input="updateField('coverImageUrl', $event.target.value)" placeholder="外部封面图链接">
+                <input class="form-input ext-url-input" :value="data.coverImageUrl" @input="updateField('coverImageUrl', $event.target.value)" :placeholder="$t('wm.externalCoverLink')">
             </div>
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>主人头像</label>
+                <label>{{ $t('wm.ownerAvatar') }}</label>
                 <div class="image-upload" :class="{ 'has-image': data.ownerAvatar }" @click="$refs.ownerAvatarInput.click()" style="width:60px;height:60px;border-radius:6px;">
                     <template v-if="data.ownerAvatar">
                         <img :src="data.ownerAvatar" alt="avatar" style="border-radius:6px;">
                         <button class="remove-image" @click.stop="updateField('ownerAvatar', '')">✕</button>
                     </template>
-                    <div v-else class="upload-placeholder"><span>📷</span><small>头像</small></div>
+                    <div v-else class="upload-placeholder"><span>📷</span><small>{{ $t('common.avatar') }}</small></div>
                 </div>
                 <input type="file" ref="ownerAvatarInput" accept="image/*" @change="handleUpload($event, 'ownerAvatar')" hidden>
                 <div class="ext-url-row">
                     <span class="ext-url-label">🔗</span>
-                    <input class="form-input ext-url-input" :value="data.ownerAvatarUrl" @input="updateField('ownerAvatarUrl', $event.target.value)" placeholder="外部头像链接">
+                    <input class="form-input ext-url-input" :value="data.ownerAvatarUrl" @input="updateField('ownerAvatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLink')">
                 </div>
             </div>
             <div class="form-group">
-                <label>主人昵称</label>
-                <input class="form-input" :value="data.ownerName" @input="updateField('ownerName', $event.target.value)" placeholder="朋友圈主人昵称">
+                <label>{{ $t('wm.ownerName') }}</label>
+                <input class="form-input" :value="data.ownerName" @input="updateField('ownerName', $event.target.value)" :placeholder="$t('wm.phOwnerName')">
             </div>
         </div>
 
         <div class="section-divider"></div>
 
         <!-- 动态列表 -->
-        <div class="sub-title">📋 动态列表 <span class="hint">({{ (data.posts || []).length }}条)</span></div>
+        <div class="sub-title">📋 {{ $t('wm.momentsList') }} <span class="hint">({{ (data.posts || []).length }}{{ $t('common.count') }})</span></div>
         <div class="comment-list">
             <div class="comment-item" v-for="(post, pidx) in (data.posts || [])" :key="pidx"
                 draggable="true"
@@ -103,7 +103,7 @@ const WeChatMomentsEditor = {
                 :style="{ borderLeft: '3px solid #576b95' }">
                 <div class="drag-handle">⋮⋮</div>
                 <div class="comment-header">
-                    <span><strong :style="{ color: '#576b95' }">📝 动态 {{ pidx + 1 }}</strong> <span class="hint">{{ post.authorName || '未命名' }}</span></span>
+                    <span><strong :style="{ color: '#576b95' }">{{ $t('wm.moment') }} {{ pidx + 1 }}</strong> <span class="hint">{{ post.authorName || $t('wm.unnamed') }}</span></span>
                     <div style="display:flex;gap:4px;">
                         <button class="remove-comment" style="width:20px;height:20px;font-size:11px;" @click="removePost(pidx)">✕</button>
                     </div>
@@ -112,32 +112,32 @@ const WeChatMomentsEditor = {
                 <!-- 帖子编辑区 -->
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:11px;">头像</label>
+                        <label style="font-size:11px;">{{ $t('common.avatar') }}</label>
                         <label class="btn btn-small btn-outline" style="cursor:pointer;font-size:10px;padding:1px 6px;">
                             📷<input type="file" accept="image/*" @change="handlePostAvatar(pidx, $event)" hidden>
                         </label>
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:11px;">昵称</label>
-                        <input class="form-input" :value="post.authorName" @input="updatePost(pidx, 'authorName', $event.target.value)" placeholder="作者昵称" style="font-size:12px;">
+                        <label style="font-size:11px;">{{ $t('wm.nickname') }}</label>
+                        <input class="form-input" :value="post.authorName" @input="updatePost(pidx, 'authorName', $event.target.value)" :placeholder="$t('wm.phAuthorName')" style="font-size:12px;">
                     </div>
                 </div>
                 <div class="ext-url-row" style="margin-top:2px;">
                     <span class="ext-url-label">🔗</span>
-                    <input class="form-input ext-url-input" :value="post.authorAvatarUrl" @input="updatePost(pidx, 'authorAvatarUrl', $event.target.value)" placeholder="外部头像链接" style="font-size:11px;">
+                    <input class="form-input ext-url-input" :value="post.authorAvatarUrl" @input="updatePost(pidx, 'authorAvatarUrl', $event.target.value)" :placeholder="$t('common.externalAvatarLink')" style="font-size:11px;">
                 </div>
 
                 <div class="form-group" style="margin-bottom:6px;margin-top:6px;">
-                    <textarea class="form-input" :value="post.text" @input="updatePost(pidx, 'text', $event.target.value)" placeholder="动态内容..." rows="2" style="font-size:12px;min-height:40px;"></textarea>
+                    <textarea class="form-input" :value="post.text" @input="updatePost(pidx, 'text', $event.target.value)" :placeholder="$t('wm.phMomentContent')" rows="2" style="font-size:12px;min-height:40px;"></textarea>
                 </div>
 
                 <!-- 图片管理 -->
                 <div style="margin-bottom:6px;">
-                    <label style="font-size:11px;">图片 ({{ (post.images || []).filter(i => i.image || i.imageUrl).length }}/9)</label>
+                    <label style="font-size:11px;">{{ $t('wm.images') }} ({{ (post.images || []).filter(i => i.image || i.imageUrl).length }}/9)</label>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">
                         <div v-for="(img, iidx) in (post.images || [])" :key="iidx" style="position:relative;width:44px;height:44px;">
                             <img v-if="img.image || img.imageUrl" :src="img.image || img.imageUrl" style="width:44px;height:44px;border-radius:3px;object-fit:cover;">
-                            <div v-else style="width:44px;height:44px;border-radius:3px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:10px;">空</div>
+                            <div v-else style="width:44px;height:44px;border-radius:3px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:10px;">{{ $t('wm.empty') }}</div>
                             <button style="position:absolute;top:-3px;right:-3px;width:12px;height:12px;border-radius:50%;background:#ff3b30;color:#fff;border:none;font-size:7px;cursor:pointer;line-height:1;" @click="removePostImage(pidx, iidx)">✕</button>
                         </div>
                         <label v-if="(post.images || []).length < 9" class="btn btn-small btn-outline" style="cursor:pointer;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:3px;">
@@ -148,38 +148,38 @@ const WeChatMomentsEditor = {
 
                 <div class="form-row" style="margin-bottom:0;">
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:11px;">位置</label>
-                        <input class="form-input" :value="post.location" @input="updatePost(pidx, 'location', $event.target.value)" placeholder="位置" style="font-size:11px;">
+                        <label style="font-size:11px;">{{ $t('wm.momentLocation') }}</label>
+                        <input class="form-input" :value="post.location" @input="updatePost(pidx, 'location', $event.target.value)" :placeholder="$t('wm.momentLocation')" style="font-size:11px;">
                     </div>
                     <div class="form-group" style="margin-bottom:0;">
-                        <label style="font-size:11px;">时间</label>
+                        <label style="font-size:11px;">{{ $t('wm.momentTime') }}</label>
                         <input class="form-input" :value="post.timestamp" @input="updatePost(pidx, 'timestamp', $event.target.value)" placeholder="2小时前" style="font-size:11px;">
                     </div>
                 </div>
 
                 <!-- 点赞 -->
                 <div style="margin-top:6px;">
-                    <label style="font-size:11px;">❤️ 点赞</label>
+                    <label style="font-size:11px;">{{ $t('wm.momentLikes') }}</label>
                     <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
-                        <input v-for="(like, lidx) in (post.likes || [])" :key="lidx" class="form-input" :value="like.name" @input="updatePostLike(pidx, lidx, $event.target.value)" placeholder="名字" style="font-size:11px;width:70px;padding:2px 6px;">
+                        <input v-for="(like, lidx) in (post.likes || [])" :key="lidx" class="form-input" :value="like.name" @input="updatePostLike(pidx, lidx, $event.target.value)" :placeholder="$t('wm.phName')" style="font-size:11px;width:70px;padding:2px 6px;">
                         <button class="remove-comment" style="width:16px;height:16px;font-size:9px;" @click="removePostLike(pidx, lidx)">✕</button>
-                        <button style="font-size:11px;color:#576b95;background:none;border:none;cursor:pointer;" @click="addPostLike(pidx)">+赞</button>
+                        <button style="font-size:11px;color:#576b95;background:none;border:none;cursor:pointer;" @click="addPostLike(pidx)">{{ $t('wm.addLike') }}</button>
                     </div>
                 </div>
 
                 <!-- 评论 -->
                 <div style="margin-top:6px;">
-                    <label style="font-size:11px;">💬 评论 ({{ (post.comments || []).length }})</label>
+                    <label style="font-size:11px;">{{ $t('wm.momentComments') }} ({{ (post.comments || []).length }})</label>
                     <div v-for="(cmt, cidx) in (post.comments || [])" :key="cidx" style="display:flex;gap:4px;align-items:center;margin-top:2px;">
-                        <input class="form-input" :value="cmt.username" @input="updatePostComment(pidx, cidx, 'username', $event.target.value)" placeholder="名字" style="font-size:11px;width:55px;padding:2px 4px;">
-                        <input class="form-input" :value="cmt.replyTo" @input="updatePostComment(pidx, cidx, 'replyTo', $event.target.value)" placeholder="回复" style="font-size:11px;width:45px;padding:2px 4px;">
-                        <input class="form-input" :value="cmt.text" @input="updatePostComment(pidx, cidx, 'text', $event.target.value)" placeholder="内容" style="font-size:11px;flex:1;padding:2px 4px;">
+                        <input class="form-input" :value="cmt.username" @input="updatePostComment(pidx, cidx, 'username', $event.target.value)" :placeholder="$t('wm.phName')" style="font-size:11px;width:55px;padding:2px 4px;">
+                        <input class="form-input" :value="cmt.replyTo" @input="updatePostComment(pidx, cidx, 'replyTo', $event.target.value)" :placeholder="$t('wm.phReplyTo')" style="font-size:11px;width:45px;padding:2px 4px;">
+                        <input class="form-input" :value="cmt.text" @input="updatePostComment(pidx, cidx, 'text', $event.target.value)" :placeholder="$t('wm.phCommentContent')" style="font-size:11px;flex:1;padding:2px 4px;">
                         <button class="remove-comment" style="width:14px;height:14px;font-size:8px;" @click="removePostComment(pidx, cidx)">✕</button>
                     </div>
-                    <button style="font-size:11px;color:#576b95;background:none;border:none;cursor:pointer;margin-top:2px;" @click="addPostComment(pidx)">+评论</button>
+                    <button style="font-size:11px;color:#576b95;background:none;border:none;cursor:pointer;margin-top:2px;" @click="addPostComment(pidx)">{{ $t('wm.addComment') }}</button>
                 </div>
             </div>
-            <button class="add-comment-btn" @click="addPost">➕ 添加动态</button>
+            <button class="add-comment-btn" @click="addPost">{{ $t('wm.addMoment') }}</button>
         </div>
     </div>
     `,
@@ -329,7 +329,7 @@ const WeChatMomentsPreview = {
             <img v-if="data.coverImage || data.coverImageUrl" :src="data.coverImage || data.coverImageUrl" class="wm-cover-img">
             <div v-else class="wm-cover-placeholder"></div>
             <div class="wm-owner-bar">
-                <span class="wm-owner-name">{{ data.ownerName || '用户' }}</span>
+                <span class="wm-owner-name">{{ data.ownerName || $t('wm.defaultUser') }}</span>
                 <div class="wm-owner-avatar" :style="ownerAvatarStyle">
                     <img v-if="data.ownerAvatar || data.ownerAvatarUrl" :src="data.ownerAvatar || data.ownerAvatarUrl">
                     <span v-else>{{ (data.ownerName || 'U')[0] }}</span>
@@ -348,7 +348,7 @@ const WeChatMomentsPreview = {
                         </div>
                     </div>
                     <div class="wm-content-col">
-                        <div class="wm-username">{{ post.authorName || '用户' }}</div>
+                        <div class="wm-username">{{ post.authorName || $t('wm.defaultUser') }}</div>
                         <div v-if="post.text" class="wm-text">{{ post.text }}</div>
 
                         <!-- 图片 -->
@@ -374,7 +374,7 @@ const WeChatMomentsPreview = {
                                 <div class="wm-comment" v-for="(cmt, cidx) in (post.comments || []).filter(c => c.text)" :key="cidx">
                                     <span class="wm-cmt-name">{{ cmt.username || '匿名' }}</span>
                                     <template v-if="cmt.replyTo">
-                                        <span class="wm-cmt-reply"> 回复 </span>
+                                        <span class="wm-cmt-reply"> {{ $t('wm.replyLabel') }} </span>
                                         <span class="wm-cmt-name">{{ cmt.replyTo }}</span>
                                     </template>
                                     <span class="wm-cmt-text">: {{ cmt.text }}</span>
