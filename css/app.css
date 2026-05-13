@@ -40,12 +40,14 @@ body {
     line-height: 1.5;
     overflow: hidden;
     height: 100vh;
+    height: 100dvh;
 }
 
 #app {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
 }
 
 /* Header */
@@ -1197,6 +1199,8 @@ textarea.form-input {
     left: 0;
     right: 0;
     height: 50px;
+    height: calc(50px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     background: #fff;
     border-top: 1px solid var(--border-color);
     z-index: 200;
@@ -1275,6 +1279,7 @@ textarea.form-input {
     .app-main {
         flex-direction: column;
         padding-bottom: 50px;
+        padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
     .editor-panel {
@@ -1347,6 +1352,7 @@ textarea.form-input {
     .universal-layout {
         flex-direction: column;
         padding-bottom: 50px;
+        padding-bottom: calc(50px + env(safe-area-inset-bottom, 0px));
     }
 
     .universal-sidebar {
@@ -1393,5 +1399,10 @@ textarea.form-input {
     /* View toggle */
     .view-toggle {
         flex-shrink: 0;
+    }
+
+    /* Hide footer on mobile — tab bar replaces it */
+    .app-footer {
+        display: none;
     }
 }
